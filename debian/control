@@ -1,0 +1,49 @@
+Source: openstack-meta-packages
+Section: net
+Priority: extra
+Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
+Uploaders: Loic Dachary (OuoU) <loic@debian.org>,
+           Julien Danjou <acid@debian.org>,
+           Thomas Goirand <zigo@debian.org>,
+           Ghe Rivero <ghe.rivero@stackops.com>,
+           Mehdi Abaakouk <sileht@sileht.net>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.3
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
+Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.gi
+Homepage: http://openstack.alioth.debian.org/
+
+Package: openstack-proxy-node
+Architecture: all
+Depends: ${misc:Depends},
+ cinder-api,
+ cinder-scheduler,
+ glance,
+ keystone,
+ memcached,
+ nova-api,
+ nova-scheduler,
+ openstack-dashboard,
+ rabbitmq-server
+Recommends: mysql-server
+Description: Metapackage to install an Openstack proxy node
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to implement
+ and massively scalable.
+ .
+ This metapackage will install a proxy node server, or management / API node,
+ composed of: Nova-API, Nova-Scheduler, Glance, Cinder-API, Cinder-Scheduler,
+ Keystone, RabbitMQ, Memcached, and openstack-dashboard.
+
+Package: openstack-compute-node
+Architecture: all
+Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-network, nova-api
+Description: Metapackage to install an Openstack copmute node
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to implement
+ and massively scalable.
+ .
+ This metapackage will install a KVM based compute node which will also run
+ nova-network and Nova-API (with only the metadata API enabled).

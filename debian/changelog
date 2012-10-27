@@ -1,0 +1,5 @@
+openstack-meta-packages (0.1) experimental; urgency=low
+
+  * Initial release.
+
+ -- Thomas Goirand <zigo@debian.org>  Sat, 27 Oct 2012 08:55:54 +0000
