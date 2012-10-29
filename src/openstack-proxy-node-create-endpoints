@@ -35,8 +35,8 @@ KEYSTONE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint ht
 NOVA_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=nova --type=compute --description="Nova Compute Service")
 
-NOVA_ENDPOINT_ID=$(pkgos_get_id --token ${AUTH_TOKEN} --endpoint http://192.168.206.130:35357/v2.0/ endpoint-create \
-	--region ${REGION} --service_id=abc0f03c02904c24abdcc3b7910e2eed \
+NOVA_ENDPOINT_ID=$(pkgos_get_id --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
+	--region ${REGION} --service_id=${NOVA_SERVICE_ID} \
 	--publicurl=http://${IP}:8774/v2/'%(tenant_id)s' \
 	--internalurl=http://${IP}:8774/v2/'%(tenant_id)s' \
 	--adminurl=http://${IP}:8774/v2/'%(tenant_id)s'
@@ -44,7 +44,7 @@ NOVA_ENDPOINT_ID=$(pkgos_get_id --token ${AUTH_TOKEN} --endpoint http://192.168.
 CINDER_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=cinder --type=volume --description="Cinder Volume Service"
 
-CINDER_ENDPOINT_ID=$(pkgos_get_id keystone --token 012345SECRET99TOKEN012345 --endpoint http://192.168.206.130:35357/v2.0/ endpoint-create \
+CINDER_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
 	--service_id=${CINDER_SERVICE_ID} \
 	--publicurl=http://${IP}:8776/v1/'%(tenant_id)s' \
@@ -54,18 +54,18 @@ CINDER_ENDPOINT_ID=$(pkgos_get_id keystone --token 012345SECRET99TOKEN012345 --e
 GLANCE_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=glance --type=image --description="Glance Image Service"
 
-GLANCE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://192.168.206.130:35357/v2.0/ endpoint-create \
+GLANCE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
 	--service_id=${IP} \
 	--publicurl=http://${IP}:9292/v1 \
 	--internalurl=http://${IP}:9292/v1 \
 	--adminurl=http://${IP}:9292/v1
 
-EC2_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}192.168.206.130:35357/v2.0/ service-create \
+EC2_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=ec2 --type=ec2 --description="EC2 Compatibility Layer")
 
-EC2_ENDPOINT_ID==$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://192.168.206.130:35357/v2.0/ endpoint-create \
-	--region RegionOne \
+EC2_ENDPOINT_ID==$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
+	--region ${REGION} \
 	--service_id=${EC2_SERVICE_ID} \
 	--publicurl=http://${IP}:8773/services/Cloud \
 	--internalurl=http://${IP}:8773/services/Cloud \
