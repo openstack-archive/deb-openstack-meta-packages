@@ -56,7 +56,7 @@ GLANCE_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http:
 
 GLANCE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
-	--service_id=${IP} \
+	--service_id=${GLANCE_SERVICE_ID} \
 	--publicurl=http://${IP}:9292/v1 \
 	--internalurl=http://${IP}:9292/v1 \
 	--adminurl=http://${IP}:9292/v1)
