@@ -39,10 +39,10 @@ NOVA_ENDPOINT_ID=$(pkgos_get_id --token ${AUTH_TOKEN} --endpoint http://${IP}:35
 	--region ${REGION} --service_id=${NOVA_SERVICE_ID} \
 	--publicurl=http://${IP}:8774/v2/'%(tenant_id)s' \
 	--internalurl=http://${IP}:8774/v2/'%(tenant_id)s' \
-	--adminurl=http://${IP}:8774/v2/'%(tenant_id)s'
+	--adminurl=http://${IP}:8774/v2/'%(tenant_id)s')
 
 CINDER_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
-	--name=cinder --type=volume --description="Cinder Volume Service"
+	--name=cinder --type=volume --description="Cinder Volume Service")
 
 CINDER_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
@@ -52,14 +52,14 @@ CINDER_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http
 	--adminurl=http://${IP}:8776/v1/'%(tenant_id)s')
 
 GLANCE_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
-	--name=glance --type=image --description="Glance Image Service"
+	--name=glance --type=image --description="Glance Image Service")
 
 GLANCE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
 	--service_id=${IP} \
 	--publicurl=http://${IP}:9292/v1 \
 	--internalurl=http://${IP}:9292/v1 \
-	--adminurl=http://${IP}:9292/v1
+	--adminurl=http://${IP}:9292/v1)
 
 EC2_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=ec2 --type=ec2 --description="EC2 Compatibility Layer")
@@ -69,4 +69,4 @@ EC2_ENDPOINT_ID==$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http:/
 	--service_id=${EC2_SERVICE_ID} \
 	--publicurl=http://${IP}:8773/services/Cloud \
 	--internalurl=http://${IP}:8773/services/Cloud \
-	--adminurl=http://${IP}:8773/services/Admin
+	--adminurl=http://${IP}:8773/services/Admin)
