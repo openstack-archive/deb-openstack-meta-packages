@@ -35,7 +35,7 @@ KEYSTONE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint ht
 NOVA_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=nova --type=compute --description="Nova Compute Service")
 
-NOVA_ENDPOINT_ID=$(pkgos_get_id --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
+NOVA_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} --service_id=${NOVA_SERVICE_ID} \
 	--publicurl=http://${IP}:8774/v2/'%(tenant_id)s' \
 	--internalurl=http://${IP}:8774/v2/'%(tenant_id)s' \
