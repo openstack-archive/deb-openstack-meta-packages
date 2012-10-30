@@ -13,3 +13,5 @@ if [ "$RET" = "true" ] ; then
 
     /usr/share/openstack-proxy-node/openstack-proxy-node-create-endpoints "$IP" "$REGION"
 fi
+
+#DEBHELPER#
