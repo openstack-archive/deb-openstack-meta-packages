@@ -24,6 +24,7 @@ Depends: ${misc:Depends},
  nova-api,
  nova-scheduler,
  openstack-dashboard,
+ openstack-pkg-tools,
  rabbitmq-server
 Recommends: mysql-server
 Description: Metapackage to install an Openstack proxy node
