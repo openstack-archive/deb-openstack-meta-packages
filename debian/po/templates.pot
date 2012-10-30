@@ -1,0 +1,54 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: openstack-meta-packages\n"
+"Report-Msgid-Bugs-To: openstack-meta-packages@packages.debian.org\n"
+"POT-Creation-Date: 2012-10-30 11:40+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../openstack-proxy-node.templates:1001
+msgid "Create endpoints now?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../openstack-proxy-node.templates:1001
+msgid "Please choose whether you want to create endpoints in Keystone now."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-proxy-node.templates:2001
+msgid "Name of the Openstack region to create:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-proxy-node.templates:2001
+msgid "Please specify a name for the region to create."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-proxy-node.templates:3001
+msgid "IP address of the node:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-proxy-node.templates:3001
+msgid "Please specify the IP address of the node to register."
+msgstr ""
