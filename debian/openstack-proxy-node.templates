@@ -1,0 +1,17 @@
+Template: openstack-proxy-node/create_endpoints
+Type: boolean
+Default: true
+_Description: Create endpoints now?
+ Please choose whether you want to create endpoints in Keystone now.
+
+Template: openstack-proxy-node/region
+Type: string
+Default: default-region
+_Description: Name of the Openstack region to create:
+ Please specify a name for the region to create.
+
+Template: openstack-proxy-node/ip_address
+Type: string
+Default: 127.0.0.1
+_Description: IP address of the node:
+ Please specify the IP address of the node to register.
