@@ -14,6 +14,7 @@ if [ "$1" = "configure" ] ; then
 	
 	/usr/share/openstack-proxy-node/openstack-proxy-node-create-endpoints "$IP" "$REGION"
     fi
+    db_stop
 fi
     
 #DEBHELPER#
