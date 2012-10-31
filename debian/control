@@ -25,6 +25,8 @@ Depends: ${misc:Depends},
  nova-scheduler,
  openstack-dashboard,
  openstack-pkg-tools,
+ quantum-plugin-openvswitch,
+ quantum-server,
  rabbitmq-server
 Recommends: mysql-server
 Description: Metapackage to install an Openstack proxy node
