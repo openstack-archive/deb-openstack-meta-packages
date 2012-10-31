@@ -2,6 +2,10 @@ Template: openstack-proxy-node/create_endpoints
 Type: boolean
 Default: true
 _Description: Create endpoints now?
+ To be able to reach each service (identity, compute, network, image, or
+ object-store), you have to fill the Keystone catalog with the name and
+ address of each services name and URL.
+ .
  Please choose whether you want to create endpoints in Keystone now.
 
 Template: openstack-proxy-node/region
