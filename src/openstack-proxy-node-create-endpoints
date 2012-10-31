@@ -65,9 +65,19 @@ GLANCE_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http
 EC2_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
 	--name=ec2 --type=ec2 --description="EC2 Compatibility Layer")
 
-EC2_ENDPOINT_ID==$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
+EC2_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
 	--region ${REGION} \
 	--service_id=${EC2_SERVICE_ID} \
 	--publicurl=http://${IP}:8773/services/Cloud \
 	--internalurl=http://${IP}:8773/services/Cloud \
 	--adminurl=http://${IP}:8773/services/Admin)
+
+QUANTUM_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
+	--name=quantum --type=network --description="Quantum networking service")
+
+QUANTUM_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
+	--region ${REGION} \
+	--service_id=${QUANTUM_SERVICE_ID} \
+	--publicurl=http://${IP}:9696/v1 \
+	--internalurl=http://${IP}:9696/v1 \
+	--adminurl=http://${IP}:9696/v1)
