@@ -11,8 +11,9 @@ if [ "$1" = "configure" ] ; then
 	REGION=$RET
 	db_get openstack-compute-node/ip_address || true
 	IP=$RET
-
-	/usr/share/openstack-compute-node/openstack-compute-node-create-endpoints "$IP" "$REGION"
+	db_get openstack-compute-node/auth-token || true
+	SERVICE_TOKEN=${RET}
+	/usr/share/openstack-compute-node/openstack-compute-node-create-endpoints "$IP" "$REGION" "$SERVICE_TOKEN"
     fi
     db_stop
 fi

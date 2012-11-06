@@ -19,3 +19,9 @@ Type: string
 Default: 127.0.0.1
 _Description: IP address of the node:
  Please specify the IP address of the node to register.
+
+Template: openstack-compute-node/auth-token
+Type: string
+_Description: Authentication server administration token:
+ Please enter the token to use with the authentication
+ server.

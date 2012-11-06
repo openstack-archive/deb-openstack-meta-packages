@@ -1,43 +1,48 @@
 #!/bin/sh
 
-set -e
+set -ex
 
-if [ -z "${1}" ] || [ -z "${2}" ] ; then
-	echo "Usage: $0 <ip-address> <region>"
-	exit 1
+if [ -z "${1}" ] || [ -z "${2}" ] || [ -z "${3}" ] ; then
+    echo "Usage: $0 <ip-address> <region> <auth-token>"
+    exit 1
 fi
 
 IP=${1}
 REGION=${2}
+AUTH_TOKEN=${3}
 
 if ! [ -r /usr/share/openstack-pkg-tools/pkgos_func ] ; then
-	echo "Could not include /usr/share/openstack-pkg-tools/pkgos_func: exiting"
-	exit 1
+    echo "Could not include /usr/share/openstack-pkg-tools/pkgos_func: exiting"
+    exit 1
 fi
 . /usr/share/openstack-pkg-tools/pkgos_func
 
-pkgos_get_config /etc/keystone/keystone.conf admin_token DEFAULT
-if [ -z "${RET}" ] ; then
-	echo "No keystone admin token: exiting"
-	exit 1
+pkgos_get_config /etc/nova/api-paste.ini auth_host filter:authtoken
+AUTH_HOST=$RET
+
+if [ -z "$AUTH_HOST" ] || [ -z "$AUTH_TOKEN" ] ; then
+    echo "Missing Keystone credentials, exiting"
+    exit 1
 fi
-AUTH_TOKEN=${RET}
 
-NOVA_SERVICE_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
+SERVICE_ENDPOINT="http://$AUTH_HOST:35357/v2.0/"
+SERVICE_TOKEN=${AUTH_TOKEN}
+
+NOVA_SERVICE_ID=$(pkgos_get_id keystone --endpoint "${SERVICE_ENDPOINT}" service-create \
 	--name=nova --type=compute --description="Nova Compute Service")
+NOVA_ENDPOINT_ID=$(pkgos_get_id keystone \
+    --endpoint "${SERVICE_ENDPOINT}" endpoint-create \
+    --region ${REGION} --service_id=${NOVA_SERVICE_ID} \
+    --publicurl=http://${IP}:8774/v2/'%(tenant_id)s' \
+    --internalurl=http://${IP}:8774/v2/'%(tenant_id)s' \
+    --adminurl=http://${IP}:8774/v2/'%(tenant_id)s')
 
-NOVA_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
-	--region ${REGION} --service_id=${NOVA_SERVICE_ID} \
-	--publicurl=http://${IP}:8774/v2/'%(tenant_id)s' \
-	--internalurl=http://${IP}:8774/v2/'%(tenant_id)s' \
-	--adminurl=http://${IP}:8774/v2/'%(tenant_id)s')
-
-QUANTUM_SERVICE_ID=$(pkgos_get_id keystone  --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ service-create \
+QUANTUM_SERVICE_ID=$(pkgos_get_id keystone --endpoint "${SERVICE_ENDPOINT}" service-create \
 	--name=quantum --type=network --description="Quantum networking service")
-
-QUANTUM_ENDPOINT_ID=$(pkgos_get_id keystone --token ${AUTH_TOKEN} --endpoint http://${IP}:35357/v2.0/ endpoint-create \
-	--region ${REGION} \
-	--service_id=${QUANTUM_SERVICE_ID} \
-	--publicurl=http://${IP}:9696/v1 \
-	--internalurl=http://${IP}:9696/v1 \
-	--adminurl=http://${IP}:9696/v1)
+QUANTUM_ENDPOINT_ID=$(pkgos_get_id keystone \
+    --endpoint "${SERVICE_ENDPOINT}" endpoint-create \
+    --region ${REGION} \
+    --service_id=${QUANTUM_SERVICE_ID} \
+    --publicurl=http://${IP}:9696/v1 \
+    --internalurl=http://${IP}:9696/v1 \
+    --adminurl=http://${IP}:9696/v1)
