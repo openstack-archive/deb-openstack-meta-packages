@@ -22,6 +22,7 @@ Depends: ${misc:Depends},
  keystone,
  memcached,
  nova-api,
+ nova-cert,
  nova-scheduler,
  openstack-dashboard,
  openstack-pkg-tools,
@@ -41,7 +42,7 @@ Description: Metapackage to install an Openstack proxy node
 
 Package: openstack-compute-node
 Architecture: all
-Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, quantum-plugin-openvswitch-agent, nova-api
+Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, quantum-plugin-openvswitch-agent, nova-api, quantum-dhcp-agent, quantum-l3-agent
 Description: Metapackage to install an Openstack copmute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
