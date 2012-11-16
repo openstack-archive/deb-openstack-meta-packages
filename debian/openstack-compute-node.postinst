@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+if [ "$1" = "configure" ] ; then
+    db_get openstack-compute-node/create_endpoints || true
+    if [ "$RET" = "true" ] ; then
+	db_get openstack-compute-node/region || true
+	REGION=$RET
+	db_get openstack-compute-node/ip_address || true
+	IP=$RET
+	db_get openstack-compute-node/auth-token || true
+	SERVICE_TOKEN=${RET}
+	/usr/share/openstack-compute-node/openstack-compute-node-create-endpoints "$IP" "$REGION" "$SERVICE_TOKEN"
+    fi
+    db_stop
+fi
+
+#DEBHELPER#
