@@ -7,7 +7,7 @@ Uploaders: Loic Dachary (OuoU) <loic@debian.org>,
            Thomas Goirand <zigo@debian.org>,
            Ghe Rivero <ghe.rivero@stackops.com>,
            Mehdi Abaakouk <sileht@sileht.net>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), po-debconf
 Standards-Version: 3.9.3
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
 Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.gi
@@ -16,6 +16,7 @@ Homepage: http://openstack.alioth.debian.org/
 Package: openstack-proxy-node
 Architecture: all
 Depends: ${misc:Depends},
+ debconf,
  cinder-api,
  cinder-scheduler,
  glance,
