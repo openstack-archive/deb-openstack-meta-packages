@@ -20,7 +20,6 @@ Depends: ${misc:Depends},
  cinder-api,
  cinder-scheduler,
  glance,
- keystone,
  memcached,
  nova-api,
  nova-cert,
@@ -28,7 +27,7 @@ Depends: ${misc:Depends},
  openstack-dashboard-apache,
  openstack-pkg-tools,
  rabbitmq-server
-Recommends: mysql-server, quantum-plugin-openvswitch, quantum-server
+Recommends: keystone, mysql-server, quantum-plugin-openvswitch, quantum-server
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
