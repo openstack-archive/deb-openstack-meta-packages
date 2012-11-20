@@ -25,7 +25,7 @@ Depends: ${misc:Depends},
  nova-api,
  nova-cert,
  nova-scheduler,
- openstack-dashboard,
+ openstack-dashboard-apache,
  openstack-pkg-tools,
  rabbitmq-server
 Recommends: mysql-server, quantum-plugin-openvswitch, quantum-server
