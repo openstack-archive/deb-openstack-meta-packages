@@ -27,10 +27,8 @@ Depends: ${misc:Depends},
  nova-scheduler,
  openstack-dashboard,
  openstack-pkg-tools,
- quantum-plugin-openvswitch,
- quantum-server,
  rabbitmq-server
-Recommends: mysql-server
+Recommends: mysql-server, quantum-plugin-openvswitch, quantum-server
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -43,9 +41,8 @@ Description: Metapackage to install an Openstack proxy node
 
 Package: openstack-compute-node
 Architecture: all
-Depends: ${misc:Depends}, nova-compute-kvm, nova-compute,
- quantum-plugin-openvswitch-agent, nova-api, quantum-dhcp-agent,
- quantum-l3-agent, openstack-pkg-tools
+Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-api, openstack-pkg-tools
+Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network, quantum-dhcp-agent | nova-network
 Description: Metapackage to install an Openstack copmute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
