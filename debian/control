@@ -13,21 +13,58 @@ Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packag
 Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.gi
 Homepage: http://openstack.alioth.debian.org/
 
+Package: openstack-clients
+Architecture: all
+Depends: ${misc:Depends}, python-cinderclient, python-glanceclient, python-keystoneclient, python-novaclient, python-quantumclient, python-swiftclient
+Description: Metapackage to install all Openstack clients
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to implement
+ and massively scalable.
+ .
+ This metapackage will install all of the Openstack clients available for
+ remote controling block devices (Cinder), Image Service (Glance), Identity
+ (Keystone), Compute (Nova), Networking (Quantum) and Object Storage (Swift).
+
+Package: openstack-cloud-services
+Architecture: all
+Depends: ${misc:Depends}, memcached, rabbitmq-server, mysql-server
+Description: Metapackage to install all Openstack service dependencies
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to implement
+ and massively scalable.
+ .
+ This metapackage will install memcached, rabbitmq and MySQL servers, which
+ are all needed in order to run an Openstack cloud service.
+
+Package: openstack-cloud-identity
+Architecture: all
+Pre-Depends: openstack-cloud-services
+Depends: ${misc:Depends}, keystone
+Description: Metapackage to install an Openstack keystone
+  OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to implement
+ and massively scalable.
+ .
+ This metapackage will install keystone, and is needed because of the orders
+ in which things should be configured to install all of openstack at once.
+
 Package: openstack-proxy-node
 Architecture: all
+Pre-Depends: openstack-cloud-identity
 Depends: ${misc:Depends},
  debconf,
  cinder-api,
  cinder-scheduler,
  glance,
- memcached,
  nova-api,
  nova-cert,
  nova-scheduler,
  openstack-dashboard-apache,
- openstack-pkg-tools,
- rabbitmq-server
-Recommends: keystone, mysql-server, quantum-plugin-openvswitch, quantum-server
+ openstack-pkg-tools
+Recommends: quantum-plugin-openvswitch, quantum-server
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -42,7 +79,7 @@ Package: openstack-compute-node
 Architecture: all
 Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-api, openstack-pkg-tools
 Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network, quantum-dhcp-agent | nova-network
-Description: Metapackage to install an Openstack copmute node
+Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
  and private cloud providers regardless of size, by being simple to implement
@@ -50,3 +87,17 @@ Description: Metapackage to install an Openstack copmute node
  .
  This metapackage will install a KVM based compute node which will also run
  nova-network and Nova-API (with only the metadata API enabled).
+
+Package: openstack-toaster
+Architecture: all
+Pre-Depends: openstack-proxy-node, openstack-compute-node
+Depends: ${misc:Depends}
+Description: Metapackage to install all of Openstack services at once
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to
+ implement
+ and massively scalable.
+ .
+ This metapackage will install all Openstack server packages to run a cloud
+ on a single computer. Later, more computers can join the cloud.
