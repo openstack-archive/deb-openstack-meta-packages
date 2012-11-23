@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openstack-meta-packages\n"
 "Report-Msgid-Bugs-To: openstack-meta-packages@packages.debian.org\n"
-"POT-Creation-Date: 2012-10-30 11:40+0100\n"
+"POT-Creation-Date: 2012-11-23 18:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,36 +19,57 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../openstack-proxy-node.templates:1001
+#: ../openstack-compute-node.templates:1001
 msgid "Create endpoints now?"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../openstack-proxy-node.templates:1001
+#: ../openstack-compute-node.templates:1001
+msgid ""
+"To be able to reach each service (identity, compute, network, image, or "
+"object-store), you have to fill the Keystone catalog with the name and "
+"address of each services name and URL."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../openstack-compute-node.templates:1001
 msgid "Please choose whether you want to create endpoints in Keystone now."
 msgstr ""
 
 #. Type: string
 #. Description
-#: ../openstack-proxy-node.templates:2001
+#: ../openstack-compute-node.templates:2001
 msgid "Name of the Openstack region to create:"
 msgstr ""
 
 #. Type: string
 #. Description
-#: ../openstack-proxy-node.templates:2001
+#: ../openstack-compute-node.templates:2001
 msgid "Please specify a name for the region to create."
 msgstr ""
 
 #. Type: string
 #. Description
-#: ../openstack-proxy-node.templates:3001
+#: ../openstack-compute-node.templates:3001
 msgid "IP address of the node:"
 msgstr ""
 
 #. Type: string
 #. Description
-#: ../openstack-proxy-node.templates:3001
+#: ../openstack-compute-node.templates:3001
 msgid "Please specify the IP address of the node to register."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-compute-node.templates:4001
+msgid "Authentication server administration token:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../openstack-compute-node.templates:4001
+msgid "Please enter the token to use with the authentication server."
 msgstr ""
