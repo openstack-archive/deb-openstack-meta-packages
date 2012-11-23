@@ -28,7 +28,7 @@ Description: Metapackage to install all Openstack clients
 
 Package: openstack-cloud-services
 Architecture: all
-Depends: ${misc:Depends}, memcached, rabbitmq-server, mysql-server
+Depends: ${misc:Depends}, memcached, rabbitmq-server, mysql-server, ntp
 Description: Metapackage to install all Openstack service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -76,7 +76,7 @@ Description: Metapackage to install an Openstack proxy node
 
 Package: openstack-compute-node
 Architecture: all
-Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-api, openstack-pkg-tools
+Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-api, openstack-pkg-tools, ntp
 Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network, quantum-dhcp-agent | nova-network
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
