@@ -55,7 +55,6 @@ Package: openstack-proxy-node
 Architecture: all
 Pre-Depends: openstack-cloud-identity
 Depends: ${misc:Depends},
- debconf,
  cinder-api,
  cinder-scheduler,
  glance,
