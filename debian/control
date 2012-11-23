@@ -59,7 +59,6 @@ Depends: ${misc:Depends},
  cinder-scheduler,
  glance,
  nova-api,
- nova-cert,
  nova-xvpvncproxy,
  nova-scheduler,
  openstack-dashboard-apache,
@@ -77,7 +76,13 @@ Description: Metapackage to install an Openstack proxy node
 
 Package: openstack-compute-node
 Architecture: all
-Depends: ${misc:Depends}, nova-compute-kvm, nova-compute, nova-api, openstack-pkg-tools, ntp
+Depends: ${misc:Depends},
+ nova-api,
+ nova-cert,
+ nova-compute,
+ nova-compute-kvm,
+ ntp,
+ openstack-pkg-tools
 Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network, quantum-dhcp-agent | nova-network
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
