@@ -60,6 +60,7 @@ Depends: ${misc:Depends},
  glance,
  nova-api,
  nova-cert,
+ nova-xvpvncproxy,
  nova-scheduler,
  openstack-dashboard-apache,
  openstack-pkg-tools
