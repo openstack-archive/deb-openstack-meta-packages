@@ -59,8 +59,9 @@ Depends: ${misc:Depends},
  cinder-scheduler,
  glance,
  nova-api,
- nova-xvpvncproxy,
+ nova-console,
  nova-scheduler,
+ nova-xvpvncproxy,
  openstack-dashboard-apache,
  openstack-pkg-tools
 Recommends: quantum-plugin-openvswitch, quantum-server
