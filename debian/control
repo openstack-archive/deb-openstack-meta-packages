@@ -67,7 +67,7 @@ Depends: ${misc:Depends},
  nova-xvpvncproxy,
  openstack-dashboard-apache,
  openstack-pkg-tools
-Recommends: quantum-plugin-openvswitch, quantum-server
+Recommends: quantum-plugin-openvswitch, quantum-server, quantum-dhcp-agent
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -88,7 +88,7 @@ Depends: ${misc:Depends},
  nova-compute-kvm,
  ntp,
  openstack-pkg-tools
-Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network, quantum-dhcp-agent | nova-network
+Recommends: quantum-l3-agent | nova-network, quantum-plugin-openvswitch-agent | nova-network
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
