@@ -88,6 +88,7 @@ Depends: ${misc:Depends},
  nova-compute-kvm,
  ntp,
  openstack-pkg-tools
+Pre-Depends: mysql-client
 Recommends: quantum-plugin-openvswitch-agent | nova-network
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
