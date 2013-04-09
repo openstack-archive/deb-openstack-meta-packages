@@ -64,7 +64,7 @@ Depends: ${misc:Depends},
  nova-api,
  nova-console,
  nova-scheduler,
- nova-xvpvncproxy,
+ nova-conductor,
  openstack-dashboard-apache,
  openstack-pkg-tools
 Recommends: quantum-plugin-openvswitch, quantum-server, quantum-dhcp-agent, quantum-l3-agent
@@ -86,7 +86,8 @@ Depends: ${misc:Depends},
  nova-cert,
  nova-compute,
  nova-compute-kvm,
- nova-conductor,
+ nova-xvpvncproxy,
+ novnc,
  ntp,
  openstack-pkg-tools
 Pre-Depends: mysql-client
