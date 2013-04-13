@@ -1,3 +1,10 @@
+openstack-meta-packages (0.2) experimental; urgency=low
+
+  * Added Depends: nova-conductor in the openstack-proxy-node package.
+  * Moved Depends: nova-xvpvncproxy to the openstack-compute-node package.
+
+ -- Thomas Goirand <zigo@debian.org>  Sat, 13 Apr 2013 01:29:08 +0000
+
 openstack-meta-packages (0.1) experimental; urgency=low
 
   * Initial release.
