@@ -1,3 +1,9 @@
+openstack-meta-packages (0.3) experimental; urgency=low
+
+  * Fix typo in Vcs-Git (Closes: #705496).
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 16 Apr 2013 17:55:20 +0000
+
 openstack-meta-packages (0.2) experimental; urgency=low
 
   * Added Depends: nova-conductor in the openstack-proxy-node package.
