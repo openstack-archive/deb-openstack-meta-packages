@@ -10,7 +10,7 @@ Uploaders: Loic Dachary (OuoU) <loic@debian.org>,
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.3
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
-Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.gi
+Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.git
 Homepage: http://openstack.alioth.debian.org/
 
 Package: openstack-clients
