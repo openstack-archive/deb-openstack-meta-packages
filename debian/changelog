@@ -1,5 +1,6 @@
 openstack-meta-packages (0.3) experimental; urgency=low
 
+  * Uploading to unstable.
   * Fix typo in Vcs-Git (Closes: #705496).
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 16 Apr 2013 17:55:20 +0000
