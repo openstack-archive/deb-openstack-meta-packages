@@ -1,6 +1,7 @@
 openstack-meta-packages (0.5) unstable; urgency=low
 
   * Fixed the nova-consoleproxy dependency.
+  * Removed nova-console and added nova-consoleauth from -proxy-node.
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 23 May 2013 16:46:17 +0800
 
