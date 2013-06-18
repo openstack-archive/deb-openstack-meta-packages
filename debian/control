@@ -81,7 +81,6 @@ Package: openstack-compute-node
 Architecture: all
 Depends: ${misc:Depends},
  ceilometer-agent-compute,
- nova-api,
  nova-cert,
  nova-compute,
  nova-compute-kvm,

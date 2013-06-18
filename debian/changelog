@@ -1,3 +1,10 @@
+openstack-meta-packages (0.6) unstable; urgency=low
+
+  * Removed nova-api from the openstack-compute-node package, since the way to
+    run the metadata service is now through quantum.
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 18 Jun 2013 23:38:06 +0800
+
 openstack-meta-packages (0.5) unstable; urgency=low
 
   * Fixed the nova-consoleproxy dependency.
