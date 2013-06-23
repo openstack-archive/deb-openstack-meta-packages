@@ -65,8 +65,13 @@ Depends: ${misc:Depends},
  nova-conductor,
  nova-consoleproxy,
  openstack-dashboard-apache,
- openstack-pkg-tools
-Recommends: quantum-plugin-openvswitch, quantum-server, quantum-dhcp-agent, quantum-l3-agent, quantum-metadata-agent
+ openstack-pkg-tools,
+ quantum-plugin-openvswitch,
+ quantum-server,
+ quantum-dhcp-agent,
+ quantum-l3-agent,
+ quantum-metadata-agent,
+ quantum-plugin-openvswitch-agent
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -74,8 +79,8 @@ Description: Metapackage to install an Openstack proxy node
  and massively scalable.
  .
  This metapackage will install a proxy node server, or management / API node,
- composed of: Nova-API, Nova-Scheduler, Glance, Cinder-API, Cinder-Scheduler,
- Keystone, RabbitMQ, Memcached, and openstack-dashboard.
+ composed of: Nova-API, Nova-Scheduler, Glance, Keystone, Quantum (using
+ OpenVSwitch) RabbitMQ, Memcached, and openstack-dashboard.
 
 Package: openstack-compute-node
 Architecture: all
@@ -86,9 +91,9 @@ Depends: ${misc:Depends},
  nova-compute-kvm,
  novnc,
  ntp,
- openstack-pkg-tools
+ openstack-pkg-tools,
+ quantum-plugin-openvswitch-agent
 Pre-Depends: mysql-client
-Recommends: quantum-plugin-openvswitch-agent | nova-network
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -96,7 +101,7 @@ Description: Metapackage to install an Openstack compute node
  and massively scalable.
  .
  This metapackage will install a KVM based compute node which will also run
- nova-network and Nova-API (with only the metadata API enabled).
+ Quantum OVS Agent.
 
 Package: openstack-toaster
 Architecture: all
