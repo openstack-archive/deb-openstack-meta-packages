@@ -2,16 +2,14 @@ openstack-meta-packages (0.6) unstable; urgency=low
 
   * Removed nova-api from the openstack-compute-node package, since the way to
     run the metadata service is now through quantum.
-
- -- Thomas Goirand <zigo@debian.org>  Tue, 18 Jun 2013 23:38:06 +0800
-
-openstack-meta-packages (0.5) unstable; urgency=low
-
+  * Now using Quantum as stronger Depends and not just Recommends:.
+  * Added Heat in the proxy node.
+  * Ran wrap-and-sort.
   * Fixed the nova-consoleproxy dependency.
   * Removed nova-console and added nova-consoleauth from -proxy-node.
   * Removed cinder-api and cinder-scheduler from the -proxy-node.
 
- -- Thomas Goirand <zigo@debian.org>  Thu, 23 May 2013 16:46:17 +0800
+ -- Thomas Goirand <zigo@debian.org>  Tue, 18 Jun 2013 23:38:06 +0800
 
 openstack-meta-packages (0.4) unstable; urgency=low
 

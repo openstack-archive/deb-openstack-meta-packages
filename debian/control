@@ -3,10 +3,10 @@ Section: net
 Priority: extra
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
 Uploaders: Loic Dachary (OuoU) <loic@debian.org>,
-           Julien Danjou <acid@debian.org>,
-           Thomas Goirand <zigo@debian.org>,
-           Ghe Rivero <ghe.rivero@stackops.com>,
-           Mehdi Abaakouk <sileht@sileht.net>
+ Julien Danjou <acid@debian.org>,
+ Thomas Goirand <zigo@debian.org>,
+ Ghe Rivero <ghe.rivero@stackops.com>,
+ Mehdi Abaakouk <sileht@sileht.net>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.3
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
@@ -15,7 +15,13 @@ Homepage: http://openstack.alioth.debian.org/
 
 Package: openstack-clients
 Architecture: all
-Depends: ${misc:Depends}, python-cinderclient, python-glanceclient, python-keystoneclient, python-novaclient, python-quantumclient, python-swiftclient
+Depends: python-cinderclient,
+ python-glanceclient,
+ python-keystoneclient,
+ python-novaclient,
+ python-quantumclient,
+ python-swiftclient,
+ ${misc:Depends}
 Description: Metapackage to install all Openstack clients
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -28,7 +34,14 @@ Description: Metapackage to install all Openstack clients
 
 Package: openstack-cloud-services
 Architecture: all
-Depends: ${misc:Depends}, memcached, rabbitmq-server, mysql-server, ntp, dbconfig-common, openvswitch-datapath-dkms, mongodb-server
+Depends: dbconfig-common,
+ memcached,
+ mongodb-server,
+ mysql-server,
+ ntp,
+ openvswitch-datapath-dkms,
+ rabbitmq-server,
+ ${misc:Depends}
 Description: Metapackage to install all Openstack service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -41,7 +54,7 @@ Description: Metapackage to install all Openstack service dependencies
 Package: openstack-cloud-identity
 Architecture: all
 Pre-Depends: openstack-cloud-services
-Depends: ${misc:Depends}, keystone
+Depends: keystone, ${misc:Depends}
 Description: Metapackage to install an Openstack keystone
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -54,24 +67,28 @@ Description: Metapackage to install an Openstack keystone
 Package: openstack-proxy-node
 Architecture: all
 Pre-Depends: openstack-cloud-identity
-Depends: ${misc:Depends},
- ceilometer-agent-central,
+Depends: ceilometer-agent-central,
  ceilometer-api,
  ceilometer-collector,
  glance,
+ heat-api,
+ heat-api-cfn,
+ heat-api-cloudwatch,
  nova-api,
- nova-consoleauth,
- nova-scheduler,
  nova-conductor,
+ nova-consoleauth,
  nova-consoleproxy,
+ nova-scheduler,
  openstack-dashboard-apache,
  openstack-pkg-tools,
- quantum-plugin-openvswitch,
- quantum-server,
  quantum-dhcp-agent,
  quantum-l3-agent,
  quantum-metadata-agent,
- quantum-plugin-openvswitch-agent
+ quantum-plugin-openvswitch,
+ quantum-plugin-openvswitch-agent,
+ heat-engine,
+ quantum-server,
+ ${misc:Depends}
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -84,15 +101,15 @@ Description: Metapackage to install an Openstack proxy node
 
 Package: openstack-compute-node
 Architecture: all
-Depends: ${misc:Depends},
- ceilometer-agent-compute,
+Depends: ceilometer-agent-compute,
  nova-cert,
  nova-compute,
  nova-compute-kvm,
  novnc,
  ntp,
  openstack-pkg-tools,
- quantum-plugin-openvswitch-agent
+ quantum-plugin-openvswitch-agent,
+ ${misc:Depends}
 Pre-Depends: mysql-client
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
@@ -105,7 +122,7 @@ Description: Metapackage to install an Openstack compute node
 
 Package: openstack-toaster
 Architecture: all
-Pre-Depends: openstack-proxy-node, openstack-compute-node
+Pre-Depends: openstack-compute-node, openstack-proxy-node
 Depends: ${misc:Depends}
 Description: Metapackage to install all of Openstack services at once
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
