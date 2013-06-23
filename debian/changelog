@@ -8,6 +8,7 @@ openstack-meta-packages (0.6) unstable; urgency=low
   * Fixed the nova-consoleproxy dependency.
   * Removed nova-console and added nova-consoleauth from -proxy-node.
   * Removed cinder-api and cinder-scheduler from the -proxy-node.
+  * Bumped Standard-Version to 3.9.4.
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 18 Jun 2013 23:38:06 +0800
 
