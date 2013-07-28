@@ -20,7 +20,7 @@ Depends: python-cinderclient,
  python-heatclient,
  python-keystoneclient,
  python-novaclient,
- python-quantumclient,
+ python-neutronclient,
  python-swiftclient,
  ${misc:Depends}
 Description: Metapackage to install all Openstack clients
@@ -82,13 +82,13 @@ Depends: ceilometer-agent-central,
  nova-scheduler,
  openstack-dashboard-apache,
  openstack-pkg-tools,
- quantum-dhcp-agent,
- quantum-l3-agent,
- quantum-metadata-agent,
- quantum-plugin-openvswitch,
- quantum-plugin-openvswitch-agent,
+ neutron-dhcp-agent,
+ neutron-l3-agent,
+ neutron-metadata-agent,
+ neutron-plugin-openvswitch,
+ neutron-plugin-openvswitch-agent,
  heat-engine,
- quantum-server,
+ neutron-server,
  ${misc:Depends}
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
@@ -109,7 +109,7 @@ Depends: ceilometer-agent-compute,
  novnc,
  ntp,
  openstack-pkg-tools,
- quantum-plugin-openvswitch-agent,
+ neutron-plugin-openvswitch-agent,
  ${misc:Depends}
 Pre-Depends: mysql-client
 Description: Metapackage to install an Openstack compute node
