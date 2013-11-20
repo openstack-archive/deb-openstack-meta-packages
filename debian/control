@@ -2,15 +2,13 @@ Source: openstack-meta-packages
 Section: net
 Priority: extra
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
-Uploaders: Loic Dachary (OuoU) <loic@debian.org>,
- Julien Danjou <acid@debian.org>,
+Uploaders: Julien Danjou <acid@debian.org>,
  Thomas Goirand <zigo@debian.org>,
- Ghe Rivero <ghe.rivero@stackops.com>,
  Mehdi Abaakouk <sileht@sileht.net>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.4
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
-Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.git
+Vcs-Browser: http://git.gplhost.com/gitweb/?p=openstack/openstack-meta-packages.git;a=summary
+Vcs-Git: http://git.gplhost.com/openstack/openstack-meta-packages.git
 Homepage: http://openstack.alioth.debian.org/
 
 Package: openstack-clients
