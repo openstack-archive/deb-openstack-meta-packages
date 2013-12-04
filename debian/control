@@ -35,7 +35,7 @@ Package: openstack-cloud-services
 Architecture: all
 Depends: dbconfig-common,
  memcached,
- mongodb-server,
+ mongodb,
  mysql-server,
  ntp,
  openvswitch-datapath-dkms,
@@ -69,6 +69,8 @@ Pre-Depends: openstack-cloud-identity
 Depends: ceilometer-agent-central,
  ceilometer-api,
  ceilometer-collector,
+ ceilometer-alarm-evaluator,
+ ceilometer-alarm-notifier,
  glance,
  nova-api,
  nova-conductor,
