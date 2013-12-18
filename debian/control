@@ -35,7 +35,7 @@ Package: openstack-cloud-services
 Architecture: all
 Depends: dbconfig-common,
  memcached,
- mongodb,
+ mongodb | mongodb-10gen-unstable | mongodb-nightly | mongodb-stable | mongodb-unstable | mongodb-10gen,
  mysql-server,
  ntp,
  openvswitch-datapath-dkms,

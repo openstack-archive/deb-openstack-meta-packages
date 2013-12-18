@@ -3,6 +3,9 @@ openstack-meta-packages (0.7) UNRELEASED; urgency=low
   * Added missing python-heatclient dependency.
   * Adds ceilometer-alarm-evaluator & ceilometer-alarm-notifier to the
     openstack-proxy-node package.
+  * Added mongodb-10gen-unstable, mongodb-nightly, mongodb-stable,
+    mongodb-unstable and mongodb-10gen as possible candidates to replace
+    mongodb.
 
  -- Thomas Goirand <zigo@debian.org>  Sun, 23 Jun 2013 18:47:53 +0000
 
