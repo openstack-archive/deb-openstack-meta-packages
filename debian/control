@@ -130,3 +130,16 @@ Description: Metapackage to install all of Openstack services at once
  .
  This metapackage will install all Openstack server packages to run a cloud
  on a single computer. Later, more computers can join the cloud.
+
+Package: openstack-deploy
+Architecture: all
+Depends: ${misc:Depends}
+Description: Tools to deploy OpenStack
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to
+ implement
+ and massively scalable.
+ .
+ This package contains preseeder scripts and other deployment tools to setup an
+ OpenStack cloud quickly.
