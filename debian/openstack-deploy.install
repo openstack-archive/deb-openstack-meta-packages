@@ -1,2 +1,3 @@
-src/preseed-lib /usr/share/openstack-deploy
-src/mysql-remote-root /usr/share/openstack-proxy-node
+src/openstack-deploy	/usr/bin
+src/preseed-lib		/usr/share/openstack-deploy
+src/mysql-remote-root	/usr/share/openstack-deploy

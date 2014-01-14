@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -e
+
+ACTION=${1}
+
+OSINSTALL_RC=osinstallrc
+APTGET="apt-get -o Dpkg::Options::=--force-confnew --force-yes -fuy"
+
+osinstall_gen_pass () {
+	GENERATED_PASSWORD=$(dd if=/dev/random bs=64 count=1 2>|/dev/null | md5sum | awk '{print $1}')
+}
+
+osinstall_check_installed () {
+	local PKG_NAME
+	PKG_NAME=${1}
+	INSTALL_STRING=`dpkg -l ${PKG_NAME} | grep ^ii | awk '{print $2}'`
+	if [ "${INSTALL_STRING}" = ${PKG_NAME} ] ; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+osinstall_rcvalue () {
+	local RC_VARNAME RC_VARCONTENT RC_MESSAGE RC_ISPASS RC_DEFAULT
+	RC_VARNAME=${1}
+	RC_MESSAGE=${2}
+	RC_ISPASS=${3}
+	RC_DEFAULT=${4}
+	RC_VARCONTENT=${!RC_VARNAME}	# TODO: find a way to work out this in ISO sh
+	if [ -z "${RC_VARCONTENT}" ] ; then
+		echo -n "${RC_MESSAGE}"
+		read RC_VARCONTENT
+		if [ -z "${RC_VARCONTENT}" ]  && [ "${RC_ISPASS}" = "yes" ] ; then
+			osinstall_gen_pass
+			RC_VARCONTENT=${GENERATED_PASSWORD}
+		elif [ -z "${RC_VARCONTENT}" ]  && [ -n "${RC_DEFAULT}" ] ; then
+			RC_VARCONTENT=${RC_DEFAULT}
+		else
+			while [ -z "${RC_VARCONTENT}" ] ; do
+				echo -n "${RC_MESSAGE}"
+				read RC_VARCONTENT
+			done
+		fi
+		echo "${RC_VARNAME}=${RC_VARCONTENT}" >>${OSINSTALL_RC}
+		. ${OSINSTALL_RC}
+	fi
+}
+
+usage () {
+	echo "${0} <services|controller|compute|all-in-one>"
+	exit 1
+}
+
+if [ -r ${OSINSTALL_RC} ] ; then
+	. ${OSINSTALL_RC}
+else
+	echo "" >${OSINSTALL_RC}
+fi
+
+osinstall_mysql_server () {
+	osinstall_rcvalue RC_MYSQL_SERVER_PKG_NAME "MySQL package name [mysql-server-5.5]: " no mysql-server-5.5
+	osinstall_rcvalue RC_MYSQL_PASSWORD "MySQL server password [generated-password]: " yes
+	if ! osinstall_check_installed ${RC_MYSQL_SERVER_PKG_NAME} ; then
+echo "${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password password ${RC_MYSQL_PASSWORD}
+${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password seen true
+${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again password ${RC_MYSQL_PASSWORD}
+${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again seen true
+" | debconf-set-selections
+		${APTGET} ${RC_MYSQL_SERVER_PKG_NAME}
+	fi
+}
+
+case "${1}" in
+"controller")
+;;
+"compute")
+;;
+"all-in-one")
+	osinstall_mysql_server
+;;
+*)
+	usage
+;;
+esac

@@ -1,0 +1,218 @@
+#!/bin/sh
+
+set -e
+set -x
+
+APTGET="apt-get -o Dpkg::Options::=--force-confnew --force-yes -fuy"
+
+fix_debconf_and_dbconfig_common () {
+	$APTGET install -y debconf
+	echo "debconf debconf/priority select medium
+debconf debconf/priority seen true
+debconf debconf-apt-progress/title string fake
+debconf debconf-apt-progress/title seen true  
+debconf debconf-apt-progress/preparing string fake
+debconf debconf-apt-progress/preparing seen true
+" | debconf-set-selections
+	dpkg-reconfigure -f noninteractive debconf
+
+	$APTGET install -y dbconfig-common
+	echo "dbconfig-common dbconfig-common/remote-questions-default seen true
+dbconfig-common dbconfig-common/remote-questions-default boolean true
+dbconfig-common dbconfig-common/remember-admin-pass seen true
+dbconfig-common dbconfig-common/remember-admin-pass boolean true
+" | debconf-set-selections
+	dpkg-reconfigure -f noninteractive dbconfig-common
+}
+
+fix_man_db () {
+	echo "man-db man-db/install-setuid seen true
+man-db man-db/install-setuid boolean false
+" | debconf-set-selections
+}
+
+fix_ca_certs () {
+	echo "ca-certificates ca-certificates/trust_new_crts seen true
+ca-certificates ca-certificates/trust_new_crts select yes
+" | debconf-set-selections
+}
+
+install_mysql_server () {
+	echo "mysql-server-5.5 mysql-server/root_password password ${MYSQL_PASSWORD}
+mysql-server-5.5 mysql-server/root_password seen true
+mysql-server-5.5 mysql-server/root_password_again password ${MYSQL_PASSWORD}
+mysql-server-5.5 mysql-server/root_password_again seen true
+" | debconf-set-selections
+	$APTGET install -y mysql-server
+}
+
+install_keystone () {
+	echo "keystone keystone/configure_db boolean true
+keystone keystone/configure_db seen true
+keystone keystone/auth-token password ${KEYSTONE_AUTH_TOKEN}
+keystone keystone/auth-token seen true
+keystone keystone/create-admin-tenant boolean true
+keystone keystone/create-admin-tenant seen true
+keystone keystone/admin-user string admin
+keystone keystone/admin-user seen true
+keystone keystone/admin-email string root@localhost
+keystone keystone/admin-email seen true
+keystone keystone/admin-password password ${KEYSTONE_ADM_PASS}
+keystone keystone/admin-password seen true
+keystone keystone/admin-password-confirm password ${KEYSTONE_ADM_PASS}
+keystone keystone/admin-password-confirm seen true
+keystone keystone/admin-role-name string admin
+keystone keystone/admin-role-name seen true
+keystone keystone/admin-tenant-name string admin
+keystone keystone/admin-tenant-name seen true
+keystone keystone/register-endpoint boolean true
+keystone keystone/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
+keystone keystone/endpoint-ip seen true
+keystone keystone/region-name string ${KEYSTONE_REGION}
+keystone keystone/region-name seen true
+" | debconf-set-selections
+	set_dbconfig_conf keystone ${KEYSTONE_SQL_PASS} keystonedb keystone
+	DEBIAN_FRONTEND=noninteractive $APTGET install -y keystone
+}
+
+preseed_endpoint () {
+	local PKG_NAME TMPL_NAME
+	PKG_NAME=${1}
+	TMPL_NAME=${2}
+	echo "${1} ${2}/register-endpoint boolean true
+${1} ${2}/register-endpoint seen true
+${1} ${2}/keystone-ip string 127.0.0.1
+${1} ${2}/keystone-ip seen true
+${1} ${2}/keystone-auth-token password ${KEYSTONE_AUTH_TOKEN}
+${1} ${2}/keystone-auth-token seen true
+${1} ${2}/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
+${1} ${2}/endpoint-ip seen true
+${1} ${2}/region-name string ${KEYSTONE_REGION}
+${1} ${2}/region-name seen true
+" | debconf-set-selections
+}
+
+preseed_keystone_admin_creds () {
+	local PKG_NAME TMPL_NAME
+	PKG_NAME=${1}
+	TMPL_NAME=${2}
+	echo "${1} ${2}/auth-host string ${KEYSTONE_ENDPOINT_IP}
+${1} ${2}/auth-host seen true
+${1} ${2}/admin-tenant-name string admin
+${1} ${2}/admin-tenant-name seen true
+${1} ${2}/admin-user string admin
+${1} ${2}/admin-user seen true
+${1} ${2}/admin-password password ${KEYSTONE_ADM_PASS}
+${1} ${2}/admin-password seen true
+" | debconf-set-selections
+}
+
+preseed_glance () {
+	echo "glance-common glance/paste-flavor select keystone
+glance-common glance/paste-flavor seen true
+" | debconf-set-selections
+	preseed_endpoint glance-api glance
+	preseed_keystone_admin_creds glance-common glance
+	set_dbconfig_conf glance-common ${GLANCE_SQL_PASS} glancedb glance
+}
+
+preseed_quantum () {
+	INSTALL_TYPE=${1}
+	if [ "${INSTALL_TYPE}" = "single-node" ] ; then
+		NETWORK_TYPE="local"
+		TUNNELING="True"
+	else
+		NETWORK_TYPE="gre"
+		TUNNELING="False"
+	fi
+	echo "quantum-plugin-openvswitch quantum-plugin-openvswitch/tenant_network_type select ${NETWORK_TYPE}
+quantum-plugin-openvswitch quantum-plugin-openvswitch/tenant_network_type seen true
+quantum-plugin-openvswitch quantum-plugin-openvswitch/enable_tunneling select ${TUNNELING}
+quantum-plugin-openvswitch quantum-plugin-openvswitch/enable_tunneling seen true
+quantum-plugin-openvswitch quantum-plugin-openvswitch/tunnel_id_ranges string 1:1000
+quantum-plugin-openvswitch quantum-plugin-openvswitch/tunnel_id_ranges seen true
+" | debconf-set-selections
+	preseed_keystone_admin_creds quantum-common quantum
+	set_dbconfig_conf quantum-plugin-openvswitch ${QUANTUM_OVS_PLUG_SQL_PASS} quantumplugovsdb quantumplugovs
+	preseed_endpoint quantum-server quantum
+	preseed_keystone_admin_creds quantum-l3-agent quantum-l3-agent
+}
+
+preseed_nova () {
+	set_dbconfig_conf nova-common ${NOVA_COMMON_SQL_PASS} novadb nova
+	preseed_keystone_admin_creds nova-common nova
+	preseed_endpoint nova-api nova
+	echo "nova-common nova/active-api multiselect ec2, osapi_compute, metadata
+nova-common nova/active-api seen true
+" | debconf-set-selections
+}
+
+preseed_ceilometer () {
+	preseed_endpoint ceilometer-api ceilometer
+}
+
+preseed_cinder () {
+	set_dbconfig_conf cinder-common ${CINDER_COMMON_SQL_PASS} cinderdb cinder
+	preseed_keystone_admin_creds cinder-common cinder
+	preseed_endpoint cinder-api cinder
+}
+preseed_horizon () {
+	echo "openstack-dashboard-apache horizon/activate_vhost boolean true
+openstack-dashboard-apache horizon/activate_vhost seen true
+openstack-dashboard-apache horizon/use_ssl boolean true
+openstack-dashboard-apache horizon/use_ssl seen true
+" | debconf-set-selections
+}
+DEFROUTE_IF=`LC_ALL=C /sbin/route | grep default |awk -- '{ print $8 }'`
+DEFROUTE_IP=`LC_ALL=C ip addr show "${DEFROUTE_IF}" | grep inet | head -n 1 | awk '{print $2}' | cut -d/ -f1 | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
+
+# Install type possible values: single-node, proxy-node or compute-node
+INSTALL_TYPE=single-node
+
+# Feel free to change all values below
+MASTER_PASS="changeme"
+
+MYSQL_PASSWORD=${MASTER_PASS}
+KEYSTONE_AUTH_TOKEN=${MASTER_PASS}
+KEYSTONE_ADM_PASS=${MASTER_PASS}
+KEYSTONE_ENDPOINT_IP=${DEFROUTE_IP}
+KEYSTONE_REGION="regionOne"
+KEYSTONE_SQL_PASS=${MYSQL_PASSWORD}
+
+GLANCE_SQL_PASS=${MYSQL_PASSWORD}
+QUANTUM_OVS_PLUG_SQL_PASS=${MYSQL_PASSWORD}
+QUANTUM_L3_AGENT_SQL_PASS=${MYSQL_PASSWORD}
+NOVA_COMMON_SQL_PASS=${MYSQL_PASSWORD}
+CINDER_COMMON_SQL_PASS=${MYSQL_PASSWORD}
+
+fix_debconf_and_dbconfig_common
+fix_man_db
+#fix_ca_certs
+if [ "${INSTALL_TYPE}" = "compute-node" ] ; then
+	preseed_quantum ${INSTALL_TYPE}
+	preseed_nova
+else
+	install_mysql_server
+	$APTGET install -y openstack-cloud-services
+	install_keystone
+	preseed_glance
+	preseed_quantum ${INSTALL_TYPE}
+	preseed_nova
+	preseed_ceilometer
+	preseed_cinder
+	preseed_horizon
+fi
+
+case "${INSTALL_TYPE}" in
+"single-node")
+	DEBIAN_FRONTEND=noninteractive $APTGET install -y openstack-toaster
+;;
+"proxy-node")
+	DEBIAN_FRONTEND=noninteractive $APTGET install -y openstack-proxy-node
+;;
+"compute-node")
+	DEBIAN_FRONTEND=noninteractive $APTGET install -y openstack-compute-node
+;;
+esac
+
+exit 0
