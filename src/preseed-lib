@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e
-set -x
 
 if [ -z "${APTGET}" ] ; then
 	APTGET="apt-get -o Dpkg::Options::=--force-confnew --force-yes -fuy"
@@ -123,9 +122,10 @@ os_preseed_endpoint () {
 	TMPL_NAME=${2}
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
+	KEYSTONE_AUTH_TOKEN=${5}
 	echo "${PKG_NAME} ${TMPL_NAME}/register-endpoint boolean true
 ${PKG_NAME} ${TMPL_NAME}/register-endpoint seen true
-${PKG_NAME} ${TMPL_NAME}/keystone-ip string 127.0.0.1
+${PKG_NAME} ${TMPL_NAME}/keystone-ip string ${KEYSTONE_ENDPOINT_IP}
 ${PKG_NAME} ${TMPL_NAME}/keystone-ip seen true
 ${PKG_NAME} ${TMPL_NAME}/keystone-auth-token password ${KEYSTONE_AUTH_TOKEN}
 ${PKG_NAME} ${TMPL_NAME}/keystone-auth-token seen true
@@ -248,54 +248,56 @@ keystone keystone/region-name seen true
 }
 
 os_preseed_glance () {
-	local GLANCE_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS RBT_HOST RBT_LOGIN RBT_PASS
+	local GLANCE_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	GLANCE_SQL_PASS=${1}
 	MYSQL_PASSWORD=${2}
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
 	KEYSTONE_ADMIN_PASS=${5}
-	RBT_HOST=${6}
-	RBT_LOGIN=${7}
-	RBT_PASS=${8}
+	KEYSTONE_AUTH_TOKEN=${6}
+	RBT_HOST=${7}
+	RBT_LOGIN=${8}
+	RBT_PASS=${9}
 	echo "glance-common glance/paste-flavor select keystone
 glance-common glance/paste-flavor seen true
 " | debconf-set-selections
 	os_preseed_set_dbconfig_conf glance-common glance ${GLANCE_SQL_PASS} glancedb glance ${MYSQL_PASSWORD}
-	os_preseed_endpoint glance-api glance ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION}
+	os_preseed_endpoint glance-api glance ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken glance-common glance ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds glance-common glance ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
 }
 
 os_preseed_nova () {
-	local NOVA_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS RBT_HOST RBT_LOGIN RBT_PASS
+	local NOVA_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	NOVA_SQL_PASS=${1}
 	MYSQL_PASSWORD=${2}
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
 	KEYSTONE_ADMIN_PASS=${5}
-	RBT_HOST=${6}
-	RBT_LOGIN=${7}
-	RBT_PASS=${8}
+	KEYSTONE_AUTH_TOKEN=${6}
+	RBT_HOST=${7}
+	RBT_LOGIN=${8}
+	RBT_PASS=${9}
 	        echo "nova-common nova/active-api multiselect ec2, osapi_compute, metadata
 nova-common nova/active-api seen true
 " | debconf-set-selections
 	os_preseed_set_dbconfig_conf nova-common nova ${NOVA_SQL_PASS} novadb nova ${MYSQL_PASSWORD}
-	os_preseed_endpoint nova-api nova ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION}
+	os_preseed_endpoint nova-api nova ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken nova-common nova ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds nova-common nova ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
 }
 
 os_preseed_neutron () {
-	local NEUTRON_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS RBT_HOST RBT_LOGIN RBT_PASS
+	local NEUTRON_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	NEUTRON_SQL_PASS=${1}
 	MYSQL_PASSWORD=${2}
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
 	KEYSTONE_ADMIN_PASS=${5}
-	RBT_HOST=${6}
-	RBT_LOGIN=${7}
-	RBT_PASS=${8}
-
+	KEYSTONE_AUTH_TOKEN=${6}
+	RBT_HOST=${7}
+	RBT_LOGIN=${8}
+	RBT_PASS=${9}
 	INSTALL_TYPE="multi-node"
 	if [ "${INSTALL_TYPE}" = "single-node" ] ; then
 		NETWORK_TYPE="local"
@@ -321,31 +323,58 @@ neutron-common neutron/plugin-select seen true
 }
 
 os_preseed_cinder () {
-	local CINDER_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS RBT_HOST RBT_LOGIN RBT_PASS
+	local CINDER_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	CINDER_SQL_PASS=${1}
 	MYSQL_PASSWORD=${2}
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
 	KEYSTONE_ADMIN_PASS=${5}
-	RBT_HOST=${6} 
-	RBT_LOGIN=${7}
-	RBT_PASS=${8}
+	KEYSTONE_AUTH_TOKEN=${6}
+	RBT_HOST=${7}
+	RBT_LOGIN=${8}
+	RBT_PASS=${9}
 
 	os_preseed_set_dbconfig_conf cinder-common cinder ${CINDER_SQL_PASS} cinderdb cinder ${MYSQL_PASSWORD}
-	os_preseed_endpoint cinder-api cinder ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION}
+	os_preseed_endpoint cinder-api cinder ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken cinder-common cinder ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds cinder-common cinder ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
 }
 
 os_preseed_ceilometer () {
-	local KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS RBT_HOST RBT_LOGIN RBT_PASS
+	local KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	KEYSTONE_ENDPOINT_IP=${1}
 	KEYSTONE_REGION=${2}
 	KEYSTONE_ADMIN_PASS=${3}
-	RBT_HOST=${4}
-	RBT_LOGIN=${5}
-	RBT_PASS=${6}
-	os_preseed_endpoint ceilometer-api ceilometer ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION}
+	KEYSTONE_AUTH_TOKEN=${4}
+	RBT_HOST=${5}
+	RBT_LOGIN=${6}
+	RBT_PASS=${7}
+	os_preseed_endpoint ceilometer-api ceilometer ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken ceilometer-common ceilometer ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds ceilometer-common ceilometer ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
+}
+
+os_preseed_heat () {
+	local HEAT_SQL_PASS MYSQL_PASSWORD KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
+	HEAT_SQL_PASS=${1}
+	MYSQL_PASSWORD=${2}
+	KEYSTONE_ENDPOINT_IP=${3}
+	KEYSTONE_REGION=${4}
+	KEYSTONE_ADMIN_PASS=${5}
+	KEYSTONE_AUTH_TOKEN=${6}
+	RBT_HOST=${7} 
+	RBT_LOGIN=${8}
+	RBT_PASS=${9}
+	os_preseed_set_dbconfig_conf heat-common heat ${HEAT_SQL_PASS} heatdb heat ${MYSQL_PASSWORD}
+	os_preseed_endpoint heat-api heat ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
+	os_preseed_keystone_autotoken heat-common heat ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
+	os_preseed_rabbit_creds heat-common heat ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
+}
+
+os_pressed_horizon () {
+	echo "openstack-dashboard-apache horizon/activate_vhost boolean true
+openstack-dashboard-apache horizon/activate_vhost seen true
+openstack-dashboard-apache horizon/use_ssl boolean true
+openstack-dashboard-apache horizon/use_ssl seen true
+" | debconf-set-selections
 }

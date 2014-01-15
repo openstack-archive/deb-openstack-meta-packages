@@ -124,19 +124,32 @@ osinstall_keystone () {
 	os_install_keystone ${RC_KEYSTONE_AUTHTOKEN} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_SQL_PASS} ${RC_MYSQL_PASSWORD}
 }
 
-osinstall_glance () {
+osinstall_preseed_all () {
 	osinstall_rcvalue RC_GLANCE_SQL_PASS "Glance MySQL password [generated-password]: " yes
 	os_preseed_glance ${RC_GLANCE_SQL_PASS} ${RC_MYSQL_PASSWORD} \
-		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} \
+		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
-}
-
-osinstall_glance () {
+	osinstall_rcvalue RC_NEUTRON_SQL_PASS "Neutron MySQL password [generated-password]: " yes
+	os_preseed_neutron ${RC_NEUTRON_SQL_PASS} ${RC_MYSQL_PASSWORD} \
+		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 	osinstall_rcvalue RC_NOVA_SQL_PASS "Nova MySQL password [generated-password]: " yes
 	os_preseed_nova ${RC_NOVA_SQL_PASS} ${RC_MYSQL_PASSWORD} \
-		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} \
+		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+	osinstall_rcvalue RC_CINDER_SQL_PASS "Cinder MySQL password [generated-password]: " yes
+	os_preseed_cinder ${RC_CINDER_SQL_PASS} ${RC_MYSQL_PASSWORD} \
+		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+	os_preseed_ceilometer ${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+	osinstall_rcvalue RC_HEAT_SQL_PASS "Heat MySQL password [generated-password]: " yes
+	os_preseed_cinder ${RC_HEAT_SQL_PASS} ${RC_MYSQL_PASSWORD} \
+		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+	os_pressed_horizon
 }
+
 
 case "${1}" in
 "controller")
@@ -144,6 +157,7 @@ case "${1}" in
 	osinstall_install_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
+	osinstall_preseed_all
 ;;
 "compute")
 	os_pressed_misc
@@ -158,6 +172,7 @@ case "${1}" in
 	osinstall_install_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
+	osinstall_preseed_all
 ;;
 *)
 	usage
