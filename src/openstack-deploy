@@ -184,7 +184,7 @@ case "${1}" in
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_preseed_all
-	${APTGET} install openstack-proxy-node
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-proxy-node
 ;;
 "compute")
 	os_pressed_misc
@@ -192,7 +192,7 @@ case "${1}" in
 	osinstall_install_if_not_installed ntp
 	osinstall_install_if_not_installed python-argparse
 	osinstall_rcvalue_keystone_endpoint
-	${APTGET} install openstack-compute-node
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-compute-node
 ;;
 "all-in-one")
 	os_pressed_misc
@@ -203,7 +203,7 @@ case "${1}" in
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_preseed_all
-	${APTGET} install openstack-toaster
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-toaster
 ;;
 *)
 	usage
