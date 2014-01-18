@@ -300,6 +300,14 @@ os_preseed_nova () {
 nova-common nova/active-api seen true
 nova-consoleproxy nova-consoleproxy/daemon_type select spicehtml5
 nova-consoleproxy nova-consoleproxy/daemon_type seen true
+nova-common nova/neutron_url string http://${KEYSTONE_ENDPOINT_IP}:9696
+nova-common nova/neutron_url seen true
+nova-common nova/neutron_admin_tenant_name string admin
+nova-common nova/neutron_admin_tenant_name seen true
+nova-common nova/neutron_admin_username string admin
+nova-common nova/neutron_admin_username seen true
+nova-common nova/neutron_admin_username password ${KEYSTONE_ADMIN_PASS}
+nova-common nova/neutron_admin_username seen true
 " | debconf-set-selections
 	os_preseed_set_dbconfig_conf nova-common nova ${NOVA_SQL_PASS} novadb nova ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint nova-api nova ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
