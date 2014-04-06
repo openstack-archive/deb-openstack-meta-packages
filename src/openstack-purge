@@ -17,7 +17,7 @@ python-feedparser python-libvirt python-lockfile python-netaddr \
 python-paramiko python-qpid python-suds python-xenapi python-sqlite \
 python-pyudev python-requests python-daemon python-libxml2 python-pycurl \
 python-sqlalchemy-ext python-mysqldb python-django-nose \
-node-less python-dev python-mock pep8 python-prettytable python-jsonschema \
+python-dev python-mock pep8 python-prettytable python-jsonschema \
 python-httplib2 python-mox python-simplejson python-unittest2 python-lxml \
 curl python-all-dev python-flask python-ming python-stevedore libvirt-bin \
 python-pecan python-extras python-warlock \
