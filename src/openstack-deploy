@@ -44,8 +44,14 @@ osinstall_rcvalue () {
 	RC_VARCONTENT=${!RC_VARNAME}	# TODO: find a way to work out this in ISO sh
 	# using something like: eval "RC_VARCONTENT=\$$RC_VARNAME"
 	if [ -z "${RC_VARCONTENT}" ] ; then
-		echo -n "${RC_MESSAGE}"
-		read RC_VARCONTENT
+		if [ "${RC_ISPASS}" = "yes" ] && [ "${OS_INTERACTIVE}" = "no" ] ; then
+			echo "Skipping entering pass in non-interactive mode"
+		elif [ -n "${RC_DEFAULT}" ] && [ "${OS_INTERACTIVE}" = "no" ] ; then
+			echo "Skipping user customization of default value in non-interactive mode"
+		else
+			echo -n "${RC_MESSAGE}"
+			read RC_VARCONTENT
+		fi
 		if [ -z "${RC_VARCONTENT}" ]  && [ "${RC_ISPASS}" = "yes" ] ; then
 			osinstall_gen_pass
 			RC_VARCONTENT=${GENERATED_PASSWORD}
@@ -175,6 +181,13 @@ osinstall_preseed_compute () {
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 }
+
+if [ "${1}" = "--non-interactive" ] ; then
+	OS_INTERACTIVE="no"
+	shift
+else
+	OS_INTERACTIVE="yes"
+fi
 
 case "${1}" in
 "controller")
