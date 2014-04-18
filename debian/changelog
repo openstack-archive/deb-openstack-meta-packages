@@ -1,3 +1,9 @@
+openstack-meta-packages (0.8) unstable; urgency=medium
+
+  * Uploading to unstable.
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 18 Apr 2014 10:42:59 +0000
+
 openstack-meta-packages (0.7) experimental; urgency=medium
 
   * Added missing python-heatclient dependency.
