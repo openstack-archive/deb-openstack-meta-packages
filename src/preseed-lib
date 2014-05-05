@@ -32,7 +32,7 @@ dbc_install='true'
 dbc_upgrade='true'
 
 # dbc_remove: deconfigure database with dbconfig-common?
-#              set to anything but \"true\" to opt out of assistance
+#             set to anything but \"true\" to opt out of assistance
 dbc_remove=''
 
 # dbc_dbtype: type of underlying database to use
@@ -93,8 +93,6 @@ dbc_authmethod_user=''
 ##
 ## end postgresql specific settings
 ##
-
-
 " >/etc/dbconfig-common/${PKG_NAME}.conf
 	echo "${PKG_NAME} ${TMPL_NAME}/configure_db boolean true
 ${PKG_NAME} ${TMPL_NAME}/configure_db seen true
