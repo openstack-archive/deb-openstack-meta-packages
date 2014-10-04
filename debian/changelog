@@ -4,6 +4,7 @@ openstack-meta-packages (0.10) unstable; urgency=medium
     recommends: mostly everything is in the mainstream kernel now.
   * Downgraded memcached from depends to recommends, as it's not available
     in some arch (Closes: #763539).
+  * Added ceilometer and trove clients in the openstack-clients package.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 04 Oct 2014 11:50:26 +0000
 

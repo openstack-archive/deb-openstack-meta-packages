@@ -13,13 +13,15 @@ Homepage: http://openstack.alioth.debian.org/
 
 Package: openstack-clients
 Architecture: all
-Depends: python-cinderclient,
+Depends: python-ceilometerclient,
+         python-cinderclient,
          python-glanceclient,
          python-heatclient,
          python-keystoneclient,
          python-neutronclient,
          python-novaclient,
          python-swiftclient,
+         python-troveclient,
          ${misc:Depends}
 Description: Metapackage to install all Openstack clients
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
