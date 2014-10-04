@@ -1,3 +1,12 @@
+openstack-meta-packages (0.10) unstable; urgency=medium
+
+  * Downgraded openvswitch-datapath-dkms and memcached from depends to
+    recommends: mostly everything is in the mainstream kernel now.
+  * Downgraded memcached from depends to recommends, as it's not available
+    in some arch (Closes: #763539).
+
+ -- Thomas Goirand <zigo@debian.org>  Sat, 04 Oct 2014 11:50:26 +0000
+
 openstack-meta-packages (0.9) unstable; urgency=medium
 
   * Updated Vcs-Git URL.

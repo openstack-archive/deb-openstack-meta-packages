@@ -34,13 +34,12 @@ Description: Metapackage to install all Openstack clients
 Package: openstack-cloud-services
 Architecture: all
 Depends: dbconfig-common,
-         memcached,
          mongodb | mongodb-10gen-unstable | mongodb-nightly | mongodb-stable | mongodb-unstable | mongodb-10gen,
          mysql-server,
          ntp,
-         openvswitch-datapath-dkms,
          rabbitmq-server,
          ${misc:Depends}
+Recommends: memcached, openvswitch-datapath-dkms
 Description: Metapackage to install all Openstack service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
