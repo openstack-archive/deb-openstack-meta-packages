@@ -89,6 +89,6 @@ open-iscsi poppler-data qemu-keymaps reiserfsprogs scrub seabios sgml-base sharu
 vlan x11-common xfsprogs xml-core zerofree
 
 apt-get -y purge mysql-server mysql-server-5.5 mysql-server-core-5.5 mysql-client-5.5 mysql-common libmysqlclient18 \
-	libaio1 libdbd-mysql-perl libdbi-perl libnet-daemon-perl libplrpc-perl psmisc
+	libaio1 libdbd-mysql-perl libdbi-perl libnet-daemon-perl psmisc
 
 apt-get -y --purge autoremove
