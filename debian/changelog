@@ -1,3 +1,9 @@
+openstack-meta-packages (0.11) unstable; urgency=medium
+
+  * Removed libplrpc-perl from the list of packages to purge in openstack-purge
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 14 Oct 2014 23:08:40 +0800
+
 openstack-meta-packages (0.10) unstable; urgency=medium
 
   * Downgraded openvswitch-datapath-dkms and memcached from depends to

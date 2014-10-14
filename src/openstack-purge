@@ -38,7 +38,7 @@ libgomp1 libhtml-template-perl libitm1 libjs-jquery libjs-jquery-cookie \
 libjs-jquery-metadata libjs-jquery-tablesorter libjs-mochikit \
 libjs-sphinxdoc libjs-underscore libltdl7 libmagic1 libmpc2 \
 libmpfr4 libodbc1 libopts25 \
-libplrpc-perl libpython2.6 libpython2.7 libquadmath0 \
+libpython2.6 libpython2.7 libquadmath0 \
 libsasl2-modules libsctp1 libsqlite0 libv8-3.8.9.20 libxslt1.1 \
 libyaml-0-2 linux-headers-3.2.0-4-amd64 linux-headers-3.2.0-4-common \
 linux-headers-amd64 linux-kbuild-3.2 linux-libc-dev lksctp-tools make \
