@@ -1,0 +1,60 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          openstack-proxy-node-nat
+# Required-Start:    $all $network openstack-proxy-node-network
+# Required-Stop:     $network
+# Should-Start:      $local_fs
+# Should-Stop:       $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: A small script to initialise iptables to allow forwarding and masquerading.
+# Description:       A small script to initialise iptables to allow forwarding and masquerading.
+### END INIT INFO
+
+MODPROBE=/sbin/modprobe
+IPTABLES=/sbin/iptables
+EXTIF="br-ex"
+
+if ! [ -r /etc/default/openstack-proxy-node-network ] ; then
+	echo "Could not found /etc/default/openstack-proxy-node-network"
+	exit 0
+fi
+. /etc/default/openstack-proxy-node-network
+
+. /lib/lsb/init-functions
+
+case "$1" in
+start)
+	echo 1 >/proc/sys/net/ipv4/ip_forward
+
+	$MODPROBE ip_tables
+	$MODPROBE ip_conntrack
+	$MODPROBE ip_conntrack_ftp
+	$MODPROBE ip_conntrack_irc
+	$MODPROBE iptable_nat
+	$MODPROBE ip_nat_ftp
+
+	#$IPTABLES -P FORWARD DROP
+	#$IPTABLES -F FORWARD
+	#$IPTABLES -t nat -F
+
+	# Allow all connections OUT and only existing and related ones IN
+	$IPTABLES -I FORWARD -i ${EXTIF} -o ${MGMT_IF} -m state --state ESTABLISHED,RELATED -j ACCEPT
+	$IPTABLES -I FORWARD -i ${MGMT_IF} -s ${MGMT_NET_CIDR} -o ${EXTIF} -j ACCEPT
+
+	#$IPTABLES -t nat -A POSTROUTING -o $EXTIF -j MASQUERADE
+	$IPTABLES -t nat -I POSTROUTING -s ${MGMT_NET_CIDR} -o ${EXTIF} -j MASQUERADE
+;;
+stop)
+;;
+restart|reload|force-reload)
+	$0 stop
+	sleep 1
+	$0 start
+;;
+*)
+	echo 'Usage: $0 {start|stop|restart|reload}'
+	exit 1
+;;
+esac

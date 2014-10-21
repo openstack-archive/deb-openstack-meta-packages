@@ -1,4 +1,6 @@
-src/mysql-remote-root	/usr/share/openstack-deploy
-src/openstack-deploy	/usr/sbin
-src/openstack-purge	/usr/sbin
-src/preseed-lib		/usr/share/openstack-deploy
+src/mysql-remote-root			/usr/share/openstack-deploy
+src/openstack-deploy			/usr/sbin
+src/openstack-purge			/usr/sbin
+src/preseed-lib				/usr/share/openstack-deploy
+src/init.d/openstack-proxy-node-network	/usr/share/openstack-deploy
+src/init.d/openstack-proxy-node-nat	/usr/share/openstack-deploy

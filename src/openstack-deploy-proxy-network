@@ -1,0 +1,119 @@
+#!/bin/sh
+
+set -e
+set -x
+
+prompt_for_mgmt_network () {
+	echo -n "Please enter the IP of your management network [172.16.99.1/24]:"
+	read MGMT_IP_CIDR
+	if [ -z "${MGMT_IP_CIDR}" ] ; then
+		MGMT_IP_CIDR=172.16.99.1/24
+	fi
+	MGMT_NET_CIDR=`ipcalc ${MGMT_IP_CIDR} | grep Network: | awk '{print $2}'`
+	MGMT_NET=`echo ${MGMT_NET_CIDR} | cut -d'/' -f1`
+	MGMT_IP=`echo ${MGMT_IP_CIDR} | cut -d'/' -f1`
+	MGMT_MASK=`ipcalc ${MGMT_IP_CIDR} | grep Netmask: | awk '{print $2}'`
+	echo -n "Please enter the interface name for your MGNT net [eth1]:"
+	read MGMT_IF
+	if [ -z "${MGMT_IF}" ] ; then
+		MGMT_IF=eth1
+	fi
+}
+
+find_default_ip () {
+	local DEFROUTE_IF
+	echo "===> Detecting current IP configuration"
+	DEFROUTE_IF=`LC_ALL=C /sbin/route | grep default |awk -- '{ print $8 }' | cut -d" " -f1`
+	if [ -n "${DEFROUTE_IF}" ] ; then
+		DEFROUTE_IP=`LC_ALL=C ip addr show "${DEFROUTE_IF}" | grep inet | head -n 1 | awk '{print $2}' | cut -d/ -f1 | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
+		if [ -n ${DEFROUTE_IP} ] ; then
+			DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show eth0 | grep inet | head -n 1 | awk '{print $2}'`
+			DEFROUTE_MASK=`ipcalc ${DEFROUTE_IP_CIDR} | grep Netmask: | awk '{print $2}'`
+			DEFROUTE_GW=`LC_ALL=C /sbin/route | grep default | awk '{print $2}'`
+			echo "===> Founded the following network config: ${DEFROUTE_IP} netmask: ${DEFROUTE_MASK} gateway ${DEFROUTE_GW}"
+			echo "===> Writing it in /etc/default/openstack-proxy-node-network"
+			echo "# This file is used by /etc/init.d/openstack-proxy-node-network
+# to setup networking at boot time. The goal of this script is to
+# setup networking correctly in order to use tempest tests in a VM.
+#
+# So please do not report about correctness and policy compliance
+# if you aren't providing patches to improve. It's OK if it is a bit
+# hackish, the goal is just to run functional tempest tests
+
+DEFROUTE_IP=${DEFROUTE_IP}
+DEFROUTE_MASK=${DEFROUTE_MASK}
+DEFROUTE_GW=${DEFROUTE_GW}
+DEFROUTE_IP_CIDR=${DEFROUTE_IP_CIDR}
+
+MGMT_IF=${MGMT_IF}
+
+MGMT_NET=${MGMT_NET}
+MGMT_NET_CIDR=${MGMT_NET_CIDR}
+MGMT_IP=${MGMT_IP}
+MGMT_MASK=${MGMT_MASK}
+MGMT_IP_CIDR=${MGMT_IP_CIDR}
+" > /etc/default/openstack-proxy-node-network
+		else
+			echo "Could not find your default route IP address: exiting"
+			exit 1
+		fi
+	fi
+}
+
+install_and_start_network_init_script () {
+	echo "===> Installing OVS bridged network init script"
+	cp /usr/share/openstack-deploy/openstack-proxy-node-network /etc/init.d
+	chmod +x /etc/init.d/openstack-proxy-node-network
+	update-rc.d openstack-proxy-node-network defaults
+	echo "===> Starting OVS bridged network init script"
+	invoke-rc.d openstack-proxy-node-network start
+
+	echo "===> Installing MGMT network NAT init script"
+	cp /usr/share/openstack-deploy/openstack-proxy-node-nat /etc/init.d
+	chmod +x /etc/init.d/openstack-proxy-node-nat
+	update-rc.d openstack-proxy-node-nat defaults
+	echo "===> Starting MGMT network NAT init script"
+	invoke-rc.d openstack-proxy-node-nat
+}
+
+pkgos_get_id () {
+	SERVICE_ENDPOINT=${SERVICE_ENDPOINT:-http://127.0.0.1:35357/v2.0/} SERVICE_TOKEN=${AUTH_TOKEN} "$@" | awk '/ id / { print $4 }'
+}
+
+calc_host_min_max () {
+	local DIGIT1 DIGIT2 DIGIT3 DIGIT4
+	EXT_HOST_MAX=`ipcalc ${DEFROUTE_IP_CIDR} | grep HostMax: | awk '{print $2}'`
+	DIGIT1=`echo ${DEFROUTE_IP} | cut -d. -f1`
+	DIGIT2=`echo ${DEFROUTE_IP} | cut -d. -f2`
+	DIGIT3=`echo ${DEFROUTE_IP} | cut -d. -f3`
+	DIGIT4=`echo ${DEFROUTE_IP} | cut -d. -f4`
+	DIGIT4=$(( ${DIGIT4} + 1))
+	EXT_HOST_MIN="${DIGIT1}.${DIGIT2}.${DIGIT3}.${DIGIT4}"
+	EXT_NET_CIDR=`ipcalc ${DEFROUTE_IP_CIDR} | grep Network: | awk '{print $2}'`
+}
+
+setup_neutron_networking () {
+	# Create the LAN
+	LAN_NET=`pkgos_get_id neutron net-create testnetwork`
+	LAN_SUBNET=`pkgos_get_id neutron subnet-create testnetwork 10.0.0.0/24 -- --dns_nameservers list=true ${DEFROUTE_IP}`
+
+	# Create the existing physical network
+	EXT_NET=`pkgos_get_id neutron net-create ext_net -- --router:external=True`
+	EXT_SUBNET=`pkgos_get_id neutron subnet-create --allocation-pool start=${EXT_HOST_MIN},end=${EXT_HOST_MAX} ext_net ${EXT_NET_CIDR} -- --enable_dhcp=False`
+
+	# Create the router
+	ROUTER_ID=`pkgos_get_id neutron router-create testrouter`
+
+	# Attach the router on both sides
+	# First tell it should use ext_net as default gateway (this will allocate a floating IP)
+	neutron router-gateway-set ${ROUTER_ID} ${EXT_NET}
+
+	# Then set an interface for the router inside the LAN
+	neutron router-interface-add ${ROUTER_ID} ${LAN_SUBNET}
+}
+
+prompt_for_mgmt_network
+find_default_ip
+calc_host_min_max
+install_and_start_network_init_script
+setup_neutron_networking

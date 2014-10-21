@@ -1,0 +1,74 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          openstack-proxy-node-network
+# Required-Start:    $network $local_fs $remote_fs $syslog openvswitch-switch
+# Required-Stop:     $remote_fs openvswitch-switch quantum-server neutron-server
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: openstack-proxy-node-network
+# Description:       openstack-proxy-node-network
+### END INIT INFO
+
+# Thomas Goirand <zigo@debian.org>
+
+DESC="networking fixups"
+NAME="ext-network"
+. /lib/lsb/init-functions
+
+if ! [ -r /etc/default/openstack-proxy-node-network ] ; then
+	echo "Could not found /etc/default/openstack-proxy-node-network"
+	exit 0
+fi
+. /etc/default/openstack-proxy-node-network
+
+do_start() {
+	ovs-vsctl add-br br-ex
+	ovs-vsctl add-port br-ex eth0
+	ifconfig br-ex ${DEFROUTE_IP} netmask ${DEFROUTE_MASK} up
+	ifconfig eth0 0.0.0.0 up
+	route add default gw ${DEFROUTE_GW}
+	ip addr add ${DEFROUTE_IP_CIDR} dev br-ex
+
+	ifconfig ${MGMT_IF} ${MGMT_IP} netmask ${MGMT_MASK} up
+}
+
+do_stop() {
+	echo "Nothing to do"
+}
+
+case "$1" in
+start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	log_daemon_msg 0
+;;
+stop)
+	echo "nothing to do"
+;;
+status)
+	echo "Probably ok..."
+;;
+restart|force-reload)
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	0|1)
+		do_start
+		case "$?" in
+			0) log_end_msg 0 ;;
+			1) log_end_msg 1 ;; # Old process is still running
+			*) log_end_msg 1 ;; # Failed to start
+		esac
+	;;
+	*)
+		# Failed to stop
+		log_end_msg 1
+	;;
+	esac
+;;
+*)
+	echo "Usage: $0 {start|stop|status|restart|force-reload}" >&2
+	exit 3
+;;
+esac
+:
