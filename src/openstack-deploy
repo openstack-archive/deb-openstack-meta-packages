@@ -69,7 +69,7 @@ osinstall_rcvalue () {
 }
 
 usage () {
-	echo "${0} <services|controller|compute|all-in-one>"
+	echo "${0} [--non-interactive] <services|controller|compute|all-in-one>"
 	exit 1
 }
 
