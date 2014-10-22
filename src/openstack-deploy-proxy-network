@@ -27,7 +27,7 @@ find_default_ip () {
 	if [ -n "${DEFROUTE_IF}" ] ; then
 		DEFROUTE_IP=`LC_ALL=C ip addr show "${DEFROUTE_IF}" | grep inet | head -n 1 | awk '{print $2}' | cut -d/ -f1 | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
 		if [ -n ${DEFROUTE_IP} ] ; then
-			DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show eth0 | grep inet | head -n 1 | awk '{print $2}'`
+			DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show ${DEFROUTE_IF} | grep inet | head -n 1 | awk '{print $2}'`
 			DEFROUTE_MASK=`ipcalc ${DEFROUTE_IP_CIDR} | grep Netmask: | awk '{print $2}'`
 			DEFROUTE_GW=`LC_ALL=C /sbin/route | grep default | awk '{print $2}'`
 			echo "===> Founded the following network config: ${DEFROUTE_IP} netmask: ${DEFROUTE_MASK} gateway ${DEFROUTE_GW}"
