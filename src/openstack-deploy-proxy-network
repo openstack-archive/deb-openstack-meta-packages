@@ -73,7 +73,7 @@ install_and_start_network_init_script () {
 	chmod +x /etc/init.d/openstack-proxy-node-nat
 	update-rc.d openstack-proxy-node-nat defaults
 	echo "===> Starting MGMT network NAT init script"
-	invoke-rc.d openstack-proxy-node-nat
+	invoke-rc.d openstack-proxy-node-nat start
 }
 
 pkgos_get_id () {
