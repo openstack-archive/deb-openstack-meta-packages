@@ -3,9 +3,47 @@
 set -e
 set -x
 
+for i in $@ ; do
+	case "${1}" in
+	"--ext-host-min")
+		if [ -z "${2}" ] ; then echo "Parameter for option --ext-host-min is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		EXT_HOST_MIN=$2
+		shift
+		shift
+	;;
+	"--ext-host-max")
+		if [ -z "${2}" ] ; then echo "Parameter for option --ext-host-max is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		EXT_HOST_MAX=$2
+		shift
+		shift
+	;;
+	"--mgmt-ip-cidr")
+		if [ -z "${2}" ] ; then echo "Parameter for option --mgmt-ip-cidr is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		MGMT_IP_CIDR=$2
+		shift
+		shift
+	;;
+	"--mgmt-if")
+		if [ -z "${2}" ] ; then echo "Parameter for option --mgmt-if is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		MGMT_IF=$2
+		shift
+		shift
+	;;
+	esac
+done
+
+
+if [ ${DO_EXIT} = "yes" ] ; then
+	echo "Parameters not validated: will exit now!" > /dev/stderr
+	exit 1
+fi
+
+
 prompt_for_mgmt_network () {
-	echo -n "Please enter the IP of your management network [172.16.99.1/24]:"
-	read MGMT_IP_CIDR
+	if [ -z "${MGMT_IP_CIDR}" ] ; then
+		echo -n "Please enter the IP of your management network [172.16.99.1/24]:"
+		read MGMT_IP_CIDR
+	fi
 	if [ -z "${MGMT_IP_CIDR}" ] ; then
 		MGMT_IP_CIDR=172.16.99.1/24
 	fi
@@ -13,8 +51,10 @@ prompt_for_mgmt_network () {
 	MGMT_NET=`echo ${MGMT_NET_CIDR} | cut -d'/' -f1`
 	MGMT_IP=`echo ${MGMT_IP_CIDR} | cut -d'/' -f1`
 	MGMT_MASK=`ipcalc ${MGMT_IP_CIDR} | grep Netmask: | awk '{print $2}'`
-	echo -n "Please enter the interface name for your MGNT net [eth1]:"
-	read MGMT_IF
+	if [ -z "${MGMT_IF}" ] ; then
+		echo -n "Please enter the interface name for your MGNT net [eth1]:"
+		read MGMT_IF
+	fi
 	if [ -z "${MGMT_IF}" ] ; then
 		MGMT_IF=eth1
 	fi
@@ -82,34 +122,40 @@ pkgos_get_id () {
 
 calc_host_min_max () {
 	local DIGIT1 DIGIT2 DIGIT3 DIGIT4
-	EXT_HOST_MAX=`ipcalc ${DEFROUTE_IP_CIDR} | grep HostMax: | awk '{print $2}'`
-	DIGIT1=`echo ${DEFROUTE_IP} | cut -d. -f1`
-	DIGIT2=`echo ${DEFROUTE_IP} | cut -d. -f2`
-	DIGIT3=`echo ${DEFROUTE_IP} | cut -d. -f3`
-	DIGIT4=`echo ${DEFROUTE_IP} | cut -d. -f4`
-	DIGIT4=$(( ${DIGIT4} + 1))
-	EXT_HOST_MIN="${DIGIT1}.${DIGIT2}.${DIGIT3}.${DIGIT4}"
+	if [ -z "${EXT_HOST_MAX}" ] ; then
+		EXT_HOST_MAX=`ipcalc ${DEFROUTE_IP_CIDR} | grep HostMax: | awk '{print $2}'`
+	fi
+	if [ -z "${EXT_HOST_MIN}" ] ; then
+		DIGIT1=`echo ${DEFROUTE_IP} | cut -d. -f1`
+		DIGIT2=`echo ${DEFROUTE_IP} | cut -d. -f2`
+		DIGIT3=`echo ${DEFROUTE_IP} | cut -d. -f3`
+		DIGIT4=`echo ${DEFROUTE_IP} | cut -d. -f4`
+		DIGIT4=$(( ${DIGIT4} + 1))
+		EXT_HOST_MIN="${DIGIT1}.${DIGIT2}.${DIGIT3}.${DIGIT4}"
+	fi
 	EXT_NET_CIDR=`ipcalc ${DEFROUTE_IP_CIDR} | grep Network: | awk '{print $2}'`
 }
 
 setup_neutron_networking () {
-	# Create the LAN
-	LAN_NET=`pkgos_get_id neutron net-create testnetwork`
-	LAN_SUBNET=`pkgos_get_id neutron subnet-create testnetwork 10.0.0.0/24 -- --dns_nameservers list=true ${DEFROUTE_IP}`
+	# Map the existing physical network in Neutron
+	neutron net-create ext-net --shared --router:external=True --provider:physical_network external --provider:network_type flat
+	neutron subnet-create ext-net --name ext-subnet \
+		--allocation-pool start=${EXT_HOST_MIN},end=${EXT_HOST_MAX} \
+		--gateway ${DEFROUTE_GW} ${EXT_NET_CIDR} -- --enable_dhcp=False
 
-	# Create the existing physical network
-	EXT_NET=`pkgos_get_id neutron net-create ext_net -- --router:external=True`
-	EXT_SUBNET=`pkgos_get_id neutron subnet-create --allocation-pool start=${EXT_HOST_MIN},end=${EXT_HOST_MAX} ext_net ${EXT_NET_CIDR} -- --enable_dhcp=False`
+	# Create the demo LAN
+	LAN_NET=`pkgos_get_id neutron net-create demo-net`
+	LAN_SUBNET=`pkgos_get_id neutron subnet-create demo-net --name demo-subnet ${MGMT_NET_CIDR} -- --dns_nameservers list=true ${DEFROUTE_IP}`
 
 	# Create the router
-	ROUTER_ID=`pkgos_get_id neutron router-create testrouter`
+	neutron router-create demo-router
 
 	# Attach the router on both sides
-	# First tell it should use ext_net as default gateway (this will allocate a floating IP)
-	neutron router-gateway-set ${ROUTER_ID} ${EXT_NET}
+	# First attach the router to the demo tenant subnet:
+	neutron router-interface-add demo-router demo-subnet
 
-	# Then set an interface for the router inside the LAN
-	neutron router-interface-add ${ROUTER_ID} ${LAN_SUBNET}
+	# Attach the router to the external network by setting it as the gateway:
+	neutron router-gateway-set demo-router ext-net
 }
 
 prompt_for_mgmt_network
