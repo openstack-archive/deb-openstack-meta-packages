@@ -136,7 +136,7 @@ Description: Metapackage to install all of Openstack services at once
 
 Package: openstack-deploy
 Architecture: all
-Depends: ipcalc, ${misc:Depends}
+Depends: ipcalc, openstack-pkg-tools, ${misc:Depends}
 Description: Tools to deploy OpenStack
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public

@@ -92,6 +92,9 @@ MGMT_NET_CIDR=${MGMT_NET_CIDR}
 MGMT_IP=${MGMT_IP}
 MGMT_MASK=${MGMT_MASK}
 MGMT_IP_CIDR=${MGMT_IP_CIDR}
+
+TENANT_NET=${MGMT_NET}
+TENANT_NET_CIDR=${MGMT_NET_CIDR}
 " > /etc/default/openstack-proxy-node-network
 		else
 			echo "Could not find your default route IP address: exiting"
@@ -145,7 +148,7 @@ setup_neutron_networking () {
 
 	# Create the demo LAN
 	LAN_NET=`pkgos_get_id neutron net-create demo-net`
-	LAN_SUBNET=`pkgos_get_id neutron subnet-create demo-net --name demo-subnet ${MGMT_NET_CIDR} -- --dns_nameservers list=true ${DEFROUTE_IP}`
+	LAN_SUBNET=`pkgos_get_id neutron subnet-create demo-net --name demo-subnet ${TENANT_NET_CIDR} -- --dns_nameservers list=true ${DEFROUTE_IP}`
 
 	# Create the router
 	neutron router-create demo-router
