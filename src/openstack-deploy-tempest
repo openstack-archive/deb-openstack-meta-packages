@@ -44,53 +44,60 @@ osinstall_install_if_not_installed () {
 	fi
 }
 
-echo "===> Installing tempest and openstack-debian-images"
-osinstall_install_if_not_installed tempest
-osinstall_install_if_not_installed openstack-debian-images
-osinstall_install_if_not_installed python-glanceclient
-echo "===> Creating Debian image"
-build-openstack-debian-image -r wheezy -p ${IMAGE_PASS}
-IMAGE_PATH=`ls *.qcow2`
-echo "===> Uploading image to Glance"
-IMAGE_REF=`pkgos_get_id glance --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
-echo "===> Fixing tempest.conf"
-# [compute]
-pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
-pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
-sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
-pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
+deploy_tempest_install_pkgs () {
+	echo "===> Installing tempest and openstack-debian-images"
+	osinstall_install_if_not_installed tempest
+	osinstall_install_if_not_installed openstack-debian-images
+	osinstall_install_if_not_installed openstack-clients
+}
 
-# [compute-admin]
-pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
-pkgos_inifile set ${TEMPEST_CONF} compute-admin tenant_name admin
-echo "Fixme: fix the password name here"
-exit 1
-pkgos_inifile set ${TEMPEST_CONF} compute-admin password FOO
+build_and_upload_image () {
+	echo "===> Creating Debian image"
+	build-openstack-debian-image -r wheezy -p ${IMAGE_PASS}
+	IMAGE_PATH=`ls *.qcow2`
+	echo "===> Uploading image to Glance"
+	IMAGE_REF=`pkgos_get_id glance --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+}
 
-# [dashboard]
-pkgos_inifile set ${TEMPEST_CONF} dashboard dashboard_url http://${DEFROUTE_IP}/
-pkgos_inifile set ${TEMPEST_CONF} dashboard login_url http://${DEFROUTE_IP}/auth/login/
+fix_tempest_config () {
+	echo "===> Fixing tempest.conf"
+	# [compute]
+	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
+	pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
+	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
+	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
 
-# [network]
-pkgos_inifile set ${TEMPEST_CONF} network tenant_network_cidr ${TENANT_NET_CIDR}
-echo "Fixme: fix getting the ID of the ext-net"
-#PUBLIC_NETWORK_ID=`pkgos_get_id neutron net-list
-exit 1
-echo "Fixme: fix getting the ID of the public router"
-#PUBLIC_ROUTER_ID=
-exit 1
-pkgos_inifile set ${TEMPEST_CONF} network public_network_id ${TENANT_NET_CIDR}
-pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
+	# [compute-admin]
+	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
+	pkgos_inifile set ${TEMPEST_CONF} compute-admin tenant_name admin
+	pkgos_inifile set ${TEMPEST_CONF} compute-admin password ${RC_KEYSTONE_ADMINPASS}
 
-# [service_available]
-pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
-pkgos_inifile set ${TEMPEST_CONF} service_available glance true
-pkgos_inifile set ${TEMPEST_CONF} service_available swift false
-pkgos_inifile set ${TEMPEST_CONF} service_available nova true
-pkgos_inifile set ${TEMPEST_CONF} service_available heat false
-pkgos_inifile set ${TEMPEST_CONF} service_available ceilometer true
-pkgos_inifile set ${TEMPEST_CONF} service_available horizon true
-#sahara=false
-#ironic=false
-#trove=false
-#marconi=false
+	# [dashboard]
+	pkgos_inifile set ${TEMPEST_CONF} dashboard dashboard_url http://${DEFROUTE_IP}/
+	pkgos_inifile set ${TEMPEST_CONF} dashboard login_url http://${DEFROUTE_IP}/auth/login/
+
+	# [network]
+	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_cidr ${TENANT_NET_CIDR}
+	echo "Fixme: fix getting the ID of the ext-net"
+	PUBLIC_NETWORK_ID=`pkgos_get_id neutron net-show ext-net`
+	pkgos_inifile set ${TEMPEST_CONF} network public_network_id ${TENANT_NET_CIDR}
+	PUBLIC_ROUTER_ID=`pkgos_get_id neutron router-show demo-router`
+	pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
+
+	# [service_available]
+	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
+	pkgos_inifile set ${TEMPEST_CONF} service_available glance true
+	pkgos_inifile set ${TEMPEST_CONF} service_available swift false
+	pkgos_inifile set ${TEMPEST_CONF} service_available nova true
+	pkgos_inifile set ${TEMPEST_CONF} service_available heat false
+	pkgos_inifile set ${TEMPEST_CONF} service_available ceilometer true
+	pkgos_inifile set ${TEMPEST_CONF} service_available horizon true
+	#sahara=false
+	#ironic=false
+	#trove=false
+	#marconi=false
+}
+
+deploy_tempest_install_pkgs
+build_and_upload_image
+fix_tempest_config
