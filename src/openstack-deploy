@@ -182,6 +182,18 @@ osinstall_preseed_compute () {
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 }
 
+osinstall_write_openrc () {
+	echo "export SERVICE_ENDPOINT=http://${RC_KEYSTONE_ENDPOINT_IP}:35357/v2.0/
+export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+
+export OS_USERNAME=admin
+export OS_PASSWORD=${RC_KEYSTONE_ADMINPASS}
+export OS_TENANT_NAME=admin
+export OS_AUTH_URL=http://${RC_KEYSTONE_ENDPOINT_IP}:5000/v2.0/
+export OS_VERSION=1.1
+export OS_NO_CACHE=1" >openrc.sh
+}
+
 if [ "${1}" = "--non-interactive" ] ; then
 	OS_INTERACTIVE="no"
 	shift
@@ -198,6 +210,7 @@ case "${1}" in
 	osinstall_keystone
 	osinstall_preseed_all
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-proxy-node
+	osinstall_write_openrc
 ;;
 "compute")
 	os_pressed_misc
@@ -206,6 +219,7 @@ case "${1}" in
 	osinstall_install_if_not_installed python-argparse
 	osinstall_rcvalue_keystone_endpoint
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-compute-node
+	osinstall_write_openrc
 ;;
 "all-in-one")
 	os_pressed_misc
@@ -217,6 +231,7 @@ case "${1}" in
 	osinstall_keystone
 	osinstall_preseed_all
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-toaster
+	osinstall_write_openrc
 ;;
 *)
 	usage
