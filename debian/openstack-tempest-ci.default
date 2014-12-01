@@ -1,0 +1,17 @@
+# Credential for the cloud where the CI tests are happening
+export OS_AUTH_URL=http://158.85.165.2:5000/v2.0
+export OS_TENANT_ID=73e92bdb131f4316b709c0f8613e7b59
+export OS_TENANT_NAME="tgoirand@mirantis.com"
+export OS_USERNAME="tgoirand@mirantis.com"
+export OS_PASSWORD=XXXXX
+
+# hostname of the VM where tests will happen
+OTCI_VM_HOSTNAME=tempest-ci.debian.net
+
+# ID of the Debian image to launch for the tests
+OTCI_DEBIAN_IMAGE_ID=46a82126-c210-43c9-8f83-015a56451a36
+
+# Flavor ID to use when launching the image
+OTCI_INSTANCE_FLAVOR=2
+
+OTCI_KEYPAIR_NAME=zigo

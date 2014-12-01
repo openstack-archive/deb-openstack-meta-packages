@@ -128,8 +128,7 @@ Description: Metapackage to install all of Openstack services at once
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
  and private cloud providers regardless of size, by being simple to
- implement
- and massively scalable.
+ implement and massively scalable.
  .
  This metapackage will install all Openstack server packages to run a cloud
  on a single computer. Later, more computers can join the cloud.
@@ -141,8 +140,24 @@ Description: Tools to deploy OpenStack
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
  and private cloud providers regardless of size, by being simple to
- implement
- and massively scalable.
+ implement and massively scalable.
  .
  This package contains preseeder scripts and other deployment tools to setup an
  OpenStack cloud quickly.
+
+Package: openstack-tempest-ci
+Architecture: all
+Depends: openstack-clients
+Description: validate OpenStack Debian packages using tempest and openstack-deploy
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to
+ implement and massively scalable.
+ .
+ This package is to be used to validate OpenStack packages against the tempest
+ functional testing suite. It uses openstack-deploy to install a full OpenStack
+ deployment on a single virtual machine running itself on an OpenStack cloud,
+ using Qemu as hypervisor. Then the Tempest unit tests will be run.
+ .
+ Typically, this package is to be installed on a Jenkins machine and it's
+ script shall be run on regular basis.

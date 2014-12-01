@@ -56,14 +56,53 @@ build_and_upload_image () {
 	build-openstack-debian-image -r wheezy -p ${IMAGE_PASS}
 	IMAGE_PATH=`ls *.qcow2`
 	echo "===> Uploading image to Glance"
-	IMAGE_REF=`pkgos_get_id glance --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+	AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+	IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+}
+
+create_non_admin_keystone_user () {
+	export SERVICE_ENDPOINT=http://182.54.237.100:35357/v2.0/
+	export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+
+	export OS_USERNAME=admin
+	export OS_PASSWORD=${RC_KEYSTONE_ADMINPASS}
+	export OS_TENANT_NAME=admin
+	export OS_AUTH_URL=http://182.54.237.100:5000/v2.0/
+	keystone tenant-create --name testme
+	keystone user-create --name testme --tenant testme --pass testme
 }
 
 fix_tempest_config () {
 	echo "===> Fixing tempest.conf"
+	# [DEFAULT]
+	pkgos_inifile set ${TEMPEST_CONF} DEFAULT log_file tempest.log
+	pkgos_inifile set ${TEMPEST_CONF} DEFAULT log_dir /var/log
+
+	# [identity]
+	pkgos_inifile set ${TEMPEST_CONF} identity disable_ssl_certificate_validation true
+	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:5000/v2.0
+	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:5000/v3.0
+	pkgos_inifile set ${TEMPEST_CONF} identity auth_version v2
+	pkgos_inifile set ${TEMPEST_CONF} identity username testme
+	pkgos_inifile set ${TEMPEST_CONF} identity tenant_name testme
+	pkgos_inifile set ${TEMPEST_CONF} identity password testme
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_username admin
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_tenant_name admin
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set ${TEMPEST_CONF} identity admin_username admin
+	pkgos_inifile set ${TEMPEST_CONF} identity admin_tenant_name admin
+	pkgos_inifile set ${TEMPEST_CONF} identity admin_password ${RC_KEYSTONE_ADMINPASS}
+
+	# [identity-feature-enabled]
+	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v2 true
+	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v3 false
+
 	# [compute]
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
+	pkgos_inifile set ${TEMPEST_CONF} compute image_ref_alt ${IMAGE_REF}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
+	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_user root
+	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_password ${IMAGE_PASS}
 	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
 	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
 
@@ -78,7 +117,6 @@ fix_tempest_config () {
 
 	# [network]
 	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_cidr ${TENANT_NET_CIDR}
-	echo "Fixme: fix getting the ID of the ext-net"
 	PUBLIC_NETWORK_ID=`pkgos_get_id neutron net-show ext-net`
 	pkgos_inifile set ${TEMPEST_CONF} network public_network_id ${TENANT_NET_CIDR}
 	PUBLIC_ROUTER_ID=`pkgos_get_id neutron router-show demo-router`
@@ -100,4 +138,5 @@ fix_tempest_config () {
 
 deploy_tempest_install_pkgs
 build_and_upload_image
+create_non_admin_keystone_user
 fix_tempest_config
