@@ -3,6 +3,7 @@
 set -e
 set -x
 
+DO_EXIT=no
 for i in $@ ; do
 	case "${1}" in
 	"--ext-host-min")
@@ -33,7 +34,7 @@ for i in $@ ; do
 done
 
 
-if [ ${DO_EXIT} = "yes" ] ; then
+if [ "${DO_EXIT}" = "yes" ] ; then
 	echo "Parameters not validated: will exit now!" > /dev/stderr
 	exit 1
 fi
