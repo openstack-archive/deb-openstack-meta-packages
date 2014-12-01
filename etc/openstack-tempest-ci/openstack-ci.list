@@ -1,0 +1,5 @@
+deb http://juno-wheezy.pkgs.mirantis.com/debian wheezy-juno-backports main
+deb-src http://juno-wheezy.pkgs.mirantis.com/debian wheezy-juno-backports main
+
+deb http://archive.gplhost.com/debian juno-backports main
+deb-src http://archive.gplhost.com/debian juno-backports main

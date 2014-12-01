@@ -1,1 +1,2 @@
-src/openstack-deploy-tempest-ci	/usr/bin
+src/openstack-tempest-ci			/usr/bin
+etc/openstack-tempest-ci/openstack-ci.list	/etc/openstack-tempest-ci

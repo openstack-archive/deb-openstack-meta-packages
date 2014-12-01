@@ -1,0 +1,105 @@
+#!/bin/sh
+
+set -e
+
+if [ -r /etc/default/openstack-tempest-ci ] ; then
+	. /etc/default/openstack-tempest-ci
+fi
+
+get_id () {
+	"$@" | awk '/ id / { print $4 }'
+}
+
+otci_delete_if_already_running () {
+	echo "===> Searching for already running instance (to eventually delete)..."
+	# Kill the VM if it is online already
+	RUNNING_ID=`nova list | grep ${OTCI_VM_HOSTNAME} | awk '{print $2}'`
+	if [ -n "${RUNNING_ID}" ] ; then
+		echo "===> Deleting instance ${RUNNING_ID}..."
+		nova delete ${RUNNING_ID}
+		echo "-> Killed"
+	else
+		echo "-> Instance not running"
+	fi
+}
+
+otci_launch_vm () {
+	echo "===> Starting instance"
+	OTCI_VM_ID=`get_id nova boot --flavor ${OTCI_INSTANCE_FLAVOR} --image ${OTCI_DEBIAN_IMAGE_ID} --key-name ${OTCI_KEYPAIR_NAME} ${OTCI_VM_HOSTNAME}`
+	echo "-> Got ID: ${OTCI_VM_ID}"
+}
+
+otci_wait_until_active () {
+	COUNT=50
+	CYCLES=0
+	OTCI_STATUS=BUILD
+	echo "===> Wait until status is active"
+	echo "Wating: "
+	while [ "${OTCI_STATUS}" != "ACTIVE" ] && [ ${COUNT} != 0 ] ; do
+		echo ${CYCLES}
+		OTCI_STATUS=`nova list | grep ${OTCI_VM_HOSTNAME} | awk '{print $6}'`
+		COUNT=$(( ${COUNT} - 1 ))
+		CYCLES=$(( ${CYCLES} + 1 ))
+	done
+	if [ "${OTCI_STATUS}" != "ACTIVE"  ] ; then
+		echo "-> Timed out spawning the OTCI VM: exiting"
+		exit 1
+	else
+		echo " -> VM is spawned \o/"
+	fi
+}
+
+otci_associate_ip () {
+	echo "===> Associating floating IP"
+	nova floating-ip-associate ${OTCI_VM_ID} ${OTCI_FLOATING_IP_ADDR}
+}
+
+otci_wait_for_ssl () {
+	if [ -e /var/lib/jenkins/.ssh/known_hosts ] ; then
+		rm /var/lib/jenkins/.ssh/known_hosts
+	fi
+	COUNT=120
+	CYCLES=0
+	OTCI_CAN_SSH=no
+	echo "===> Wait until we can ssh"
+	echo "Wating: "
+	while [ "${OTCI_CAN_SSH}" != "yes" ] && [ ${COUNT} != 0 ] ; do
+		echo ${CYCLES}
+		if ssh -o "StrictHostKeyChecking no" debian@${OTCI_FLOATING_IP_ADDR} 'echo -n ""' ; then
+			OTCI_CAN_SSH=yes
+		else
+			COUNT=$(( ${COUNT} - 1 ))
+			CYCLES=$(( ${CYCLES} + 1 ))
+			sleep 1
+		fi
+	done
+}
+
+otci_remote () {
+	ssh -o "StrictHostKeyChecking no" debian@${OTCI_FLOATING_IP_ADDR} $@
+}
+
+otci_scp () {
+	scp -o "StrictHostKeyChecking no" ${1} debian@${OTCI_FLOATING_IP_ADDR}:${2}
+}
+
+otci_add_source_list () {
+	echo "===> Hacking source list and apt keys: TODO: make this better..."
+	echo "-> scp source list"
+	otci_scp /etc/openstack-tempest-ci/openstack-ci.list /etc/apt/sources.list.d
+	echo "-> wget Jenkins key"
+	otci_remote "wget http://juno-wheezy.pkgs.mirantis.com/debian/dists/pubkey.gpg"
+	echo "-> Install Jenkins key"
+	otci_remote "apt-key add pubkey.gpg"
+	echo "-> wget GPLHost key package"
+	otci_remote "wget http://archive.gplhost.com/debian/pool/juno-backports/main/g/gplhost-archive-keyring/gplhost-archive-keyring_20100926-1_all.deb"
+	echo "-> Installing GPLHost key package"
+	otci_remote "dpkg -i gplhost-archive-keyring_20100926-1_all.deb"
+}
+
+#otci_delete_if_already_running
+#otci_launch_vm
+#otci_wait_until_active
+#otci_associate_ip
+#otci_wait_for_ssl
+otci_add_source_list
