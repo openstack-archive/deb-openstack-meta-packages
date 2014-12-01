@@ -27,7 +27,7 @@ otci_delete_if_already_running () {
 
 otci_launch_vm () {
 	echo "===> Starting instance"
-	OTCI_VM_ID=`get_id nova boot --flavor ${OTCI_INSTANCE_FLAVOR} --image ${OTCI_DEBIAN_IMAGE_ID} --key-name ${OTCI_KEYPAIR_NAME} ${OTCI_VM_HOSTNAME}`
+	OTCI_VM_ID=`get_id nova boot --flavor ${OTCI_INSTANCE_FLAVOR} --nic net-id=${OTCI_ETH0_NET_ID} --nic net-id=${OTCI_ETH1_NET_ID} --image ${OTCI_DEBIAN_IMAGE_ID} --key-name ${OTCI_KEYPAIR_NAME} ${OTCI_VM_HOSTNAME}`
 	echo "-> Got ID: ${OTCI_VM_ID}"
 }
 
@@ -109,7 +109,7 @@ otci_install_openstack_deploy () {
 	echo "===> Deploying OpenStack"
 	otci_remote "sudo openstack-deploy --non-interactive all-in-one"
 	echo "===> Running openstack-deploy-proxy-network"
-	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr 192.168.0.1/24"
+	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth1"
 	echo "===> Deploying tempest"
 	otci_remote "sudo openstack-deploy-tempest"
 }
