@@ -6,6 +6,8 @@ if [ -r /etc/default/openstack-tempest-ci ] ; then
 	. /etc/default/openstack-tempest-ci
 fi
 
+APT_INSTALL="sudo apt-get install -y"
+
 get_id () {
 	"$@" | awk '/ id / { print $4 }'
 }
@@ -86,20 +88,36 @@ otci_scp () {
 otci_add_source_list () {
 	echo "===> Hacking source list and apt keys: TODO: make this better..."
 	echo "-> scp source list"
-	otci_scp /etc/openstack-tempest-ci/openstack-ci.list /etc/apt/sources.list.d
+	otci_scp /etc/openstack-tempest-ci/openstack-ci.list
+	echo "-> Install new source list"
+	otci_remote "sudo mv openstack-ci.list /etc/apt/sources.list.d/"
 	echo "-> wget Jenkins key"
 	otci_remote "wget http://juno-wheezy.pkgs.mirantis.com/debian/dists/pubkey.gpg"
 	echo "-> Install Jenkins key"
-	otci_remote "apt-key add pubkey.gpg"
+	otci_remote "sudo apt-key add pubkey.gpg"
 	echo "-> wget GPLHost key package"
 	otci_remote "wget http://archive.gplhost.com/debian/pool/juno-backports/main/g/gplhost-archive-keyring/gplhost-archive-keyring_20100926-1_all.deb"
 	echo "-> Installing GPLHost key package"
-	otci_remote "dpkg -i gplhost-archive-keyring_20100926-1_all.deb"
+	otci_remote "sudo dpkg -i gplhost-archive-keyring_20100926-1_all.deb"
+	echo "-> Updating source list"
+	otci_remote "sudo apt-get update"
 }
 
-#otci_delete_if_already_running
-#otci_launch_vm
-#otci_wait_until_active
-#otci_associate_ip
-#otci_wait_for_ssl
+otci_install_openstack_deploy () {
+	echo "===> Installing openstack-deploy"
+	otci_remote "${APT_INSTALL} openstack-deploy"
+	echo "===> Deploying OpenStack"
+	otci_remote "sudo openstack-deploy --non-interactive all-in-one"
+	echo "===> Running openstack-deploy-proxy-network"
+	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr 192.168.0.1/24"
+	echo "===> Deploying tempest"
+	otci_remote "sudo openstack-deploy-tempest"
+}
+
+otci_delete_if_already_running
+otci_launch_vm
+otci_wait_until_active
+otci_associate_ip
+otci_wait_for_ssl
 otci_add_source_list
+otci_install_openstack_deploy

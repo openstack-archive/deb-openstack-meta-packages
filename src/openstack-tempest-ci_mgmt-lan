@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+neutron net-create mgmt-lan
+neutron subnet-create mgmt-lan --name mgmt-subnet 192.168.0.0/24
