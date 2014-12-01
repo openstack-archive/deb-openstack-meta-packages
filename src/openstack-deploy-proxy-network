@@ -110,7 +110,7 @@ install_and_start_network_init_script () {
 	chmod +x /etc/init.d/openstack-proxy-node-network
 	update-rc.d openstack-proxy-node-network defaults
 	echo "===> Starting OVS bridged network init script"
-	invoke-rc.d openstack-proxy-node-network start
+	nohup invoke-rc.d openstack-proxy-node-network start
 
 	echo "===> Installing MGMT network NAT init script"
 	cp /usr/share/openstack-deploy/openstack-proxy-node-nat /etc/init.d
