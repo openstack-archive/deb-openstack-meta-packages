@@ -63,17 +63,21 @@ prompt_for_mgmt_network () {
 
 find_default_ip () {
 	local DEFROUTE_IF
-	echo "===> Detecting current IP configuration"
-	DEFROUTE_IF=`LC_ALL=C /sbin/route | grep default |awk -- '{ print $8 }' | cut -d" " -f1`
-	if [ -n "${DEFROUTE_IF}" ] ; then
-		DEFROUTE_IP=`LC_ALL=C ip addr show "${DEFROUTE_IF}" | grep inet | head -n 1 | awk '{print $2}' | cut -d/ -f1 | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
-		if [ -n ${DEFROUTE_IP} ] ; then
-			DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show ${DEFROUTE_IF} | grep inet | head -n 1 | awk '{print $2}'`
-			DEFROUTE_MASK=`ipcalc ${DEFROUTE_IP_CIDR} | grep Netmask: | awk '{print $2}'`
-			DEFROUTE_GW=`LC_ALL=C /sbin/route | grep default | awk '{print $2}'`
-			echo "===> Founded the following network config: ${DEFROUTE_IP} netmask: ${DEFROUTE_MASK} gateway ${DEFROUTE_GW}"
-			echo "===> Writing it in /etc/default/openstack-proxy-node-network"
-			echo "# This file is used by /etc/init.d/openstack-proxy-node-network
+	if [ -r /etc/default/openstack-proxy-node-network ] ; then
+		echo "===> Loading default IP configuration from /etc/default/openstack-proxy-node-network"
+		. /etc/default/openstack-proxy-node-network
+	else
+		echo "===> Detecting current IP configuration"
+		DEFROUTE_IF=`LC_ALL=C /sbin/route | grep default |awk -- '{ print $8 }' | cut -d" " -f1`
+		if [ -n "${DEFROUTE_IF}" ] ; then
+			DEFROUTE_IP=`LC_ALL=C ip addr show "${DEFROUTE_IF}" | grep inet | head -n 1 | awk '{print $2}' | cut -d/ -f1 | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
+			if [ -n ${DEFROUTE_IP} ] ; then
+				DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show ${DEFROUTE_IF} | grep inet | head -n 1 | awk '{print $2}'`
+				DEFROUTE_MASK=`ipcalc ${DEFROUTE_IP_CIDR} | grep Netmask: | awk '{print $2}'`
+				DEFROUTE_GW=`LC_ALL=C /sbin/route | grep default | awk '{print $2}'`
+				echo "===> Founded the following network config: ${DEFROUTE_IP} netmask: ${DEFROUTE_MASK} gateway ${DEFROUTE_GW}"
+				echo "===> Writing it in /etc/default/openstack-proxy-node-network"
+				echo "# This file is used by /etc/init.d/openstack-proxy-node-network
 # to setup networking at boot time. The goal of this script is to
 # setup networking correctly in order to use tempest tests in a VM.
 #
@@ -97,10 +101,12 @@ MGMT_IP_CIDR=${MGMT_IP_CIDR}
 TENANT_NET=${MGMT_NET}
 TENANT_NET_CIDR=${MGMT_NET_CIDR}
 " > /etc/default/openstack-proxy-node-network
-		else
-			echo "Could not find your default route IP address: exiting"
-			exit 1
+			else
+				echo "Could not find your default route IP address: exiting"
+				exit 1
+			fi
 		fi
+		. /etc/default/openstack-proxy-node-network
 	fi
 }
 
@@ -140,6 +146,12 @@ calc_host_min_max () {
 	EXT_NET_CIDR=`ipcalc ${DEFROUTE_IP_CIDR} | grep Network: | awk '{print $2}'`
 }
 
+source_openrc_if_present () {
+	if [ -r ~/openrc.sh ] ; then
+		. ~/openrc.sh
+	fi
+}
+
 setup_neutron_networking () {
 	# Map the existing physical network in Neutron
 	neutron net-create ext-net --shared --router:external=True --provider:physical_network external --provider:network_type flat
@@ -168,4 +180,5 @@ prompt_for_mgmt_network
 find_default_ip
 calc_host_min_max
 install_and_start_network_init_script
+source_openrc_if_present
 setup_neutron_networking
