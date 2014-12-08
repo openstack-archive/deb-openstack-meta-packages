@@ -63,6 +63,7 @@ prompt_for_mgmt_network () {
 
 find_default_ip () {
 	local DEFROUTE_IF
+	apt-get install -y install python-q-text-as-data
 	if [ -r /etc/default/openstack-proxy-node-network ] ; then
 		echo "===> Loading default IP configuration from /etc/default/openstack-proxy-node-network"
 		. /etc/default/openstack-proxy-node-network
@@ -74,7 +75,7 @@ find_default_ip () {
 			if [ -n ${DEFROUTE_IP} ] ; then
 				DEFROUTE_IP_CIDR=`LC_ALL=C ip addr show ${DEFROUTE_IF} | grep inet | head -n 1 | awk '{print $2}'`
 				DEFROUTE_MASK=`ipcalc ${DEFROUTE_IP_CIDR} | grep Netmask: | awk '{print $2}'`
-				DEFROUTE_GW=`LC_ALL=C /sbin/route | grep default | awk '{print $2}'`
+				DEFROUTE_GW=`LC_ALL=C /sbin/route -n | awk 'NR > 1 {print}' | q -H "SELECT Gateway FROM - WHERE Destination='0.0.0.0'"`
 				echo "===> Founded the following network config: ${DEFROUTE_IP} netmask: ${DEFROUTE_MASK} gateway ${DEFROUTE_GW}"
 				echo "===> Writing it in /etc/default/openstack-proxy-node-network"
 				echo "# This file is used by /etc/init.d/openstack-proxy-node-network
@@ -98,8 +99,8 @@ MGMT_IP=${MGMT_IP}
 MGMT_MASK=${MGMT_MASK}
 MGMT_IP_CIDR=${MGMT_IP_CIDR}
 
-TENANT_NET=${MGMT_NET}
-TENANT_NET_CIDR=${MGMT_NET_CIDR}
+TENANT_NET=172.16.100.0
+TENANT_NET_CIDR=172.16.100.0/24
 " > /etc/default/openstack-proxy-node-network
 			else
 				echo "Could not find your default route IP address: exiting"
