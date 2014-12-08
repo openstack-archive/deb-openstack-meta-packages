@@ -1,8 +1,9 @@
 #!/bin/sh
 
 set -e
+#set -x
 
-OSINSTALL_RC=osinstallrc
+OSINSTALL_RC=~/osinstallrc
 TEMPEST_CONF=/etc/tempest/tempest.conf
 IMAGE_PASS=SupArP4ss
 
@@ -30,6 +31,13 @@ if [ -r "${OSINSTALL_RC}" ] ; then
 	. ${OSINSTALL_RC}
 else
 	echo "Cannot find ${OSINSTALL_RC}: exiting..."
+	exit 1
+fi
+
+if [ -r ~/openrc.sh ] ; then
+	. ~/openrc.sh
+else
+	echo "Cannot find openrc.sh: exiting..."
 	exit 1
 fi
 
@@ -61,13 +69,6 @@ build_and_upload_image () {
 }
 
 create_non_admin_keystone_user () {
-	export SERVICE_ENDPOINT=http://182.54.237.100:35357/v2.0/
-	export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
-
-	export OS_USERNAME=admin
-	export OS_PASSWORD=${RC_KEYSTONE_ADMINPASS}
-	export OS_TENANT_NAME=admin
-	export OS_AUTH_URL=http://182.54.237.100:5000/v2.0/
 	keystone tenant-create --name testme
 	keystone user-create --name testme --tenant testme --pass testme
 }
