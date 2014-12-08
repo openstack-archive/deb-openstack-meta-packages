@@ -63,7 +63,7 @@ prompt_for_mgmt_network () {
 
 find_default_ip () {
 	local DEFROUTE_IF
-	apt-get install -y install python-q-text-as-data
+	apt-get install -y python-q-text-as-data
 	if [ -r /etc/default/openstack-proxy-node-network ] ; then
 		echo "===> Loading default IP configuration from /etc/default/openstack-proxy-node-network"
 		. /etc/default/openstack-proxy-node-network
