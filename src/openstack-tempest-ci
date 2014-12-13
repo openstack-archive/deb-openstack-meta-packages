@@ -1,12 +1,25 @@
 #!/bin/sh
 
 set -e
+set -x
 
 if [ -r /etc/default/openstack-tempest-ci ] ; then
 	. /etc/default/openstack-tempest-ci
 fi
 
-APT_INSTALL="sudo apt-get install -y"
+if [ -n "${1}" ] ; then
+	OTCI_DEBIAN_REPO_URL=${1}
+else
+	OTCI_DEBIAN_REPO_URL=http://http.debian.net/debian
+fi
+
+if [ "${OTCI_VIRT_MODE}" = "xen" ] ; then
+	OTCI_SSH_USER=root
+else
+	OTCI_SSH_USER=debian
+fi
+
+APT_INSTALL="sudo DEBIAN_FRONTEND=noninteractive apt-get install -y"
 
 get_id () {
 	"$@" | awk '/ id / { print $4 }'
@@ -56,6 +69,23 @@ otci_associate_ip () {
 	nova floating-ip-associate ${OTCI_VM_ID} ${OTCI_FLOATING_IP_ADDR}
 }
 
+
+otci_provision_new_vm () {
+	if [ "${OTCI_VIRT_MODE}" = "xen" ] ; then
+		rm /var/lib/jenkins/.ssh/known_hosts
+		ssh -o "StrictHostKeyChecking no" root@${OTCI_XEN_DOM0_IP} /root/p
+	else
+		otci_delete_if_already_running
+		otci_launch_vm
+		otci_wait_until_active
+		otci_associate_ip
+		otci_wait_for_ssh
+		otci_aptget_update
+		otci_upgrade_kernel
+		otci_reboot
+	fi
+}
+
 otci_wait_for_ssh () {
 	if [ -e /var/lib/jenkins/.ssh/known_hosts ] ; then
 		rm /var/lib/jenkins/.ssh/known_hosts
@@ -67,7 +97,7 @@ otci_wait_for_ssh () {
 	echo "Wating: "
 	while [ "${OTCI_CAN_SSH}" != "yes" ] && [ ${COUNT} != 0 ] ; do
 		echo ${CYCLES}
-		if ssh -o "StrictHostKeyChecking no" debian@${OTCI_FLOATING_IP_ADDR} 'echo -n ""' ; then
+		if ssh -o "StrictHostKeyChecking no" root@${OTCI_FLOATING_IP_ADDR} 'echo -n ""' ; then
 			OTCI_CAN_SSH=yes
 		else
 			COUNT=$(( ${COUNT} - 1 ))
@@ -77,12 +107,32 @@ otci_wait_for_ssh () {
 	done
 }
 
+
 otci_remote () {
-	ssh -o "StrictHostKeyChecking no" debian@${OTCI_FLOATING_IP_ADDR} $@
+	ssh -o "StrictHostKeyChecking no" ${OTCI_SSH_USER}@${OTCI_FLOATING_IP_ADDR} $@
 }
 
 otci_scp () {
-	scp -o "StrictHostKeyChecking no" ${1} debian@${OTCI_FLOATING_IP_ADDR}:${2}
+	scp -o "StrictHostKeyChecking no" ${1} ${OTCI_SSH_USER}@${OTCI_FLOATING_IP_ADDR}:${2}
+}
+
+otci_aptget_update () {
+	echo "Acquire::PDiffs \"false\";" >temp_file
+	otci_scp temp_file ""
+	otci_remote "sudo cp temp_file /etc/apt/apt.conf.d/98nopdiff"
+	rm temp_file
+	otci_remote "sudo sed -i 's#http.debian.net#${OTCI_DEBIAN_REPO_URL}#' /etc/apt/sources.list'"
+	otci_remote "sudo apt-get update"
+}
+
+otci_upgrade_kernel () {
+	otci_remote "sudo ${APT_INSTALL} -t wheezy-backports linux-image-amd64"
+	otci_remote "sudo ${APT_INSTALL} grub-pc"
+}
+
+otci_reboot () {
+	otci_remote "sudo shutdown -r now"
+	sleep 5
 }
 
 otci_add_source_list () {
@@ -109,15 +159,12 @@ otci_install_openstack_deploy () {
 	echo "===> Deploying OpenStack"
 	otci_remote "sudo openstack-deploy --non-interactive all-in-one"
 	echo "===> Running openstack-deploy-proxy-network"
-	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth1"
+	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth0:1"
 	echo "===> Deploying tempest"
-	otci_remote "sudo openstack-deploy-tempest"
+	otci_remote "sudo openstack-deploy-tempest ${OTCI_DEBIAN_REPO_URL}"
 }
 
-otci_delete_if_already_running
-otci_launch_vm
-otci_wait_until_active
-otci_associate_ip
+otci_provision_new_vm
 otci_wait_for_ssh
 otci_add_source_list
 otci_install_openstack_deploy

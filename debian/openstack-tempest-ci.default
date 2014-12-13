@@ -1,3 +1,10 @@
+# Using Xen or OpenStack
+# Possible values: xen, openstack
+OTCI_VIRT_MODE=xen
+
+# IP of the xen dom0 to provision the VM
+OTCI_XEN_DOM0_IP=185.8.56.70
+
 # Credential for the cloud where the CI tests are happening
 export OS_AUTH_URL=http://158.85.165.2:5000/v2.0
 export OS_TENANT_ID=73e92bdb131f4316b709c0f8613e7b59
@@ -21,7 +28,8 @@ OTCI_KEYPAIR_NAME=jenkins
 OTCI_FLOATING_IP_ID=1dd50df2-0ddc-4605-93ca-5ea22f977003
 
 # floating IP address
-OTCI_FLOATING_IP_ADDR=158.85.175.83
+OTCI_FLOATING_IP_ADDR=185.8.56.76
+#158.85.175.83
 
 # "normal" VM network (eg: eth0)
 OTCI_ETH0_NET_ID=1f35e850-f354-414d-bc43-1b0b91e5d731
