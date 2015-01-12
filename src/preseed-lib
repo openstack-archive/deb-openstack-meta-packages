@@ -69,6 +69,8 @@ dbc_dbname='"${DB_NAME}"'
 #	this is the administrative user that is used to create all of the above
 dbc_dbadmin='root'
 
+dbc_dbadmpass='${MYSQL_PASSWORD}'
+
 # dbc_basepath: base directory to hold database files
 #	leave unset to use the default.  only applicable if you are
 #	using a local (filesystem based) database.    
@@ -103,12 +105,12 @@ ${PKG_NAME} dbconfig-common/dbconfig-reinstall boolean true
 ${PKG_NAME} dbconfig-common/dbconfig-reinstall seen true
 ${PKG_NAME} dbconfig-common/dbconfig-upgrade boolean true
 ${PKG_NAME} dbconfig-common/dbconfig-upgrade seen true
-${PKG_NAME} dbconfig-common/database-type select mysql
-${PKG_NAME} dbconfig-common/database-type seen true
-${PKG_NAME} dbconfig-common/mysql/admin-user string root
-${PKG_NAME} dbconfig-common/mysql/admin-user seen true
-${PKG_NAME} dbconfig-common/mysql/admin-pass string ${MYSQL_PASSWORD}
-${PKG_NAME} dbconfig-common/mysql/admin-pass seen true
+${PKG_NAME} ${PKG_NAME}/database-type select mysql
+${PKG_NAME} ${PKG_NAME}/database-type seen true
+${PKG_NAME} ${PKG_NAME}/mysql/admin-user string root
+${PKG_NAME} ${PKG_NAME}/mysql/admin-user seen true
+${PKG_NAME} ${PKG_NAME}/mysql/admin-pass string ${MYSQL_PASSWORD}
+${PKG_NAME} ${PKG_NAME}/mysql/admin-pass seen true
 ${PKG_NAME} ${TMPL_NAME}/configure_db boolean true
 ${PKG_NAME} ${TMPL_NAME}/configure_db seen true
 " | debconf-set-selections
