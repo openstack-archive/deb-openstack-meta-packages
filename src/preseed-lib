@@ -345,7 +345,7 @@ neutron-common neutron/plugin-select seen true
 	os_preseed_set_dbconfig_conf neutron-common neutron ${NEUTRON_SQL_PASS} neutrondb neutron ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint neutron-server neutron ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken neutron-common neutron ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
-	os_preseed_keystone_autotoken neutron-metadata-agent neutron ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
+	os_preseed_keystone_autotoken neutron-metadata-agent neutron-metadata ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds neutron-common neutron ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
 }
 
