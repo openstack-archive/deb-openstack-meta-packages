@@ -1,6 +1,7 @@
 openstack-meta-packages (0.12) UNRELEASED; urgency=medium
 
   * Added scripts to do automatic network configuration of the proxy node.
+  * Fixed os_preseed_set_dbconfig_conf to also write the MySQL root pass.
 
  -- Thomas Goirand <zigo@debian.org>  Wed, 22 Oct 2014 01:13:08 +0800
 
