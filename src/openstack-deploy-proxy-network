@@ -197,6 +197,7 @@ restart_all_nova_and_neutron_daemons () {
 	for i in /etc/init.d/nova* ; do $i start ; done
 	for i in /etc/init.d/neutron* ; do $i stop ; done
 	for i in /etc/init.d/neutron* ; do $i start ; done
+	sleep 5
 }
 
 nova_and_neutron_fixups () {
