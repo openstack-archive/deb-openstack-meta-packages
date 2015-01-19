@@ -158,8 +158,11 @@ otci_install_openstack_deploy () {
 	otci_remote "${APT_INSTALL} openstack-deploy"
 	echo "===> Deploying OpenStack"
 	otci_remote "sudo openstack-deploy --non-interactive all-in-one"
+	echo "===> Switching to qemu"
+	otci_remote "${APT_INSTALL} nova-compute-qemu"
+	otci_remote "/etc/init.d/nova-compute restart"
 	echo "===> Running openstack-deploy-proxy-network"
-	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth0:1"
+	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth1 --ext-host-min ${OTCI_PUBIP_START} --ext-host-max ${OTCI_PUBIP_END} --local-ip ${OTCI_LOCAL_IP}"
 	echo "===> Deploying tempest"
 	otci_remote "sudo openstack-deploy-tempest ${OTCI_DEBIAN_REPO_URL}"
 }

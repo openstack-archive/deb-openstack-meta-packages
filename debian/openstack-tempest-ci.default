@@ -39,3 +39,12 @@ OTCI_ETH1_NET_ID=0b2f4c7c-c8d0-4740-9e52-b411c80ecdf9
 
 # management network IP
 OTCI_ETH1_CIDR=192.168.0.1/24
+
+# Public IP pool start
+OTCI_PUBIP_START=117.121.243.170
+
+# Public IP pool end
+OTCI_PUBIP_END=117.121.243.179
+
+# OVS agent local_ip value
+OTCI_LOCAL_IP=172.16.100.1

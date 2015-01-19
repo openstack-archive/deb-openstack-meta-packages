@@ -3,6 +3,8 @@
 set -e
 set -x
 
+. /usr/share/openstack-pkg-tools/pkgos_func
+
 DO_EXIT=no
 for i in $@ ; do
 	case "${1}" in
@@ -27,6 +29,12 @@ for i in $@ ; do
 	"--mgmt-if")
 		if [ -z "${2}" ] ; then echo "Parameter for option --mgmt-if is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
 		MGMT_IF=$2
+		shift
+		shift
+	;;
+	"--local-ip")
+		if [ -z "${2}" ] ; then echo "Parameter for option --mgmt-if is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		LOCAL_IP=$2
 		shift
 		shift
 	;;
@@ -153,6 +161,13 @@ source_openrc_if_present () {
 	fi
 }
 
+setup_local_ip () {
+	if [ -n "${LOCAL_IP}" ] ; then
+		pkgos_inifile set /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini ovs local_ip ${LOCAL_IP}
+		invoke-rc.d neutron-plugin-openvswitch-agent restart
+	fi
+}
+
 setup_neutron_networking () {
 	# Map the existing physical network in Neutron
 	neutron net-create ext-net --shared --router:external=True --provider:physical_network external --provider:network_type flat
@@ -182,4 +197,5 @@ find_default_ip
 calc_host_min_max
 install_and_start_network_init_script
 source_openrc_if_present
+setup_local_ip
 setup_neutron_networking
