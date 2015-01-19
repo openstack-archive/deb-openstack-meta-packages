@@ -168,6 +168,46 @@ setup_local_ip () {
 	fi
 }
 
+fix_nova_tenant_id_in_neutron () {
+	ADMIN_TENANT_ID=`keystone tenant-get admin | awk '/ id / { print $4 }'`
+	pkgos_inifile set /etc/neutron/neutron.conf DEFAULT nova_admin_tenant_id ${ADMIN_TENANT_ID}
+}
+
+fix_nova_and_neutron_admin_pass () {
+	pkgos_inifile set /etc/nova/nova.conf neutron admin_password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set /etc/neutron/neutron.conf DEFAULT nova_admin_password ${RC_KEYSTONE_ADMINPASS}
+}
+
+setup_metadata_shared_secret () {
+	GEN_METADATA_SECRET=`pkgos_gen_pass`
+	pkgos_inifile set /etc/nova/nova.conf neutron metadata_proxy_shared_secret ${GEN_METADATA_SECRET}
+	pkgos_inifile set /etc/neutron/metadata_agent.conf DEFAULT metadata_proxy_shared_secret ${GEN_METADATA_SECRET}
+}
+
+misc_system_fix () {
+	chmod o+w /run/shm
+	echo "net.ipv4.ip_forward=1
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0" >>/etc/sysctl.conf
+	sysctl -p
+}
+
+restart_all_nova_and_neutron_daemons () {
+	for i in /etc/init.d/nova* ; do $i stop ; done
+	for i in /etc/init.d/nova* ; do $i start ; done
+	for i in /etc/init.d/neutron* ; do $i stop ; done
+	for i in /etc/init.d/neutron* ; do $i start ; done
+}
+
+nova_and_neutron_fixups () {
+	setup_local_ip
+	fix_nova_tenant_id_in_neutron
+	fix_nova_and_neutron_admin_pass
+	setup_metadata_shared_secret
+	misc_system_fix
+	restart_all_nova_and_neutron_daemons
+}
+
 setup_neutron_networking () {
 	# Map the existing physical network in Neutron
 	neutron net-create ext-net --shared --router:external=True --provider:physical_network external --provider:network_type flat
@@ -197,5 +237,5 @@ find_default_ip
 calc_host_min_max
 install_and_start_network_init_script
 source_openrc_if_present
-setup_local_ip
+nova_and_neutron_fixups
 setup_neutron_networking
