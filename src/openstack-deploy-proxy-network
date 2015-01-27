@@ -238,6 +238,13 @@ setup_neutron_networking () {
 
 	# Attach the router to the external network by setting it as the gateway:
 	neutron router-gateway-set demo-router ext-net
+
+	# Create a single floating IP, just for our tests
+	neutron floatingip-create ext-net
+
+	# Allow ping and ssh
+	neutron security-group-rule-create --direction ingress --protocol tcp --port_range_min 22 --port_range_max 22 default
+	neutron security-group-rule-create --protocol icmp --direction ingress default
 }
 
 prompt_for_mgmt_network
