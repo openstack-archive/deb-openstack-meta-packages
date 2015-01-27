@@ -107,8 +107,8 @@ MGMT_IP=${MGMT_IP}
 MGMT_MASK=${MGMT_MASK}
 MGMT_IP_CIDR=${MGMT_IP_CIDR}
 
-TENANT_NET=172.16.100.0
-TENANT_NET_CIDR=172.16.100.0/24
+TENANT_NET=192.168.100.0
+TENANT_NET_CIDR=192.168.100.0/24
 " > /etc/default/openstack-proxy-node-network
 			else
 				echo "Could not find your default route IP address: exiting"
@@ -185,11 +185,17 @@ setup_metadata_shared_secret () {
 }
 
 misc_system_fix () {
-	chmod o+w /run/shm
+	# Fix /var/run/shm unix rights in case we're on a broken Wheezy system.
+	if ! [ -h /var/run/shm ] ; then chmod 777 /var/run/shm ; chmod +t /var/run/shm ; fi
+	# Make sure we have forwarding capabilities
 	echo "net.ipv4.ip_forward=1
 net.ipv4.conf.all.rp_filter=0
 net.ipv4.conf.default.rp_filter=0" >>/etc/sysctl.conf
 	sysctl -p
+}
+
+fix_spice_base_url () {
+	pkgos_inifile set /etc/nova/nova.conf spice html5proxy_base_url http://${DEFROUTE_IP}:6082/spice_auto.html
 }
 
 restart_all_nova_and_neutron_daemons () {
@@ -206,6 +212,7 @@ nova_and_neutron_fixups () {
 	fix_nova_and_neutron_admin_pass
 	setup_metadata_shared_secret
 	misc_system_fix
+	fix_spice_base_url
 	restart_all_nova_and_neutron_daemons
 }
 
