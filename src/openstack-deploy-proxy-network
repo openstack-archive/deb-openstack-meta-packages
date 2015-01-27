@@ -174,8 +174,8 @@ fix_nova_tenant_id_in_neutron () {
 }
 
 fix_nova_and_neutron_admin_pass () {
-	pkgos_inifile set /etc/nova/nova.conf neutron admin_password ${RC_KEYSTONE_ADMINPASS}
-	pkgos_inifile set /etc/neutron/neutron.conf DEFAULT nova_admin_password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set /etc/nova/nova.conf neutron admin_password ${OS_PASSWORD}
+	pkgos_inifile set /etc/neutron/neutron.conf DEFAULT nova_admin_password ${OS_PASSWORD}
 }
 
 setup_metadata_shared_secret () {
