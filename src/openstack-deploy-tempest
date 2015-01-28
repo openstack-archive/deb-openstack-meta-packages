@@ -53,7 +53,7 @@ osinstall_install_if_not_installed () {
 	local PKG_NAME
 	PKG_NAME=${1}
 	if ! osinstall_check_installed ${PKG_NAME} ; then
-		${APTGET} install ${PKG_NAME}
+		DEBIAN_FRONTEND=noninteractive ${APTGET} install ${PKG_NAME}
 	fi
 }
 
