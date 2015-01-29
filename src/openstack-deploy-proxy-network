@@ -181,7 +181,7 @@ fix_nova_and_neutron_admin_pass () {
 setup_metadata_shared_secret () {
 	GEN_METADATA_SECRET=`pkgos_gen_pass`
 	pkgos_inifile set /etc/nova/nova.conf neutron metadata_proxy_shared_secret ${GEN_METADATA_SECRET}
-	pkgos_inifile set /etc/neutron/metadata_agent.conf DEFAULT metadata_proxy_shared_secret ${GEN_METADATA_SECRET}
+	pkgos_inifile set /etc/neutron/metadata_agent.ini DEFAULT metadata_proxy_shared_secret ${GEN_METADATA_SECRET}
 }
 
 misc_system_fix () {
