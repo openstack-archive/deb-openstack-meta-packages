@@ -66,7 +66,7 @@ deploy_tempest_install_pkgs () {
 
 build_and_upload_image () {
 	echo "===> Creating Debian image"
-	build-openstack-debian-image -r wheezy -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
+	build-openstack-debian-image -r jessie -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
 	IMAGE_PATH=`ls *.qcow2`
 	echo "===> Uploading image to Glance"
 	AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
@@ -142,7 +142,13 @@ fix_tempest_config () {
 	#marconi=false
 }
 
+gen_ssh_root_key () {
+	ssh-keygen -t rsa -N "" -f .ssh/id_rsa
+	nova keypair-add --pub-key .ssh/id_rsa.pub odtkey
+}
+
 deploy_tempest_install_pkgs
 build_and_upload_image
 create_non_admin_keystone_user
 fix_tempest_config
+gen_ssh_root_key
