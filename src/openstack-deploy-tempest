@@ -112,6 +112,8 @@ fix_tempest_config () {
 	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
 	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
 	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
+	# flavor 1 is too small for the 2GB default Jessie image
+	pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
 
 	# [compute-admin]
 	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
