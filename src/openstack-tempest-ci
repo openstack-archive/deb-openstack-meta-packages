@@ -167,7 +167,12 @@ otci_install_openstack_deploy () {
 	otci_remote "sudo openstack-deploy-tempest ${OTCI_DEBIAN_REPO_URL}"
 }
 
+otci_run_tempest () {
+	otci_remote tempest
+}
+
 otci_provision_new_vm
 otci_wait_for_ssh
 otci_add_source_list
 otci_install_openstack_deploy
+otci_run_tempest

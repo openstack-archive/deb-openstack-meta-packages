@@ -111,6 +111,7 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_password ${IMAGE_PASS}
 	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
 	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
+	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
 
 	# [compute-admin]
 	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
@@ -131,6 +132,7 @@ fix_tempest_config () {
 	# [service_available]
 	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
 	pkgos_inifile set ${TEMPEST_CONF} service_available glance true
+	pkgos_inifile set ${TEMPEST_CONF} service_available cinder true
 	pkgos_inifile set ${TEMPEST_CONF} service_available swift false
 	pkgos_inifile set ${TEMPEST_CONF} service_available nova true
 	pkgos_inifile set ${TEMPEST_CONF} service_available heat false
@@ -147,8 +149,28 @@ gen_ssh_root_key () {
 	nova keypair-add --pub-key .ssh/id_rsa.pub odtkey
 }
 
+setup_loopback_based_lvm_vg () {
+	# Create a 10GB file on the root
+	dd if=/dev/zero of=/lvm-data.dat count=20971520
+	# Setup the loopback device
+	losetup /dev/loop2 /lvm-data.dat
+	# Create the PV
+	pvcreate /dev/loop2
+	# Create the VG
+	vgcreate pkgosvg0 /dev/loop2
+	# Activate the pkgosvg0
+	vgchange -a y pkgosvg0
+}
+
+install_cinder () {
+	# At this point in time, cinder should already be preseeded by openstack-deploy,
+	# so just installing it this way should be fine
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install cinder-api cinder-volume python-cinderclient cinder-backup
+}
+
 deploy_tempest_install_pkgs
 build_and_upload_image
 create_non_admin_keystone_user
 fix_tempest_config
 gen_ssh_root_key
+setup_loopback_based_lvm_vg
