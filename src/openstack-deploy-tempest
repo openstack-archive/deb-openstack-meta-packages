@@ -1,8 +1,8 @@
 #!/bin/sh
 
 set -e
-#set -x
 
+export PKGOS_VERBOSE=yes
 OSINSTALL_RC=~/osinstallrc
 TEMPEST_CONF=/etc/tempest/tempest.conf
 IMAGE_PASS=SupArP4ss

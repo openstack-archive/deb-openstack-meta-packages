@@ -2,6 +2,8 @@
 
 set -e
 
+export PKGOS_VERBOSE=yes
+
 ACTION=${1}
 
 if ! [ -r /usr/share/openstack-deploy/preseed-lib ] ; then
