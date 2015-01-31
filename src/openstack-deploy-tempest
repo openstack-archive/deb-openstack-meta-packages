@@ -152,6 +152,7 @@ gen_ssh_root_key () {
 }
 
 setup_loopback_based_lvm_vg () {
+	echo "===> Creating a 10 GB loopback file used as LVM"
 	# Create a 10GB file on the root
 	dd if=/dev/zero of=/lvm-data.dat count=20971520
 	# Setup the loopback device
@@ -162,6 +163,7 @@ setup_loopback_based_lvm_vg () {
 	vgcreate pkgosvg0 /dev/loop2
 	# Activate the pkgosvg0
 	vgchange -a y pkgosvg0
+	echo "Done!"
 }
 
 install_cinder () {
