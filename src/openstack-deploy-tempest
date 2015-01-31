@@ -178,3 +178,4 @@ create_non_admin_keystone_user
 fix_tempest_config
 gen_ssh_root_key
 setup_loopback_based_lvm_vg
+install_cinder
