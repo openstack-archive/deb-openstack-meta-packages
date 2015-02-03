@@ -355,7 +355,7 @@ neutron-common neutron/nova_url string ${NOVA_URL}
 neutron-common neutron/nova_url seen true
 neutron-common neutron/nova_region string ${KEYSTONE_REGION}
 neutron-common neutron/nova_region seen true
-neutron-common neutron/nova_admin_tenant_id ${NOVA_TENANT_ID}
+neutron-common neutron/nova_admin_tenant_id string ${NOVA_TENANT_ID}
 neutron-common neutron/nova_admin_tenant_id seen true
 neutron-common neutron/nova_admin_username string admin
 neutron-common neutron/nova_admin_username seen true
