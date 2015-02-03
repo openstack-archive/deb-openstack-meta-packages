@@ -151,13 +151,18 @@ osinstall_preseed_all () {
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 	osinstall_rcvalue RC_NEUTRON_SQL_PASS "Neutron MySQL password [generated-password]: " yes
+	osinstall_rcvalue RC_METADATA_SHARED_SECRET "Metadata proxy shared secret [generated-password]: " yes
+
+	# Get the tenant_id which is needed by neutron
+	ADMIN_TENANT_ID=`keystone --os-tenant-name admin --os-username admin --os-password ${RC_KEYSTONE_ADMINPASS} --os-auth-url http://${RC_KEYSTONE_ENDPOINT_IP}:35357/v2.0 tenant-get admin | grep id | awk '{print $4}'`
+	# TODO: make it work with any IP for the nova-api server (eg: replace the 127.0.0.1 below)
 	os_preseed_neutron ${RC_NEUTRON_SQL_PASS} ${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} \
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
-		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS} ${RC_METADATA_SHARED_SECRET} http://127.0.0.1:8774/v2 ${ADMIN_TENANT_ID}
 	osinstall_rcvalue RC_NOVA_SQL_PASS "Nova MySQL password [generated-password]: " yes
 	os_preseed_nova ${RC_NOVA_SQL_PASS} ${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} \
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
-		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
+		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS} ${RC_METADATA_SHARED_SECRET}
 	osinstall_rcvalue RC_CINDER_SQL_PASS "Cinder MySQL password [generated-password]: " yes
 	os_preseed_cinder ${RC_CINDER_SQL_PASS} ${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} \
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
