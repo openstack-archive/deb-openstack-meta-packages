@@ -115,6 +115,8 @@ fix_tempest_config () {
 	# flavor 1 is too small for the 2GB default Jessie image
 	pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
 
+	pkgos_inifile set ${TEMPEST_CONF} compute ssh_connect_method floating
+
 	# [compute-admin]
 	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
 	pkgos_inifile set ${TEMPEST_CONF} compute-admin tenant_name admin
