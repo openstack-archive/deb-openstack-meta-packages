@@ -6,3 +6,4 @@ src/openstack-deploy-tempest		/usr/sbin
 src/preseed-lib				/usr/share/openstack-deploy
 src/init.d/openstack-proxy-node-network	/usr/share/openstack-deploy
 src/init.d/openstack-proxy-node-nat	/usr/share/openstack-deploy
+src/tempest_exclude.conf		/usr/share/openstack-deploy
