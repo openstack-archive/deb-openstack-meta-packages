@@ -307,7 +307,7 @@ nova-common nova/neutron_admin_tenant_name string admin
 nova-common nova/neutron_admin_tenant_name seen true
 nova-common nova/neutron_admin_username string admin
 nova-common nova/neutron_admin_username seen true
-nova-common nova/neutron_admin_username password ${KEYSTONE_ADMIN_PASS}
+nova-common nova/neutron_admin_password password ${KEYSTONE_ADMIN_PASS}
 nova-common nova/neutron_admin_username seen true
 nova-common nova/metadata_secret password ${METADATA_SHARED_SECRET}
 nova-common nova/metadata_secret seen true
