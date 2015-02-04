@@ -60,7 +60,7 @@ osinstall_install_if_not_installed () {
 deploy_tempest_install_pkgs () {
 	echo "===> Installing tempest and openstack-debian-images"
 	osinstall_install_if_not_installed tempest
-	cp /usr/share/openstack-deploy/tempest_exclude.conf /etc/tempest
+	cp /usr/share/openstack-deploy/tempest_exclude.conf /etc/tempest/exclude.conf
 	osinstall_install_if_not_installed openstack-debian-images
 	osinstall_install_if_not_installed openstack-clients
 }
