@@ -172,7 +172,7 @@ setup_loopback_based_lvm_vg () {
 install_cinder () {
 	# At this point in time, cinder should already be preseeded by openstack-deploy,
 	# so just installing it this way should be fine
-	DEBIAN_FRONTEND=noninteractive ${APTGET} install cinder-api cinder-volume python-cinderclient cinder-backup
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install cinder-api cinder-volume python-cinderclient cinder-backup cinder-scheduler
 }
 
 deploy_tempest_install_pkgs
