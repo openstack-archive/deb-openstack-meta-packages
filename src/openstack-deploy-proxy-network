@@ -242,6 +242,8 @@ setup_neutron_networking () {
 
 	# Create a single floating IP, just for our tests
 	neutron floatingip-create ext-net
+	neutron floatingip-create ext-net
+	neutron floatingip-create ext-net
 
 	# Allow ping and ssh
 	neutron security-group-rule-create --direction ingress --protocol tcp --port_range_min 22 --port_range_max 22 default
