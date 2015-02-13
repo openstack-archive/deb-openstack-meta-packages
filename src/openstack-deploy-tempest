@@ -5,7 +5,17 @@ set -e
 export PKGOS_VERBOSE=yes
 OSINSTALL_RC=~/osinstallrc
 TEMPEST_CONF=/etc/tempest/tempest.conf
-IMAGE_PASS=SupArP4ss
+# This can be debian or cirros. While it's cool
+# to test using the Debian image, it's also a
+# quite big image which needs flavor 2 (eg: the
+# HDD needs more than 1 GB of space), and it
+# takes a while to build it.
+TEST_IMAGE_TYPE=cirros
+if [ "${TEST_IMAGE_TYPE}" = "debian" ] ; then
+	IMAGE_PASS=SupArP4ss
+else
+	IMAGE_PASS="cubswin:)"
+fi
 
 if [ -n "${1}" ] ; then
 	DEBIAN_REPO_PARAM=" -u ${1} -s ${1}"
@@ -66,12 +76,24 @@ deploy_tempest_install_pkgs () {
 }
 
 build_and_upload_image () {
-	echo "===> Creating Debian image"
-	build-openstack-debian-image -r jessie -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
-	IMAGE_PATH=`ls *.qcow2`
-	echo "===> Uploading image to Glance"
-	AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
-	IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
+		echo "===> Creating Debian image"
+		build-openstack-debian-image -r jessie -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
+		IMAGE_PATH=`ls *.qcow2`
+		echo "===> Uploading image to Glance"
+		AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+	else
+		# Download the Cirros image
+		CIRROS_VERSION=0.3.1
+		mkdir -p /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec
+		wget http://download.cirros-cloud.net/0.3.1/cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+		tar -C /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec -xvzf cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+		rm cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+		# Upload it to Glance and keep its ref
+		AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+	fi
 }
 
 create_non_admin_keystone_user () {
@@ -114,7 +136,9 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
 	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
 	# flavor 1 is too small for the 2GB default Jessie image
-	pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
+	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
+		pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
+	fi
 
 	pkgos_inifile set ${TEMPEST_CONF} compute ssh_connect_method floating
 
