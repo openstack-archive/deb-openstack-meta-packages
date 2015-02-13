@@ -76,22 +76,29 @@ deploy_tempest_install_pkgs () {
 }
 
 build_and_upload_image () {
+	# Even if we don't use the Cirros image for tests, we need it
+	# because there's some Cinder tests that are expecting the image
+	# to be in there.
+	# Download the Cirros image
+	CIRROS_VERSION=0.3.1
+	mkdir -p /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec
+	wget http://download.cirros-cloud.net/${CIRROS_VERSION}/cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+	tar -C /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec -xvzf cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+	rm cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
+
+
+	AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+
 	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
 		echo "===> Creating Debian image"
 		build-openstack-debian-image -r jessie -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
 		IMAGE_PATH=`ls *.qcow2`
 		echo "===> Uploading image to Glance"
-		AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
 		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
 	else
-		# Download the Cirros image
-		CIRROS_VERSION=0.3.1
-		mkdir -p /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec
-		wget http://download.cirros-cloud.net/0.3.1/cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
-		tar -C /opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-uec -xvzf cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
-		rm cirros-${CIRROS_VERSION}-x86_64-uec.tar.gz
-		# Upload it to Glance and keep its ref
-		AUTH_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
+		echo "===> Download the Cirros image"
+		IMAGE_PATH=/opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-disk.img
+		wget http://download.cirros-cloud.net/${CIRROS_VERSION}/cirros-${CIRROS_VERSION}-x86_64-disk.img -O ${IMAGE_PATH}
 		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
 	fi
 }
