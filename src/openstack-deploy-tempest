@@ -190,11 +190,11 @@ setup_loopback_based_lvm_vg () {
 	# Create a 10GB file on the root
 	dd if=/dev/zero of=/lvm-data.dat count=20971520
 	# Setup the loopback device
-	losetup /dev/loop2 /lvm-data.dat
+	losetup /dev/loop0 /lvm-data.dat
 	# Create the PV
-	pvcreate /dev/loop2
+	pvcreate /dev/loop0
 	# Create the VG
-	vgcreate pkgosvg0 /dev/loop2
+	vgcreate pkgosvg0 /dev/loop0
 	# Activate the pkgosvg0
 	vgchange -a y pkgosvg0
 	echo "Done!"
