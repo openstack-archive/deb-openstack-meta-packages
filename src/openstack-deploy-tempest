@@ -148,6 +148,12 @@ fix_tempest_config () {
 	fi
 
 	pkgos_inifile set ${TEMPEST_CONF} compute ssh_connect_method floating
+	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
+		pkgos_inifile set ${TEMPEST_CONF} compute path_to_private_key /root/.ssh/id_rsa
+		pkgos_inifile set ${TEMPEST_CONF} compute ssh_auth_method keypair
+		pkgos_inifile set ${TEMPEST_CONF} compute ssh_user debian
+	fi
+	pkgos_inifile set ${TEMPEST_CONF} compute-feature-enabled spice_console true
 
 	# [compute-admin]
 	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
