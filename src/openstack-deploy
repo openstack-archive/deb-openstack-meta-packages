@@ -71,7 +71,7 @@ osinstall_rcvalue () {
 }
 
 usage () {
-	echo "${0} [--non-interactive] <services|controller|compute|all-in-one>"
+	echo "${0} [--non-interactive] <services|controller|compute|all-in-one|fuel-master-node>"
 	exit 1
 }
 
