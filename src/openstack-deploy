@@ -228,6 +228,15 @@ case "${1}" in
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-compute-node
 	osinstall_write_openrc
 ;;
+"fuel-master-node")
+	os_pressed_misc
+	osinstall_mysql_set_localhost
+	osinstall_install_if_not_installed ntp
+	osinstall_install_if_not_installed python-argparse
+	osinstall_install_services
+	osinstall_rabbit_host_and_pass
+	osinstall_keystone
+;;
 "all-in-one")
 	os_pressed_misc
 	osinstall_mysql_set_localhost
