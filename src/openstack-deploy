@@ -236,6 +236,7 @@ case "${1}" in
 	osinstall_install_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
+	osinstall_write_openrc
 ;;
 "all-in-one")
 	os_pressed_misc
