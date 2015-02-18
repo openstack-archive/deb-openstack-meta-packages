@@ -161,3 +161,40 @@ Description: validate OpenStack Debian packages using tempest and openstack-depl
  .
  Typically, this package is to be installed on a Jenkins machine and it's
  script shall be run on regular basis.
+
+Package: fuel-master-node-services
+Depends: dbconfig-common,
+         cobbler,
+         cobbler-web,
+         ntp,
+         openstack-clients,
+         postgresql-9.4 | postgresql-9.1,
+         rabbitmq-server,
+         rsync,
+         ${misc:Depends}
+Description: Metapackage to install all needed Fuel master node service dependencies
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to
+ implement and massively scalable.
+ .
+ This metapackage contains all services that a fuel master node needs, like a
+ database server, rabbitmq, and so on.
+
+Package: fuel-master-node
+Architecture: all
+Pre-Depends: fuel-master-node-services
+Depends: astute,
+         fuel-web-apache,
+         fuel-web-static,
+         nailgun-api,
+         nailgun-assassin,
+         python-fuelclient,
+         python-network-checker,
+         mcollective,
+         cobbler
+         ${misc:Depends}
+Description: Metapackage to install a Fuel master node server
+ This metapacakge contains all the needed dependencies to install a Fuel master
+ node. Fuel is a deployment tool for OpenStack, which provides a web GUI to
+ perform OpenStack deployments.

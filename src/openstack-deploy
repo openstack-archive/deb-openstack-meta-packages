@@ -106,6 +106,13 @@ osinstall_mysql_set_localhost () {
 	. ${OSINSTALL_RC}
 }
 
+osinstall_pgsql_server () {
+	osinstall_rcvalue RC_PGSQL_SERVER_PKG_NAME "postgresql package name [postgresql-9.1]: " no postgresql-9.1
+	if ! osinstall_check_installed ${RC_PGSQL_SERVER_PKG_NAME} ; then
+		${APTGET} install ${RC_PGSQL_SERVER_PKG_NAME}
+	fi
+}
+
 osinstall_install_services () {
 	os_pressed_misc
 	osinstall_mysql_server
@@ -114,6 +121,15 @@ osinstall_install_services () {
 	osinstall_install_if_not_installed ntp
 	osinstall_install_if_not_installed python-argparse
 	osinstall_install_if_not_installed openstack-cloud-services
+}
+
+osinstall_install_fuel_services () {
+	os_pressed_misc
+	osinstall_mysql_server
+	osinstall_pgsql_server
+	osinstall_install_if_not_installed rabbitmq-server
+	osinstall_install_if_not_installed ntp
+	osinstall_install_if_not_installed fuel-master-node-services
 }
 
 osinstall_rabbit_host_and_pass () {
@@ -233,7 +249,7 @@ case "${1}" in
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
 	osinstall_install_if_not_installed python-argparse
-	osinstall_install_services
+	osinstall_install_fuel_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_write_openrc
