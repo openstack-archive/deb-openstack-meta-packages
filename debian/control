@@ -163,12 +163,14 @@ Description: validate OpenStack Debian packages using tempest and openstack-depl
  script shall be run on regular basis.
 
 Package: fuel-master-node-services
-Depends: dbconfig-common,
-         cobbler,
+Depends: cobbler,
          cobbler-web,
+         dbconfig-common,
+         dnsutils,
          ntp,
          openstack-clients,
          postgresql-9.4 | postgresql-9.1,
+         python-ipaddr,
          rabbitmq-server,
          rsync,
          ${misc:Depends}
@@ -185,15 +187,15 @@ Package: fuel-master-node
 Architecture: all
 Pre-Depends: fuel-master-node-services
 Depends: astute,
+         cobbler
+         ${misc:Depends},
          fuel-web-apache,
          fuel-web-static,
+         mcollective,
          nailgun-api,
          nailgun-assassin,
          python-fuelclient,
-         python-network-checker,
-         mcollective,
-         cobbler
-         ${misc:Depends}
+         python-network-checker
 Description: Metapackage to install a Fuel master node server
  This metapacakge contains all the needed dependencies to install a Fuel master
  node. Fuel is a deployment tool for OpenStack, which provides a web GUI to
