@@ -188,15 +188,15 @@ Package: fuel-master-node
 Architecture: all
 Pre-Depends: fuel-master-node-services
 Depends: astute,
-         cobbler
-         ${misc:Depends},
+         cobbler,
          fuel-web-apache,
          fuel-web-static,
          mcollective,
          nailgun-api,
          nailgun-assassin,
          python-fuelclient,
-         python-network-checker
+         python-network-checker,
+         ${misc:Depends}
 Description: Metapackage to install a Fuel master node server
  This metapacakge contains all the needed dependencies to install a Fuel master
  node. Fuel is a deployment tool for OpenStack, which provides a web GUI to
