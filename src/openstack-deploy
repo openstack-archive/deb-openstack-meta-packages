@@ -107,7 +107,7 @@ osinstall_mysql_set_localhost () {
 }
 
 osinstall_pgsql_server () {
-	osinstall_rcvalue RC_PGSQL_SERVER_PKG_NAME "postgresql package name [postgresql-9.1]: " no postgresql-9.1
+	osinstall_rcvalue RC_PGSQL_SERVER_PKG_NAME "postgresql package name [postgresql-9.4]: " no postgresql-9.4
 	if ! osinstall_check_installed ${RC_PGSQL_SERVER_PKG_NAME} ; then
 		${APTGET} install ${RC_PGSQL_SERVER_PKG_NAME}
 	fi
