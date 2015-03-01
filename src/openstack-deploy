@@ -119,7 +119,6 @@ osinstall_install_services () {
 	osinstall_install_if_not_installed mongodb
 	osinstall_install_if_not_installed rabbitmq-server
 	osinstall_install_if_not_installed ntp
-	osinstall_install_if_not_installed python-argparse
 	osinstall_install_if_not_installed openstack-cloud-services
 }
 
@@ -239,7 +238,6 @@ case "${1}" in
 	os_pressed_misc
 	osinstall_mysql_set_host
 	osinstall_install_if_not_installed ntp
-	osinstall_install_if_not_installed python-argparse
 	osinstall_rcvalue_keystone_endpoint
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-compute-node
 	osinstall_write_openrc
@@ -248,7 +246,6 @@ case "${1}" in
 	os_pressed_misc
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
-	osinstall_install_if_not_installed python-argparse
 	osinstall_install_fuel_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
@@ -258,7 +255,6 @@ case "${1}" in
 	os_pressed_misc
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
-	osinstall_install_if_not_installed python-argparse
 	osinstall_install_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
