@@ -121,19 +121,33 @@ TENANT_NET_CIDR=192.168.100.0/24
 }
 
 install_and_start_network_init_script () {
+	IS_SYSTEMD=no
+	if [ -r /proc/1/comm ] ; then
+		if [ `cat /proc/1/comm` = "systemd" ] ; then
+			IS_SYSTEMD=yes
+		fi
+	fi
 	echo "===> Installing OVS bridged network init script"
 	cp /usr/share/openstack-deploy/openstack-proxy-node-network /etc/init.d
 	chmod +x /etc/init.d/openstack-proxy-node-network
 	update-rc.d openstack-proxy-node-network defaults
 	echo "===> Starting OVS bridged network init script"
-	nohup invoke-rc.d openstack-proxy-node-network start
+	if [ "${IS_SYSTEMD}" = "yes" ] ; then
+		nohup /etc/init.d/openstack-proxy-node-network systemd-start
+	else
+		nohup invoke-rc.d openstack-proxy-node-network start
+	fi
 
 	echo "===> Installing MGMT network NAT init script"
 	cp /usr/share/openstack-deploy/openstack-proxy-node-nat /etc/init.d
 	chmod +x /etc/init.d/openstack-proxy-node-nat
 	update-rc.d openstack-proxy-node-nat defaults
 	echo "===> Starting MGMT network NAT init script"
-	invoke-rc.d openstack-proxy-node-nat start
+	if [ "${IS_SYSTEMD}" = "yes" ] ; then
+		nohup /etc/init.d/openstack-proxy-node-nat systemd-start
+	else
+		invoke-rc.d openstack-proxy-node-nat start
+	fi
 }
 
 pkgos_get_id () {
