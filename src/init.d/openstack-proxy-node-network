@@ -37,7 +37,7 @@ do_stop() {
 }
 
 case "$1" in
-start)
+start|systemd-start)
 	log_daemon_msg "Starting $DESC" "$NAME"
 	do_start
 	log_daemon_msg 0
