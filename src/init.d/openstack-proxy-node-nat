@@ -25,7 +25,7 @@ fi
 . /lib/lsb/init-functions
 
 case "$1" in
-start)
+start|systemd-start)
 	echo 1 >/proc/sys/net/ipv4/ip_forward
 
 	$MODPROBE ip_tables
