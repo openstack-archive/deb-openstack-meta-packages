@@ -233,7 +233,7 @@ nova_and_neutron_fixups () {
 
 setup_neutron_networking () {
 	# Map the existing physical network in Neutron
-	neutron net-create ext-net --router:external=True --provider:physical_network external --provider:network_type flat
+	neutron net-create ext-net --router:external --provider:physical_network external --provider:network_type flat
 	neutron subnet-create ext-net --name ext-subnet \
 		--allocation-pool start=${EXT_HOST_MIN},end=${EXT_HOST_MAX} \
 		--gateway ${DEFROUTE_GW} ${EXT_NET_CIDR} -- --enable_dhcp=False
