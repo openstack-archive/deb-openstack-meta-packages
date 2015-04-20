@@ -179,7 +179,14 @@ source_openrc_if_present () {
 setup_local_ip () {
 	if [ -n "${LOCAL_IP}" ] ; then
 		pkgos_inifile set /etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini ovs local_ip ${LOCAL_IP}
-		invoke-rc.d neutron-plugin-openvswitch-agent restart
+		if [ -x /etc/init.d/neutron-plugin-openvswitch-agent ] ; then
+			invoke-rc.d neutron-plugin-openvswitch-agent restart
+		elif [ -x /etc/init.d/neutron-openvswitch-agent ] ; then
+			invoke-rc.d neutron-openvswitch-agent restart
+		else
+			echo "Could not find neutron-openvswitch-agent"
+			exit 1
+		fi
 	fi
 }
 
