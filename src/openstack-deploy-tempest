@@ -210,7 +210,11 @@ install_cinder () {
 	# At this point in time, cinder should already be preseeded by openstack-deploy,
 	# so just installing it this way should be fine
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install cinder-api cinder-volume python-cinderclient cinder-backup cinder-scheduler
-	DEBIAN_FRONTEND=noninteractive ${APTGET} install -t wheezy-backports tgt || true
+	if [ -x /usr/bin/lsb_release ] && [ `lsb_release -a | grep Codename | awk '{print $2}'` = "wheezy" ] ; then
+		DEBIAN_FRONTEND=noninteractive ${APTGET} install -t wheezy-backports tgt || true
+	else
+		DEBIAN_FRONTEND=noninteractive ${APTGET} install tgt || true
+	fi
 }
 
 deploy_tempest_install_pkgs
