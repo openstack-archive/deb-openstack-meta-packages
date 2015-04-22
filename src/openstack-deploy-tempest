@@ -192,9 +192,11 @@ gen_ssh_root_key () {
 }
 
 setup_loopback_based_lvm_vg () {
-	echo "===> Creating a 10 GB loopback file used as LVM"
-	# Create a 10GB file on the root
-	dd if=/dev/zero of=/lvm-data.dat count=20971520
+	echo "===> Creating a 40 GB loopback file used as LVM"
+	## Create a 10GB file on the root
+	#dd if=/dev/zero of=/lvm-data.dat count=20971520
+	# Create a 40GB file on the root
+	dd if=/dev/zero of=/lvm-data.dat count=83886080
 	# Setup the loopback device
 	losetup /dev/loop0 /lvm-data.dat
 	# Create the PV
