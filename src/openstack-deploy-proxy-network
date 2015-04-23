@@ -246,7 +246,7 @@ setup_neutron_networking () {
 		--gateway ${DEFROUTE_GW} ext-net ${EXT_NET_CIDR} -- --enable_dhcp=False
 
 	# Create the demo LAN
-	LAN_NET=`pkgos_get_id neutron net-create demo-net`
+	LAN_NET=`pkgos_get_id neutron --shared net-create demo-net`
 	#LAN_SUBNET=`pkgos_get_id neutron subnet-create demo-net --name demo-subnet ${TENANT_NET_CIDR} -- --dns_nameservers list=true ${DEFROUTE_IP}`
 	# Sylvain says this is enough, and I don't need to do what's above:
 	LAN_SUBNET=`pkgos_get_id neutron subnet-create --name demo-subnet demo-net ${TENANT_NET_CIDR}`
