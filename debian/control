@@ -147,7 +147,7 @@ Description: Tools to deploy OpenStack
 
 Package: openstack-tempest-ci
 Architecture: all
-Depends: nmap, openstack-clients
+Depends: nmap, openstack-clients, ${misc:Depends}
 Description: validate OpenStack Debian packages using tempest and openstack-deploy
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
