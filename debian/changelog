@@ -1,4 +1,4 @@
-openstack-meta-packages (0.12) UNRELEASED; urgency=medium
+openstack-meta-packages (0.12) unstable; urgency=medium
 
   * Added scripts to do automatic network configuration of the proxy node.
   * Fixed os_preseed_set_dbconfig_conf to also write the MySQL root pass.
