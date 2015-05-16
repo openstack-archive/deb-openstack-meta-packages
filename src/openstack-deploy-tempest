@@ -136,6 +136,11 @@ fix_tempest_config () {
 	# [compute]
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref_alt ${IMAGE_REF}
+	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
+		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user cirros
+	else
+		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user root
+	fi
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_user root
 	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_password ${IMAGE_PASS}
