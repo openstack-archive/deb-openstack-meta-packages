@@ -1,6 +1,7 @@
 openstack-meta-packages (0.13) UNRELEASED; urgency=medium
 
   * Fixed --shared option when deploying proxy network.
+  * Fixed ssh user for cirros in openstack-deploy-tempest.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
 
