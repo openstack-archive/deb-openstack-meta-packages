@@ -39,7 +39,7 @@ Depends: dbconfig-common,
          ntp,
          rabbitmq-server,
          ${misc:Depends}
-Recommends: memcached, openvswitch-datapath-dkms
+Recommends: memcached
 Description: Metapackage to install all Openstack service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
