@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@
+	dh $@ --parallel
 
 get-vcs-source:
 	echo "Nothing to do here..."
