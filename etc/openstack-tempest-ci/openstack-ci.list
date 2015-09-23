@@ -1,5 +1,5 @@
-deb http://kilo-jessie.pkgs.mirantis.com/debian jessie-kilo-backports main
-deb-src http://kilo-jessie.pkgs.mirantis.com/debian jessie-kilo-backports main
+deb http://liberty-jessie.pkgs.mirantis.com/debian jessie-liberty-backports main
+deb-src http://liberty-jessie.pkgs.mirantis.com/debian jessie-liberty-backports main
 
-deb http://kilo-jessie.pkgs.mirantis.com/debian jessie-kilo-backports-nochange main
-deb-src http://kilo-jessie.pkgs.mirantis.com/debian jessie-kilo-backports-nochange main
+deb http://liberty-jessie.pkgs.mirantis.com/debian jessie-liberty-backports-nochange main
+deb-src http://liberty-jessie.pkgs.mirantis.com/debian jessie-liberty-backports-nochange main
