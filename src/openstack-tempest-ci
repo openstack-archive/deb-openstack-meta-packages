@@ -72,7 +72,7 @@ otci_associate_ip () {
 
 otci_provision_new_vm () {
 	if [ "${OTCI_VIRT_MODE}" = "xen" ] ; then
-		rm /var/lib/jenkins/.ssh/known_hosts
+		rm -f /var/lib/jenkins/.ssh/known_hosts
 		ssh -o "StrictHostKeyChecking no" root@${OTCI_XEN_DOM0_IP} /root/p
 	else
 		otci_delete_if_already_running
