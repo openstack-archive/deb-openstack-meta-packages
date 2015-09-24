@@ -3,6 +3,7 @@ openstack-meta-packages (0.14) experimental; urgency=medium
   * Fixed --shared option when deploying proxy network.
   * Fixed ssh user for cirros in openstack-deploy-tempest.
   * Switched to using liberty instead of Kilo.
+  * Also setting OS_PROJECT_NAME in openrc.sh.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
 
