@@ -225,7 +225,7 @@ restart_all_nova_and_neutron_daemons () {
 	for i in /etc/init.d/nova* ; do $i start ; done
 	for i in /etc/init.d/neutron* ; do $i stop ; done
 	for i in /etc/init.d/neutron* ; do $i start ; done
-	sleep 5
+	sleep 10
 }
 
 nova_and_neutron_fixups () {
@@ -276,5 +276,6 @@ find_default_ip
 calc_host_min_max
 install_and_start_network_init_script
 source_openrc_if_present
+set -x
 nova_and_neutron_fixups
 setup_neutron_networking
