@@ -94,12 +94,12 @@ build_and_upload_image () {
 		build-openstack-debian-image -r jessie -p ${IMAGE_PASS} ${DEBIAN_REPO_PARAM}
 		IMAGE_PATH=`ls *.qcow2`
 		echo "===> Uploading image to Glance"
-		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --visibility public --file=${IMAGE_PATH}`
 	else
 		echo "===> Download the Cirros image"
 		IMAGE_PATH=/opt/stack/new/devstack/files/images/cirros-${CIRROS_VERSION}-x86_64-disk.img
 		wget http://download.cirros-cloud.net/${CIRROS_VERSION}/cirros-${CIRROS_VERSION}-x86_64-disk.img -O ${IMAGE_PATH}
-		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --is-public=True --file=${IMAGE_PATH}`
+		IMAGE_REF=`pkgos_get_id glance image-create --name foo --disk-format=qcow2 --container-format=bare --visibility public --file=${IMAGE_PATH}`
 	fi
 }
 
