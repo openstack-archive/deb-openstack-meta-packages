@@ -276,6 +276,5 @@ find_default_ip
 calc_host_min_max
 install_and_start_network_init_script
 source_openrc_if_present
-set -x
 nova_and_neutron_fixups
 setup_neutron_networking
