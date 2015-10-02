@@ -104,8 +104,8 @@ build_and_upload_image () {
 }
 
 create_non_admin_keystone_user () {
-	keystone tenant-create --name testme
-	keystone user-create --name testme --tenant testme --pass testme
+	openstack project create testme
+	openstack user create --password testme --project testme --email root@localhost --enable testme
 }
 
 fix_tempest_config () {

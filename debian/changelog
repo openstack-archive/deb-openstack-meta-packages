@@ -7,6 +7,8 @@ openstack-meta-packages (0.14) experimental; urgency=medium
   * Fixed --is-public=True -> --visibility public when adding a new image.
   * Manualy create the cinder v1 service and endpoint (the Cinder package
     currently only creates the cinderv2 service.
+  * Using openstackclient instead of keystoneclient cli when creating the
+    testme user and project.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
 
