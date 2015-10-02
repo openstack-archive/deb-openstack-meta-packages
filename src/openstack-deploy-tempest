@@ -228,7 +228,7 @@ install_cinder () {
 	fi
 	# In production, we don't need the v1 endpoint, but for tempest, we do...
 	openstack service create --description "Cinder Volume Service" --name cinder volume
-	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8776/v2/%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8776/v2/%\(tenant_id\)s --internalurl http://${DEFROUTE_IP}:8776/v2/%\(tenant_id\)s --region regionOne cinder
+	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --internalurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --region regionOne cinder
 }
 
 deploy_tempest_install_pkgs
