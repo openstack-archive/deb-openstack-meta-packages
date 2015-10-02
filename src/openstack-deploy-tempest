@@ -139,9 +139,9 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref_alt ${IMAGE_REF}
 	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
-		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user cirros
+		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user debian
 	else
-		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user root
+		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user cirros
 	fi
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_user root
@@ -175,8 +175,9 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_cidr ${TENANT_NET_CIDR}
 	PUBLIC_NETWORK_ID=`pkgos_get_id neutron net-show ext-net`
 	pkgos_inifile set ${TEMPEST_CONF} network public_network_id ${PUBLIC_NETWORK_ID}
-	PUBLIC_ROUTER_ID=`pkgos_get_id neutron router-show demo-router`
-	pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
+# We shouldn't do this. Doing it fails all tests
+#	PUBLIC_ROUTER_ID=`pkgos_get_id neutron router-show demo-router`
+#	pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
 
 	# [service_available]
 	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true

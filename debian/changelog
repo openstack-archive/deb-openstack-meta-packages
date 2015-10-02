@@ -10,6 +10,8 @@ openstack-meta-packages (0.14) experimental; urgency=medium
   * Using openstackclient instead of keystoneclient cli when creating the
     testme user and project.
   * Defines the alt user and tenant correctly.
+  * Fixed compute image_ssh_user.
+  * Do not set public_router_id at all (this adds failures).
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
 
