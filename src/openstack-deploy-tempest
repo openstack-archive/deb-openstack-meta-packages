@@ -106,6 +106,8 @@ build_and_upload_image () {
 create_non_admin_keystone_user () {
 	openstack project create testme
 	openstack user create --password testme --project testme --email root@localhost --enable testme
+	openstack project create testme2
+	openstack user create --password testme2 --project testme2 --email root@localhost --enable testme2
 }
 
 fix_tempest_config () {
@@ -122,9 +124,9 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} identity username testme
 	pkgos_inifile set ${TEMPEST_CONF} identity tenant_name testme
 	pkgos_inifile set ${TEMPEST_CONF} identity password testme
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_username admin
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_tenant_name admin
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_username testme2
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_tenant_name testme2
+	pkgos_inifile set ${TEMPEST_CONF} identity alt_password testme2
 	pkgos_inifile set ${TEMPEST_CONF} identity admin_username admin
 	pkgos_inifile set ${TEMPEST_CONF} identity admin_tenant_name admin
 	pkgos_inifile set ${TEMPEST_CONF} identity admin_password ${RC_KEYSTONE_ADMINPASS}

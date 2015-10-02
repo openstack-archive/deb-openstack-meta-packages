@@ -9,6 +9,7 @@ openstack-meta-packages (0.14) experimental; urgency=medium
     currently only creates the cinderv2 service.
   * Using openstackclient instead of keystoneclient cli when creating the
     testme user and project.
+  * Defines the alt user and tenant correctly.
 
  -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
 
