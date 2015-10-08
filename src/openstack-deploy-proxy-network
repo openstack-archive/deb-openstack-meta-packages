@@ -239,6 +239,15 @@ nova_and_neutron_fixups () {
 }
 
 setup_neutron_networking () {
+	echo "Trying to connect to neutron..."
+	NUM_RETRY=30
+	while ! neutron net-list && [ "${NUM_RETRY}" != 0 ] ; do
+		NUM_RETRY=$(( $NUM_RETRY - 1 ))
+		echo "Retry left: ${NUM_RETRY}"
+		sleep 0.5
+	done
+	echo "... Yeah \o/"
+
 	# Map the existing physical network in Neutron
 	neutron net-create ext-net --router:external --provider:physical_network external --provider:network_type flat
 	neutron subnet-create --name ext-subnet \
