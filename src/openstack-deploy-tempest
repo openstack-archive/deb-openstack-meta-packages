@@ -217,6 +217,67 @@ setup_loopback_based_lvm_vg () {
 	echo "Done!"
 }
 
+setup_loopback_based_swift () {
+	### NOTE: this comes from http://docs.openstack.org/developer/swift/development_saio.html ###
+
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer
+
+	# Create the loopback device
+	mkdir -p /srv
+	qemu-img create /srv/swift-disk 20G
+	mkfs.xfs /srv/swift-disk
+
+	# Mount it
+	mkdir /mnt/sdb1
+	echo "/srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >>/etc/fstab
+	mount /mnt/sdb1
+
+	# Setup swift disks
+	mkdir /mnt/sdb1/1 /mnt/sdb1/2 /mnt/sdb1/3 /mnt/sdb1/4
+	chown swift:swift /mnt/sdb1/*
+	for x in `seq 1 4`; do ln -s /mnt/sdb1/$x /srv/$x; done
+	mkdir -p /srv/1/node/sdb1 /srv/1/node/sdb5 \
+		/srv/2/node/sdb2 /srv/2/node/sdb6 \
+		/srv/3/node/sdb3 /srv/3/node/sdb7 \
+		/srv/4/node/sdb4 /srv/4/node/sdb8 \
+		/var/run/swift
+	chown -R swift:swift /var/run/swift
+	# **Make sure to include the trailing slash after /srv/$x/**
+	for x in `seq 1 4`; do chown -R swift:swift /srv/$x/; done
+
+	# Common Post-Device Setup
+	mkdir -p /var/cache/swift /var/cache/swift2 /var/cache/swift3 /var/cache/swift4
+	chown swift:swift /var/cache/swift*
+
+	# Enable rsyncd for swift
+	cp /usr/share/openstack-deploy/saio/rsyncd.conf /etc
+	sed -i s/RSYNC_ENABLE=false/RSYNC_ENABLE=true/ /etc/default/rsync
+	service rsync restart
+
+	# Copy the saio config files for swift
+	rm -rf /etc/swift/
+	mkdir -p /etc/swift/
+	cp -rfv /usr/share/openstack-deploy/saio/swift/* /etc/swift/
+	chown -R swift:swift /etc/swift
+
+	# Customize the config (ie: keystone authtoken)
+	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken admin_password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken identity_uri http://${DEFROUTE_IP}:35357/
+	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken auth_uri http://${DEFROUTE_IP}:5000/
+
+	# Create the swift ring
+	chmod +x /usr/share/openstack-deploy/saio/bin/remakerings
+	/usr/share/openstack-deploy/saio/bin/remakerings
+
+	# Restart swift after the config is good
+	for i in `ls /etc/init.d/swift-*` ; do $i stop ; done
+	for i in `ls /etc/init.d/swift-*` ; do $i start ; done
+
+	# Setup the endpoint
+	openstack service create --description "OpenStack Object Storage" --name swift object-store
+	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8080/ --internalurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --region regionOne swift
+}
+
 install_cinder () {
 	# At this point in time, cinder should already be preseeded by openstack-deploy,
 	# so just installing it this way should be fine
@@ -229,12 +290,18 @@ install_cinder () {
 	# In production, we don't need the v1 endpoint, but for tempest, we do...
 	openstack service create --description "Cinder Volume Service" --name cinder volume
 	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --internalurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --region regionOne cinder
+
+	# Set configuration for swift-backup (normally not needed...)
+	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_tenant admin
+	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_user admin
+	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_key admin
 }
 
 deploy_tempest_install_pkgs
-build_and_upload_image
 create_non_admin_keystone_user
+build_and_upload_image
 fix_tempest_config
 gen_ssh_root_key
 setup_loopback_based_lvm_vg
+setup_loopback_based_swift
 install_cinder

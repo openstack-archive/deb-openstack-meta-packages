@@ -7,3 +7,4 @@ src/openstack-deploy-tempest		/usr/sbin
 src/openstack-purge			/usr/sbin
 src/preseed-lib				/usr/share/openstack-deploy
 src/tempest_exclude.conf		/usr/share/openstack-deploy
+saio					/usr/share/openstack-deploy
