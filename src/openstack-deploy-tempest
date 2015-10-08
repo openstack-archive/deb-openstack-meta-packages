@@ -220,7 +220,7 @@ setup_loopback_based_lvm_vg () {
 setup_loopback_based_swift () {
 	### NOTE: this comes from http://docs.openstack.org/developer/swift/development_saio.html ###
 
-	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer xfsprogs
 
 	# Create the loopback device
 	mkdir -p /srv
