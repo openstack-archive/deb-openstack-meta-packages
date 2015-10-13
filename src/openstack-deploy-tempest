@@ -287,10 +287,6 @@ install_cinder () {
 	else
 		DEBIAN_FRONTEND=noninteractive ${APTGET} install tgt || true
 	fi
-	# In production, we don't need the v1 endpoint, but for tempest, we do...
-	openstack service create --description "Cinder Volume Service" --name cinder volume
-	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --internalurl http://${DEFROUTE_IP}:8776/v1/%\(tenant_id\)s --region regionOne cinder
-
 	# Set configuration for swift-backup (normally not needed...)
 	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_tenant admin
 	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_user admin
