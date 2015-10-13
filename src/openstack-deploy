@@ -208,6 +208,8 @@ osinstall_write_openrc () {
 	echo "export SERVICE_ENDPOINT=http://${RC_KEYSTONE_ENDPOINT_IP}:35357/v2.0/
 export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
 
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
 export OS_USERNAME=admin
 export OS_PASSWORD=${RC_KEYSTONE_ADMINPASS}
 export OS_TENANT_NAME=admin
