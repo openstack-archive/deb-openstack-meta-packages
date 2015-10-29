@@ -59,6 +59,17 @@ fi
 #################################
 # DEFINE SOME UTILITY FUNCTIONS #
 #################################
+osinstall_check_installed () {
+	local PKG_NAME
+	PKG_NAME=${1}
+	INSTALL_STRING=`dpkg -l ${PKG_NAME} | grep ^ii | awk '{print $2}'`
+	if [ "${INSTALL_STRING}" = ${PKG_NAME} ] ; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 osinstall_install_if_not_installed () {
 	local PKG_NAME
 	PKG_NAME=${1}
