@@ -285,8 +285,11 @@ setup_loopback_based_swift () {
 	for i in `ls /etc/init.d/swift-*` ; do $i start ; done
 
 	# Setup the endpoint
-	openstack service create --description "OpenStack Object Storage" --name swift object-store
-	openstack endpoint create --publicurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8080/ --internalurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --region regionOne swift
+	openstack --os-domain-name default --os-identity-api-version=3 service create --description "OpenStack Object Storage" --name swift object-store
+	openstack --os-identity-api-version=3 endpoint create --region regionOne swift public http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s
+	openstack --os-identity-api-version=3 endpoint create --region regionOne swift admin http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s
+	openstack --os-identity-api-version=3 endpoint create --region regionOne swift internal http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s
+	#openstack --os-domain-name default --os-identity-api-version=3 endpoint create --publicurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --adminurl http://${DEFROUTE_IP}:8080/ --internalurl http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s --region regionOne swift
 }
 
 install_cinder () {
