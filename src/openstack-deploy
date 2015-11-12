@@ -214,8 +214,10 @@ export OS_USERNAME=admin
 export OS_PASSWORD=${RC_KEYSTONE_ADMINPASS}
 export OS_TENANT_NAME=admin
 export OS_PROJECT_NAME=admin
-export OS_AUTH_URL=http://${RC_KEYSTONE_ENDPOINT_IP}:5000/v2.0/
-export OS_VERSION=1.1
+export OS_AUTH_URL=http://${RC_KEYSTONE_ENDPOINT_IP}:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
 export OS_NO_CACHE=1" >openrc.sh
 }
 
