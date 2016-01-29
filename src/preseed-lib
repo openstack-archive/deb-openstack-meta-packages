@@ -297,7 +297,7 @@ os_preseed_nova () {
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
 	METADATA_SHARED_SECRET=${11}
-	        echo "nova-common nova/active-api multiselect ec2, osapi_compute, metadata
+	        echo "nova-common nova/active-api multiselect osapi_compute, metadata
 nova-common nova/active-api seen true
 nova-consoleproxy nova-consoleproxy/daemon_type select spicehtml5
 nova-consoleproxy nova-consoleproxy/daemon_type seen true

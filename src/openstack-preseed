@@ -142,7 +142,7 @@ preseed_nova () {
 	set_dbconfig_conf nova-common ${NOVA_COMMON_SQL_PASS} novadb nova
 	preseed_keystone_admin_creds nova-common nova
 	preseed_endpoint nova-api nova
-	echo "nova-common nova/active-api multiselect ec2, osapi_compute, metadata
+	echo "nova-common nova/active-api multiselect osapi_compute, metadata
 nova-common nova/active-api seen true
 " | debconf-set-selections
 }

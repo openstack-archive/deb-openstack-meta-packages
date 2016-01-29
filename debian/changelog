@@ -3,6 +3,8 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Update to mitaka instead of liberty.
   * Generating /etc/openstack-tempest-ci/openstack-ci.list dynamically to
     pickup Debian and OpenStack release names from pkgos.conf if it exists.
+  * Removed activation of ec2 lib in preseed, as it's gone away from upstream
+    code in Nova.
 
  -- Thomas Goirand <zigo@debian.org>  Fri, 29 Jan 2016 11:48:15 +0800
 
