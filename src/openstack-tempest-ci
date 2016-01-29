@@ -141,8 +141,15 @@ otci_add_source_list () {
 	otci_scp /etc/openstack-tempest-ci/openstack-ci.list
 	echo "-> Install new source list"
 	otci_remote "sudo mv openstack-ci.list /etc/apt/sources.list.d/"
+	DEBIAN_RELEASE_NAME=`lsb_release -c | awk '{print $2}'`
+	if [ -r /etc/pkgos/pkgos.conf ] ; then
+		. /etc/pkgos/pkgos.conf
+	fi
+	if [ -z "${TARGET_OPENSTACK_REL}" ] ; then
+		TARGET_OPENSTACK_REL=mitaka
+	fi
 	echo "-> wget Jenkins key"
-	otci_remote "wget http://mitaka-jessie.pkgs.mirantis.com/debian/dists/pubkey.gpg"
+	otci_remote "wget http://${TARGET_OPENSTACK_REL}-${DEBIAN_RELEASE_NAME}.pkgs.mirantis.com/debian/dists/pubkey.gpg"
 	echo "-> Install Jenkins key"
 	otci_remote "sudo apt-key add pubkey.gpg"
 	echo "-> Updating source list"

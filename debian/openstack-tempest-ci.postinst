@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ] ; then
+	if ! [ -e /etc/openstack-tempest-ci/openstack-ci.list ] ; then
+		if [ -e /etc/pkgos/pkgos.conf ] ; then
+			. /etc/pkgos/pkgos.conf
+		else
+			TARGET_DISTRO=`lsb_release -c | awk '{print $2}'`
+			TARGET_OPENSTACK_REL=mitaka
+		fi
+		echo "deb http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports main
+deb-src http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports main
+
+deb http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports-nochange main
+deb-src http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports-nochange main
+" >/etc/openstack-tempest-ci/openstack-ci.list
+	fi
+fi
+
+#DEBHELPER#
+
+exit 0

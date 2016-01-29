@@ -1,3 +1,2 @@
-etc/openstack-tempest-ci/openstack-ci.list	/etc/openstack-tempest-ci
 src/openstack-tempest-ci			/usr/bin
 src/openstack-tempest-ci_mgmt-lan		/usr/bin
