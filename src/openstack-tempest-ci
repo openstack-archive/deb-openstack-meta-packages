@@ -142,7 +142,7 @@ otci_add_source_list () {
 	echo "-> Install new source list"
 	otci_remote "sudo mv openstack-ci.list /etc/apt/sources.list.d/"
 	echo "-> wget Jenkins key"
-	otci_remote "wget http://liberty-jessie.pkgs.mirantis.com/debian/dists/pubkey.gpg"
+	otci_remote "wget http://mitaka-jessie.pkgs.mirantis.com/debian/dists/pubkey.gpg"
 	echo "-> Install Jenkins key"
 	otci_remote "sudo apt-key add pubkey.gpg"
 	echo "-> Updating source list"

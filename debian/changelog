@@ -1,3 +1,9 @@
+openstack-meta-packages (0.15) UNRELEASED; urgency=medium
+
+  * Update to mitaka instead of liberty.
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 29 Jan 2016 11:48:15 +0800
+
 openstack-meta-packages (0.14) experimental; urgency=medium
 
   * Fixed --shared option when deploying proxy network.
