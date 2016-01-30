@@ -130,17 +130,12 @@ fix_tempest_config () {
 	# [identity]
 	pkgos_inifile set ${TEMPEST_CONF} identity disable_ssl_certificate_validation true
 	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:35357/v2.0
-	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v3
+	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v2.0
 	pkgos_inifile set ${TEMPEST_CONF} identity domain_name default
+	pkgos_inifile set ${TEMPEST_CONF} identity default_domain_id default
 	pkgos_inifile set ${TEMPEST_CONF} identity auth_version v3
-	pkgos_inifile set ${TEMPEST_CONF} identity username testme
-	pkgos_inifile set ${TEMPEST_CONF} identity tenant_name testme
-	pkgos_inifile set ${TEMPEST_CONF} identity password testme
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_username testme2
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_tenant_name testme2
-	pkgos_inifile set ${TEMPEST_CONF} identity alt_password testme2
-#	pkgos_inifile set ${TEMPEST_CONF} identity admin_domain_name default
 
+	# [auth]
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_domain_name default
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_username admin
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_tenant_name admin
@@ -172,7 +167,6 @@ fix_tempest_config () {
 
 	# [dashboard]
 	pkgos_inifile set ${TEMPEST_CONF} dashboard dashboard_url http://${DEFROUTE_IP}/
-	pkgos_inifile set ${TEMPEST_CONF} dashboard login_url http://${DEFROUTE_IP}/auth/login/
 
 	# [network]
 	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_cidr ${TENANT_NET_CIDR}
