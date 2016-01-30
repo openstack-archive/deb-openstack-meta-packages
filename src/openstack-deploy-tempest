@@ -186,7 +186,7 @@ fix_tempest_config () {
 
 	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_v6_cidr 2403:cc00:1000:8888:200:20ff:fe01:8402/64
 
-	[orchestration]
+	# [orchestration]
 	pkgos_inifile set ${TEMPEST_CONF} orchestration instance_type m1.small
 	pkgos_inifile set ${TEMPEST_CONF} orchestration keypair_name odtkey
 
