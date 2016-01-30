@@ -138,45 +138,36 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} identity alt_username testme2
 	pkgos_inifile set ${TEMPEST_CONF} identity alt_tenant_name testme2
 	pkgos_inifile set ${TEMPEST_CONF} identity alt_password testme2
-	pkgos_inifile set ${TEMPEST_CONF} identity admin_username admin
-	pkgos_inifile set ${TEMPEST_CONF} identity admin_tenant_name admin
-	pkgos_inifile set ${TEMPEST_CONF} identity admin_password ${RC_KEYSTONE_ADMINPASS}
+#	pkgos_inifile set ${TEMPEST_CONF} identity admin_domain_name default
+
+	pkgos_inifile set ${TEMPEST_CONF} auth admin_domain_name default
+	pkgos_inifile set ${TEMPEST_CONF} auth admin_username admin
+	pkgos_inifile set ${TEMPEST_CONF} auth admin_tenant_name admin
+	pkgos_inifile set ${TEMPEST_CONF} auth admin_password ${RC_KEYSTONE_ADMINPASS}
 
 	# [identity-feature-enabled]
-	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v2 true
-	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v3 false
+	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v2 false
+	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v3 true
 
 	# [compute]
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref_alt ${IMAGE_REF}
 	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
-		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user debian
+		pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_user debian
 	else
-		pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_user cirros
+		pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_user cirros
 	fi
-	pkgos_inifile set ${TEMPEST_CONF} compute image_ssh_password ${IMAGE_PASS}
-	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_user root
-	pkgos_inifile set ${TEMPEST_CONF} compute image_alt_ssh_password ${IMAGE_PASS}
+	pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_password ${IMAGE_PASS}
 	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
-	pkgos_inifile set ${TEMPEST_CONF} compute network_for_ssh ext-net
+	pkgos_inifile set ${TEMPEST_CONF} validation network_for_ssh ext-net
 	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
 	# flavor 1 is too small for the 2GB default Jessie image
 	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
 		pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
 	fi
 
-	pkgos_inifile set ${TEMPEST_CONF} compute ssh_connect_method floating
-	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
-		pkgos_inifile set ${TEMPEST_CONF} compute path_to_private_key /root/.ssh/id_rsa
-		pkgos_inifile set ${TEMPEST_CONF} compute ssh_auth_method keypair
-		pkgos_inifile set ${TEMPEST_CONF} compute ssh_user debian
-	fi
 	pkgos_inifile set ${TEMPEST_CONF} compute-feature-enabled spice_console true
-
-	# [compute-admin]
-	pkgos_inifile set ${TEMPEST_CONF} compute-admin username admin
-	pkgos_inifile set ${TEMPEST_CONF} compute-admin tenant_name admin
-	pkgos_inifile set ${TEMPEST_CONF} compute-admin password ${RC_KEYSTONE_ADMINPASS}
+	pkgos_inifile set ${TEMPEST_CONF} compute-feature-enabled allow_duplicate_networks true
 
 	# [dashboard]
 	pkgos_inifile set ${TEMPEST_CONF} dashboard dashboard_url http://${DEFROUTE_IP}/
@@ -190,19 +181,29 @@ fix_tempest_config () {
 #	PUBLIC_ROUTER_ID=`pkgos_get_id neutron router-show demo-router`
 #	pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
 
+	pkgos_inifile set ${TEMPEST_CONF} network default_network 192.168.64.0/20
+	pkgos_inifile set ${TEMPEST_CONF} network build_interval 3
+
+	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_v6_cidr 2403:cc00:1000:8888:200:20ff:fe01:8402/64
+
+	[orchestration]
+	pkgos_inifile set ${TEMPEST_CONF} orchestration instance_type m1.small
+	pkgos_inifile set ${TEMPEST_CONF} orchestration keypair_name odtkey
+
 	# [service_available]
-	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
-	pkgos_inifile set ${TEMPEST_CONF} service_available glance true
-	pkgos_inifile set ${TEMPEST_CONF} service_available cinder true
-	pkgos_inifile set ${TEMPEST_CONF} service_available swift false
-	pkgos_inifile set ${TEMPEST_CONF} service_available nova true
-	pkgos_inifile set ${TEMPEST_CONF} service_available heat false
+#	pkgos_inifile set ${TEMPEST_CONF} service_available zaqar false
+	pkgos_inifile set ${TEMPEST_CONF} service_available swift true
 	pkgos_inifile set ${TEMPEST_CONF} service_available ceilometer true
 	pkgos_inifile set ${TEMPEST_CONF} service_available horizon true
-	#sahara=false
-	#ironic=false
-	#trove=false
-	#marconi=false
+#	pkgos_inifile set ${TEMPEST_CONF} service_available ironic false
+	pkgos_inifile set ${TEMPEST_CONF} service_available nova true
+	pkgos_inifile set ${TEMPEST_CONF} service_available cinder true
+#	pkgos_inifile set ${TEMPEST_CONF} service_available trove false
+	pkgos_inifile set ${TEMPEST_CONF} service_available heat false
+#	pkgos_inifile set ${TEMPEST_CONF} service_available aodh false
+#	pkgos_inifile set ${TEMPEST_CONF} service_available sahara false
+	pkgos_inifile set ${TEMPEST_CONF} service_available glance true
+	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
 }
 
 gen_ssh_root_key () {
