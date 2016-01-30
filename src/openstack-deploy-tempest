@@ -129,8 +129,9 @@ fix_tempest_config () {
 
 	# [identity]
 	pkgos_inifile set ${TEMPEST_CONF} identity disable_ssl_certificate_validation true
-	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:5000/v2.0
-	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:5000/v3
+	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:35357/v2.0
+	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v3
+	pkgos_inifile set ${TEMPEST_CONF} identity domain_name default
 	pkgos_inifile set ${TEMPEST_CONF} identity auth_version v3
 	pkgos_inifile set ${TEMPEST_CONF} identity username testme
 	pkgos_inifile set ${TEMPEST_CONF} identity tenant_name testme
