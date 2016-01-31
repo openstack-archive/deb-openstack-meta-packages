@@ -125,7 +125,7 @@ fix_tempest_config () {
 	echo "===> Fixing tempest.conf"
 	# [identity]
 	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:35357/v2.0
-	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v2.0
+	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v3
 
 	# [auth]
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_password ${RC_KEYSTONE_ADMINPASS}
