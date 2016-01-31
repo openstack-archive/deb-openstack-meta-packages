@@ -19,7 +19,7 @@ Depends: python-aodhclient,
          python-designateclient,
          python-glanceclient,
          python-gnocchiclient,
-         python-ironicclient.
+         python-ironicclient,
          python-heatclient,
          python-keystoneclient,
          python-magnumclient,
