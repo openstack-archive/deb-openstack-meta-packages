@@ -65,9 +65,10 @@ Description: Metapackage to install an Openstack keystone
 Package: openstack-proxy-node
 Architecture: all
 Pre-Depends: openstack-cloud-identity
-Depends: ceilometer-agent-central,
-         ceilometer-alarm-evaluator,
-         ceilometer-alarm-notifier,
+Depends: aodh-api,
+         aodh-evaluator,
+         aodh-notifier,
+         ceilometer-agent-central,
          ceilometer-api,
          ceilometer-collector,
          glance,

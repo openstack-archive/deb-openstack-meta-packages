@@ -419,6 +419,24 @@ os_preseed_heat () {
 	os_preseed_rabbit_creds heat-common heat ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
 }
 
+os_preseed_aodh () {
+	local AODH_SQL_PASS MYSQL_PASSWORD MYSQL_HOST KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
+	AODH_SQL_PASS=${1}
+	MYSQL_PASSWORD=${2}
+	MYSQL_HOST=${3}
+	KEYSTONE_ENDPOINT_IP=${4}
+	KEYSTONE_REGION=${5}
+	KEYSTONE_ADMIN_PASS=${6}
+	KEYSTONE_AUTH_TOKEN=${7}
+	RBT_HOST=${8}
+	RBT_LOGIN=${9}
+	RBT_PASS=${10}
+	os_preseed_set_dbconfig_conf aodh-common aodh ${HEAT_SQL_PASS} aodhdb aodh ${MYSQL_PASSWORD} ${MYSQL_HOST}
+	os_preseed_endpoint aodh-api aodh ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
+	os_preseed_keystone_autotoken aodh-common aodh ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
+	os_preseed_rabbit_creds aodh-common aodh ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
+}
+
 os_pressed_horizon () {
 	echo "openstack-dashboard-apache horizon/activate_vhost boolean true
 openstack-dashboard-apache horizon/activate_vhost seen true
