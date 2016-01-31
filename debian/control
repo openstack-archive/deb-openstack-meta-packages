@@ -11,15 +11,29 @@ Vcs-Git: git://anonscm.debian.org/openstack/openstack-meta-packages.git
 
 Package: openstack-clients
 Architecture: all
-Depends: python-ceilometerclient,
+Depends: python-aodhclient,
+         python-barbicanclient,
+         python-ceilometerclient,
          python-cinderclient,
+         python-congressclient,
+         python-designateclient,
          python-glanceclient,
+         python-gnocchiclient,
+         python-ironicclient.
          python-heatclient,
          python-keystoneclient,
+         python-magnumclient,
+         python-manilaclient,
+         python-mistralclient,
+         python-muranoclient,
          python-neutronclient,
          python-novaclient,
+         python-openstackclient,
+         python-saharaclient,
+         python-senlinclient,
          python-swiftclient,
          python-troveclient,
+         python-zaqarclient,
          ${misc:Depends}
 Description: Metapackage to install all Openstack clients
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
