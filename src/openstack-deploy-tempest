@@ -194,8 +194,8 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} service_available nova true
 	pkgos_inifile set ${TEMPEST_CONF} service_available cinder true
 #	pkgos_inifile set ${TEMPEST_CONF} service_available trove false
-	pkgos_inifile set ${TEMPEST_CONF} service_available heat false
-#	pkgos_inifile set ${TEMPEST_CONF} service_available aodh false
+	pkgos_inifile set ${TEMPEST_CONF} service_available heat true
+	pkgos_inifile set ${TEMPEST_CONF} service_available aodh true
 #	pkgos_inifile set ${TEMPEST_CONF} service_available sahara false
 	pkgos_inifile set ${TEMPEST_CONF} service_available glance true
 	pkgos_inifile set ${TEMPEST_CONF} service_available neutron true
