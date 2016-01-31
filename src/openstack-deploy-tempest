@@ -123,27 +123,12 @@ create_non_admin_keystone_user () {
 
 fix_tempest_config () {
 	echo "===> Fixing tempest.conf"
-	# [DEFAULT]
-	pkgos_inifile set ${TEMPEST_CONF} DEFAULT log_file tempest.log
-	pkgos_inifile set ${TEMPEST_CONF} DEFAULT log_dir /var/log
-
 	# [identity]
-	pkgos_inifile set ${TEMPEST_CONF} identity disable_ssl_certificate_validation true
 	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:35357/v2.0
 	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v2.0
-	pkgos_inifile set ${TEMPEST_CONF} identity domain_name default
-	pkgos_inifile set ${TEMPEST_CONF} identity default_domain_id default
-	pkgos_inifile set ${TEMPEST_CONF} identity auth_version v3
 
 	# [auth]
-	pkgos_inifile set ${TEMPEST_CONF} auth admin_domain_name default
-	pkgos_inifile set ${TEMPEST_CONF} auth admin_username admin
-	pkgos_inifile set ${TEMPEST_CONF} auth admin_tenant_name admin
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_password ${RC_KEYSTONE_ADMINPASS}
-
-	# [identity-feature-enabled]
-	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v2 false
-	pkgos_inifile set ${TEMPEST_CONF} identity-feature-enabled api_v3 true
 
 	# [compute]
 	pkgos_inifile set ${TEMPEST_CONF} compute image_ref ${IMAGE_REF}
@@ -154,7 +139,6 @@ fix_tempest_config () {
 		pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_user cirros
 	fi
 	pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_password ${IMAGE_PASS}
-	sed -i "s/#[\t ]*region[ \t]*=.*/region=regionOne/"  ${TEMPEST_CONF}
 	pkgos_inifile set ${TEMPEST_CONF} validation network_for_ssh ext-net
 	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
 	# flavor 1 is too small for the 2GB default Jessie image
@@ -177,7 +161,6 @@ fix_tempest_config () {
 #	pkgos_inifile set ${TEMPEST_CONF} network public_router_id ${PUBLIC_ROUTER_ID}
 
 	pkgos_inifile set ${TEMPEST_CONF} network default_network 192.168.64.0/20
-	pkgos_inifile set ${TEMPEST_CONF} network build_interval 3
 
 	pkgos_inifile set ${TEMPEST_CONF} network tenant_network_v6_cidr 2403:cc00:1000:8888:200:20ff:fe01:8402/64
 
