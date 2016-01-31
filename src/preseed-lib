@@ -254,6 +254,7 @@ keystone keystone/admin-role-name seen true
 keystone keystone/admin-tenant-name string admin
 keystone keystone/admin-tenant-name seen true
 keystone keystone/register-endpoint boolean true
+keystone keystone/register-endpoint seen true
 keystone keystone/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
 keystone keystone/endpoint-ip seen true
 keystone keystone/region-name string ${KEYSTONE_REGION}
@@ -308,7 +309,7 @@ nova-common nova/neutron_admin_tenant_name seen true
 nova-common nova/neutron_admin_username string admin
 nova-common nova/neutron_admin_username seen true
 nova-common nova/neutron_admin_password password ${KEYSTONE_ADMIN_PASS}
-nova-common nova/neutron_admin_username seen true
+nova-common nova/neutron_admin_password seen true
 nova-common nova/metadata_secret password ${METADATA_SHARED_SECRET}
 nova-common nova/metadata_secret seen true
 " | debconf-set-selections
