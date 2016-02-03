@@ -232,7 +232,6 @@ nova_and_neutron_fixups () {
 	setup_local_ip
 	#fix_nova_tenant_id_in_neutron
 	#fix_nova_and_neutron_admin_pass
-	#setup_metadata_shared_secret
 	misc_system_fix
 	fix_spice_base_url
 	restart_all_nova_and_neutron_daemons
