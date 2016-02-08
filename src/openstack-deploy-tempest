@@ -253,7 +253,8 @@ setup_loopback_based_swift () {
 	# Customize the config (ie: keystone authtoken)
 	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken admin_password ${RC_KEYSTONE_ADMINPASS}
 	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken identity_uri http://${DEFROUTE_IP}:35357/
-	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken auth_uri http://${DEFROUTE_IP}:35357/
+	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken auth_uri http://${DEFROUTE_IP}:5000/
+	pkgos_inifile set /etc/swift/proxy-server.conf filter:authtoken auth_url http://${DEFROUTE_IP}:5000/
 
 	# Create the swift ring
 	chmod +x /usr/share/openstack-deploy/saio/bin/remakerings
