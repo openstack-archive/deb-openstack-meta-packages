@@ -185,7 +185,7 @@ Depends: cobbler,
          dnsutils,
          ntp,
          openstack-clients,
-         postgresql-9.4 | postgresql-9.1,
+         postgresql,
          python-ipaddr,
          rabbitmq-server,
          rsync,
@@ -210,7 +210,6 @@ Depends: astute,
          nailgun-api,
          nailgun-assassin,
          python-fuelclient,
-         python-network-checker,
          ${misc:Depends}
 Description: Metapackage to install a Fuel master node server
  This metapacakge contains all the needed dependencies to install a Fuel master
