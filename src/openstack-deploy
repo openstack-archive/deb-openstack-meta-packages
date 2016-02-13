@@ -221,6 +221,21 @@ osinstall_build_fuel_bootstrap_iso () {
 	fi
 }
 
+osinstall_preseed_master_node_values () {
+	osinstall_rcvalue RC_COBBLER_PASS "Cobbler admin password [generated-password]: " yes
+	echo "cobbler cobbler/password password ${RC_COBBLER_PASS}
+" | debconf-set-selections
+}
+
+osinstall_fix_master_node_setup () {
+	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
+	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
+	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
+	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
+	sed -i 's|MCO_PASSWORD: "guest"|MCO_PASSWORD: "'${RC_RABIT_PASS}'"|' /etc/nailgun/settings.yaml
+	service nailgun-api restart
+}
+
 osinstall_write_openrc () {
 	echo "export SERVICE_ENDPOINT=http://${RC_KEYSTONE_ENDPOINT_IP}:35357/v2.0/
 export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
@@ -274,6 +289,9 @@ case "${1}" in
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_write_openrc
+	osinstall_preseed_master_node_values
+	osinstall_install_if_not_installed fuel-master-node
+	osinstall_fix_master_node_setup
 ;;
 "all-in-one")
 	os_pressed_misc
