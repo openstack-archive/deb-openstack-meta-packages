@@ -208,6 +208,19 @@ osinstall_preseed_compute () {
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 }
 
+
+osinstall_build_fuel_bootstrap_iso () {
+	osinstall_install_if_not_installed fuel-bootstrap-iso
+	osinstall_rcvalue RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO "URL for Debian mirror [httpredir.debian.org]: " no http://httpredir.debian.org/debian
+	for i in LB_PARENT_MIRROR_BOOTSTRAP LB_PARENT_MIRROR_CHROOT LB_PARENT_MIRROR_DEBIAN_INSTALLER LB_MIRROR_BOOTSTRAP LB_MIRROR_CHROOT LB_MIRROR_DEBIAN_INSTALLER \
+		LB_PARENT_MIRROR_BINARY LB_MIRROR_BINARY ; do
+		sed -i 's|^'${i}'=.*|'${i}'="'${RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO}'"|' /var/lib/fuel-bootstrap-iso/config-live-build/config/bootstrap
+	done
+	if ! [ -d /var/lib/fuel-bootstrap-iso/fs/fuel-bootstrap-iso/live ] ; then
+		build-fuel-bootstrap-iso
+	fi
+}
+
 osinstall_write_openrc () {
 	echo "export SERVICE_ENDPOINT=http://${RC_KEYSTONE_ENDPOINT_IP}:35357/v2.0/
 export SERVICE_TOKEN=${RC_KEYSTONE_AUTHTOKEN}
@@ -256,6 +269,7 @@ case "${1}" in
 	os_pressed_misc
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
+	osinstall_build_fuel_bootstrap_iso
 	osinstall_install_fuel_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
