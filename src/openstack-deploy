@@ -228,12 +228,25 @@ osinstall_preseed_master_node_values () {
 }
 
 osinstall_fix_master_node_setup () {
+	# Fixup nailgun login and passwords for Keystone and Rabbit
 	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|MCO_PASSWORD: "guest"|MCO_PASSWORD: "'${RC_RABIT_PASS}'"|' /etc/nailgun/settings.yaml
 	service nailgun-api restart
+	# Fixup tftp-hpa boot path
+	sed -i 's|TFTP_DIRECTORY="/srv/tftp"|TFTP_DIRECTORY="/var/lib/fuel-bootstrap-iso/fs/tftpboot"|' /etc/default/tftpd-hpa
+	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
+	service tftpd-hpa restart
+	# Fixup cobbler and dnsmasq
+	cp /etc/dnsmasq.conf /etc/dnsmasq.upstream
+	sed -i "s|module = manage_bind|module = manage_dnsmasq|" /etc/cobbler/modules.conf
+	sed -i "s|module = manage_isc|module = manage_dnsmasq|" /etc/cobbler/modules.conf
+	sed -i "s|interface=eth0|interface=eth1|" /etc/cobbler/dnsmasq.template
+	service cobbler restart
+	cobbler sync
+	service dnsmasq restart
 }
 
 osinstall_write_openrc () {
