@@ -211,7 +211,7 @@ osinstall_preseed_compute () {
 
 osinstall_build_fuel_bootstrap_iso () {
 	osinstall_install_if_not_installed fuel-bootstrap-iso
-	osinstall_rcvalue RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO "URL for Debian mirror [httpredir.debian.org]: " no http://httpredir.debian.org/debian
+	osinstall_rcvalue RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO "URL for Debian mirror [http://httpredir.debian.org/debian]: " no http://httpredir.debian.org/debian
 	for i in LB_PARENT_MIRROR_BOOTSTRAP LB_PARENT_MIRROR_CHROOT LB_PARENT_MIRROR_DEBIAN_INSTALLER LB_MIRROR_BOOTSTRAP LB_MIRROR_CHROOT LB_MIRROR_DEBIAN_INSTALLER \
 		LB_PARENT_MIRROR_BINARY LB_MIRROR_BINARY ; do
 		sed -i 's|^'${i}'=.*|'${i}'="'${RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO}'"|' /var/lib/fuel-bootstrap-iso/config-live-build/config/bootstrap
