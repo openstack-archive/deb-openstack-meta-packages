@@ -228,6 +228,19 @@ osinstall_preseed_master_node_values () {
 }
 
 osinstall_fix_master_node_setup () {
+	# Setup rabbitmq
+	rabbitmq-plugins enable rabbitmq_management
+	service rabbitmq-server restart
+
+	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
+	# This is already commited to git on Alioth, though a backport should be done.
+	https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
+	chmod +x /usr/bin/rabbitmqadmin
+
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_directed type=direct durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_broadcast type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
+
 	# Fixup nailgun login and passwords for Keystone and Rabbit
 	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
@@ -235,6 +248,19 @@ osinstall_fix_master_node_setup () {
 	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|MCO_PASSWORD: "guest"|MCO_PASSWORD: "'${RC_RABIT_PASS}'"|' /etc/nailgun/settings.yaml
 	service nailgun-api restart
+
+	# Fixup astute rabbitmq login and pass
+	sed -i "s|broker_username: 'naily'|broker_username: 'guest'|" /etc/astute/astuted.conf
+	sed -i "s|broker_password: 'naily'|broker_password: '${RC_RABIT_PASS}'|" /etc/astute/astuted.conf
+	# TODO: Astute *must* get rid of ruby-popen4, fix this up until this is fixed
+	osinstall_install_if_not_installed ruby-popen4
+	service astute stop || true
+	service astute start
+#broker_queue: 'naily'
+#broker_publisher_queue: 'nailgun'
+#broker_exchange: 'nailgun'
+
+
 	# Fixup tftp-hpa boot path
 	sed -i 's|TFTP_DIRECTORY="/srv/tftp"|TFTP_DIRECTORY="/var/lib/fuel-bootstrap-iso/fs/tftpboot"|' /etc/default/tftpd-hpa
 	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
@@ -297,6 +323,7 @@ case "${1}" in
 	os_pressed_misc
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
+	osinstall_install_if_not_installed curl
 	osinstall_build_fuel_bootstrap_iso
 	osinstall_install_fuel_services
 	osinstall_rabbit_host_and_pass
