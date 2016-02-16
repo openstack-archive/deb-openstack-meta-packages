@@ -211,11 +211,6 @@ osinstall_preseed_compute () {
 
 osinstall_build_fuel_bootstrap_iso () {
 	osinstall_install_if_not_installed fuel-bootstrap-iso
-	osinstall_rcvalue RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO "URL for Debian mirror [http://httpredir.debian.org/debian]: " no http://httpredir.debian.org/debian
-	for i in LB_PARENT_MIRROR_BOOTSTRAP LB_PARENT_MIRROR_CHROOT LB_PARENT_MIRROR_DEBIAN_INSTALLER LB_MIRROR_BOOTSTRAP LB_MIRROR_CHROOT LB_MIRROR_DEBIAN_INSTALLER \
-		LB_PARENT_MIRROR_BINARY LB_MIRROR_BINARY ; do
-		sed -i 's|^'${i}'=.*|'${i}'="'${RC_DEBIAN_MIRROR_URL_BUILD_FUEL_BOOTSTRAP_ISO}'"|' /var/lib/fuel-bootstrap-iso/config-live-build/config/bootstrap
-	done
 	if ! [ -d /var/lib/fuel-bootstrap-iso/fs/fuel-bootstrap-iso/live ] ; then
 		build-fuel-bootstrap-iso
 	fi
@@ -224,22 +219,32 @@ osinstall_build_fuel_bootstrap_iso () {
 osinstall_preseed_master_node_values () {
 	osinstall_rcvalue RC_COBBLER_PASS "Cobbler admin password [generated-password]: " yes
 	echo "cobbler cobbler/password password ${RC_COBBLER_PASS}
+cobbler cobbler/password seen true
+postgresql-common postgresql-common/ssl boolean false
+postgresql-common postgresql-common/ssl seen true
+nailgun-common fuel/configure_db boolean true
+nailgun-common fuel/configure_db seen true
 " | debconf-set-selections
 }
 
 osinstall_fix_master_node_setup () {
 	# Setup rabbitmq
+	echo "===> Enabling rabbitmq"
 	rabbitmq-plugins enable rabbitmq_management
 	service rabbitmq-server restart
 
 	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
 	# This is already commited to git on Alioth, though a backport should be done.
-	https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
+	"===> Downloading rabbitmqadmin to declare queues and exchanges"
+	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
 	chmod +x /usr/bin/rabbitmqadmin
 
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_directed type=direct durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_broadcast type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=naily durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
 
 	# Fixup nailgun login and passwords for Keystone and Rabbit
 	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
@@ -271,6 +276,8 @@ osinstall_fix_master_node_setup () {
 	sed -i "s|module = manage_isc|module = manage_dnsmasq|" /etc/cobbler/modules.conf
 	sed -i "s|interface=eth0|interface=eth1|" /etc/cobbler/dnsmasq.template
 	service cobbler restart
+	echo "Waiting 5 seconds to make sure cobblerd is up"
+	sleep 5
 	cobbler sync
 	service dnsmasq restart
 }
