@@ -235,7 +235,7 @@ osinstall_fix_master_node_setup () {
 
 	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
 	# This is already commited to git on Alioth, though a backport should be done.
-	"===> Downloading rabbitmqadmin to declare queues and exchanges"
+	echo "===> Downloading rabbitmqadmin to declare queues and exchanges"
 	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
 	chmod +x /usr/bin/rabbitmqadmin
 
@@ -247,6 +247,7 @@ osinstall_fix_master_node_setup () {
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
 
 	# Fixup nailgun login and passwords for Keystone and Rabbit
+	echo "===> Fixing up Nailgun settings.yaml and restarting"
 	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
@@ -255,6 +256,7 @@ osinstall_fix_master_node_setup () {
 	service nailgun-api restart
 
 	# Fixup astute rabbitmq login and pass
+	echo "Fixing up astute.conf and restarting"
 	sed -i "s|broker_username: 'naily'|broker_username: 'guest'|" /etc/astute/astuted.conf
 	sed -i "s|broker_password: 'naily'|broker_password: '${RC_RABIT_PASS}'|" /etc/astute/astuted.conf
 	# TODO: Astute *must* get rid of ruby-popen4, fix this up until this is fixed
@@ -267,10 +269,12 @@ osinstall_fix_master_node_setup () {
 
 
 	# Fixup tftp-hpa boot path
+	echo "===> Fixing up /etc/default/tftp-hpa tftp path and IP, and restarting"
 	sed -i 's|TFTP_DIRECTORY="/srv/tftp"|TFTP_DIRECTORY="/var/lib/fuel-bootstrap-iso/fs/tftpboot"|' /etc/default/tftpd-hpa
 	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
 	service tftpd-hpa restart
 	# Fixup cobbler and dnsmasq
+	echo "===> Fixing up cobbler & dnsmasq and restarting both"
 	cp /etc/dnsmasq.conf /etc/dnsmasq.upstream
 	sed -i "s|module = manage_bind|module = manage_dnsmasq|" /etc/cobbler/modules.conf
 	sed -i "s|module = manage_isc|module = manage_dnsmasq|" /etc/cobbler/modules.conf
