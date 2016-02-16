@@ -233,6 +233,8 @@ osinstall_fix_master_node_setup () {
 	rabbitmq-plugins enable rabbitmq_management
 	service rabbitmq-server restart
 
+	rabbitmqctl add_vhost /mcollective
+
 	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
 	# This is already commited to git on Alioth, though a backport should be done.
 	echo "===> Downloading rabbitmqadmin to declare queues and exchanges"
