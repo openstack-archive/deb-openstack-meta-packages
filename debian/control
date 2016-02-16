@@ -209,6 +209,7 @@ Depends: astute,
          mcollective,
          nailgun-api,
          nailgun-assassin,
+         nailgun-reciever,
          python-fuelclient,
          ${misc:Depends}
 Description: Metapackage to install a Fuel master node server
