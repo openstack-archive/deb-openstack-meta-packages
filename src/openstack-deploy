@@ -230,7 +230,11 @@ nailgun-common fuel/configure_db seen true
 osinstall_fix_master_node_setup () {
 	# Setup rabbitmq
 	echo "===> Enabling rabbitmq"
+	# The management is needed for rabbitmqadmin to work
 	rabbitmq-plugins enable rabbitmq_management
+	# stomp is what mcollective uses
+	rabbitmq-plugins enable rabbitmq_stomp
+	# Enabling plugins need a restart
 	service rabbitmq-server restart
 
 	rabbitmqctl add_vhost /mcollective
@@ -242,6 +246,7 @@ osinstall_fix_master_node_setup () {
 	chmod +x /usr/bin/rabbitmqadmin
 
 	rabbitmqctl add_user mcollective marionette
+	rabbitmqctl add_user naily naily
 
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_directed type=direct durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_broadcast type=topic durable=true
@@ -256,27 +261,21 @@ osinstall_fix_master_node_setup () {
 	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
-	sed -i 's|MCO_PASSWORD: "guest"|MCO_PASSWORD: "'${RC_RABIT_PASS}'"|' /etc/nailgun/settings.yaml
 	service nailgun-api restart
 
 	# Fixup astute rabbitmq login and pass
 	echo "Fixing up astute.conf and restarting"
-	sed -i "s|broker_username: 'naily'|broker_username: 'guest'|" /etc/astute/astuted.conf
-	sed -i "s|broker_password: 'naily'|broker_password: '${RC_RABIT_PASS}'|" /etc/astute/astuted.conf
-	# TODO: Astute *must* get rid of ruby-popen4, fix this up until this is fixed
+	# TODO: This is a workaround so that Astute also works on
+	# Jessie. In Sid, ruby-popen4 doesn't exist anymore.
 	osinstall_install_if_not_installed ruby-popen4
 	# Fixme: find out why this is needed:
 	systemctl enable astute.service
 	service astute stop || true
 	service astute start
-#broker_queue: 'naily'
-#broker_publisher_queue: 'nailgun'
-#broker_exchange: 'nailgun'
 
-
-	# Fixup tftp-hpa boot path
+	# Fixup tftp-hpa boot IP. This is in fact not really needed,
+	# but better for security.
 	echo "===> Fixing up /etc/default/tftp-hpa tftp path and IP, and restarting"
-	sed -i 's|TFTP_DIRECTORY="/srv/tftp"|TFTP_DIRECTORY="/var/lib/fuel-bootstrap-iso/fs/tftpboot"|' /etc/default/tftpd-hpa
 	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
 	service tftpd-hpa restart
 	# Fixup cobbler and dnsmasq
