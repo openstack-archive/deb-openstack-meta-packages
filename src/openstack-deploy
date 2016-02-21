@@ -228,6 +228,9 @@ nailgun-common fuel/configure_db seen true
 }
 
 osinstall_fix_master_node_setup () {
+	# Make sure apache is up, otherwise, cobbler will fail
+	apache2ctl start || true
+
 	# Setup rabbitmq
 	echo "===> Enabling rabbitmq"
 	# The management is needed for rabbitmqadmin to work
@@ -254,6 +257,7 @@ osinstall_fix_master_node_setup () {
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=naily durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=mcollective configure='.*' write='.*' read='.*'
 
 	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/server.cfg
 	service mcollective restart
@@ -285,6 +289,10 @@ osinstall_fix_master_node_setup () {
 	echo "===> Do cobbler sync and restart dnsmasq"
 	cobbler sync
 	service dnsmasq restart
+
+	# Some convenience for the root shell
+	echo ". /root/openrc.sh" >>/root/.bashrc
+	echo 'alias fuel="fuel --user $OS_USERNAME --password $OS_PASSWORD"' >>/root/.bashrc
 }
 
 osinstall_write_openrc () {
