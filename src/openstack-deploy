@@ -255,6 +255,9 @@ osinstall_fix_master_node_setup () {
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
 
+	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/server.cfg
+	service mcollective restart
+
 	# Fixup nailgun login and passwords for Keystone and Rabbit
 	echo "===> Fixing up Nailgun settings.yaml and restarting"
 	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
