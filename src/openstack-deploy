@@ -263,6 +263,8 @@ osinstall_fix_master_node_setup () {
 	sed -i "s|broker_password: 'naily'|broker_password: '${RC_RABIT_PASS}'|" /etc/astute/astuted.conf
 	# TODO: Astute *must* get rid of ruby-popen4, fix this up until this is fixed
 	osinstall_install_if_not_installed ruby-popen4
+	# Fixme: find out why this is needed:
+	systemctl enable astute.service
 	service astute stop || true
 	service astute start
 #broker_queue: 'naily'
@@ -276,14 +278,7 @@ osinstall_fix_master_node_setup () {
 	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
 	service tftpd-hpa restart
 	# Fixup cobbler and dnsmasq
-	echo "===> Fixing up cobbler & dnsmasq and restarting both"
-	cp /etc/dnsmasq.conf /etc/dnsmasq.upstream
-	sed -i "s|module = manage_bind|module = manage_dnsmasq|" /etc/cobbler/modules.conf
-	sed -i "s|module = manage_isc|module = manage_dnsmasq|" /etc/cobbler/modules.conf
-	sed -i "s|interface=eth0|interface=eth1|" /etc/cobbler/dnsmasq.template
-	service cobbler restart
-	echo "Waiting 5 seconds to make sure cobblerd is up"
-	sleep 5
+	echo "===> Do cobbler sync and restart dnsmasq"
 	cobbler sync
 	service dnsmasq restart
 }
