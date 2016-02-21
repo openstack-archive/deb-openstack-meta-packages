@@ -241,6 +241,8 @@ osinstall_fix_master_node_setup () {
 	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
 	chmod +x /usr/bin/rabbitmqadmin
 
+	rabbitmqctl add_user mcollective marionette
+
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_directed type=direct durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_broadcast type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
