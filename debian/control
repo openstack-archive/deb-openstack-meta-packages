@@ -43,7 +43,7 @@ Description: Metapackage to install all Openstack clients
  .
  This metapackage will install all of the Openstack clients available for
  remote controling block devices (Cinder), Image Service (Glance), Identity
- (Keystone), Compute (Nova), Networking (Quantum) and Object Storage (Swift).
+ (Keystone), Compute (Nova), Networking (Neutron) and Object Storage (Swift).
 
 Package: openstack-cloud-services
 Architecture: all
@@ -111,7 +111,7 @@ Description: Metapackage to install an Openstack proxy node
  and massively scalable.
  .
  This metapackage will install a proxy node server, or management / API node,
- composed of: Nova-API, Nova-Scheduler, Glance, Keystone, Quantum (using
+ composed of: Nova-API, Nova-Scheduler, Glance, Keystone, Neutron (using
  OpenVSwitch) RabbitMQ, Memcached, and openstack-dashboard.
 
 Package: openstack-compute-node
@@ -133,7 +133,7 @@ Description: Metapackage to install an Openstack compute node
  and massively scalable.
  .
  This metapackage will install a KVM based compute node which will also run
- Quantum OVS Agent.
+ Neutron OVS Agent.
 
 Package: openstack-toaster
 Architecture: all
@@ -196,6 +196,19 @@ Description: Metapackage to install all needed Fuel master node service dependen
  and private cloud providers regardless of size, by being simple to
  implement and massively scalable.
  .
+ Fuel is an open source deployment and management tool for OpenStack. Developed
+ as an OpenStack community effort, it provides an intuitive, GUI-driven
+ experience for deployment and management of OpenStack, related community
+ projects and plug-ins.
+ .
+ Fuel brings consumer-grade simplicity to streamline and accelerate the
+ otherwise time-consuming, often complex, and error-prone process of deploying,
+ testing and maintaining various configuration flavors of OpenStack at scale.
+ Unlike other platform-specific deployment or management utilities, Fuel is an
+ upstream OpenStack project that focuses on automating the deployment and
+ testing of OpenStack and a range of third-party options, so it’s not
+ compromised by hard bundling or vendor lock-in.
+ .
  This metapackage contains all services that a fuel master node needs, like a
  database server, rabbitmq, and so on.
 
@@ -213,6 +226,23 @@ Depends: astute,
          python-fuelclient,
          ${misc:Depends}
 Description: Metapackage to install a Fuel master node server
- This metapacakge contains all the needed dependencies to install a Fuel master
- node. Fuel is a deployment tool for OpenStack, which provides a web GUI to
- perform OpenStack deployments.
+ OpenStack is a reliable cloud infrastructure. Its mission is to produce
+ the ubiquitous cloud computing platform that will meet the needs of public
+ and private cloud providers regardless of size, by being simple to
+ implement and massively scalable.
+ .
+ Fuel is an open source deployment and management tool for OpenStack. Developed
+ as an OpenStack community effort, it provides an intuitive, GUI-driven
+ experience for deployment and management of OpenStack, related community
+ projects and plug-ins.
+ .
+ Fuel brings consumer-grade simplicity to streamline and accelerate the
+ otherwise time-consuming, often complex, and error-prone process of deploying,
+ testing and maintaining various configuration flavors of OpenStack at scale.
+ Unlike other platform-specific deployment or management utilities, Fuel is an
+ upstream OpenStack project that focuses on automating the deployment and
+ testing of OpenStack and a range of third-party options, so it’s not
+ compromised by hard bundling or vendor lock-in.
+ .
+ This metapackage contains all the needed dependencies to install a Fuel master
+ node.
