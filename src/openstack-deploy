@@ -228,8 +228,12 @@ nailgun-common fuel/configure_db seen true
 }
 
 osinstall_fix_master_node_setup () {
+	# Make sure Apache is using SSL
+	a2enmod ssl
+	a2ensite default-ssl.conf
 	# Make sure apache is up, otherwise, cobbler will fail
 	apache2ctl start || true
+	apache2ctl reload || true
 
 	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
 	# This is already commited to git on Alioth, though a backport should be done.
