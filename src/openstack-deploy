@@ -237,6 +237,11 @@ osinstall_fix_master_node_setup () {
 	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
 	chmod +x /usr/bin/rabbitmqadmin
 
+	# Set defaults for mcollective
+	MCO_VHOST=mcollective
+	MCO_USERNAME=mcollective
+	MCO_PASSWORD=marionette
+
 	# Setup rabbitmq
 	echo "===> Enabling rabbitmq"
 	# The management is needed for rabbitmqadmin to work
@@ -246,15 +251,15 @@ osinstall_fix_master_node_setup () {
 	# Enabling plugins need a restart
 	service rabbitmq-server restart
 
-	rabbitmqctl add_vhost /mcollective
+	rabbitmqctl add_vhost ${MCO_VHOST}
 
-	rabbitmqctl add_user mcollective marionette
+	rabbitmqctl add_user ${MCO_USERNAME} ${MCO_PASSWORD}
 	rabbitmqctl add_user naily naily
 
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=mcollective configure='.*' write='.*' read='.*'
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=guest configure='.*' write='.*' read='.*'
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=/mcollective declare exchange name=mcollective_directed type=direct durable=true
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=/mcollective declare exchange name=mcollective_broadcast type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${MCO_USERNAME} configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=guest configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_directed type=direct durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_broadcast type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=naily durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
