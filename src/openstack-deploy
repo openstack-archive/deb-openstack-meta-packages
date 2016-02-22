@@ -231,6 +231,12 @@ osinstall_fix_master_node_setup () {
 	# Make sure apache is up, otherwise, cobbler will fail
 	apache2ctl start || true
 
+	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
+	# This is already commited to git on Alioth, though a backport should be done.
+	echo "===> Downloading rabbitmqadmin to declare queues and exchanges"
+	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
+	chmod +x /usr/bin/rabbitmqadmin
+
 	# Setup rabbitmq
 	echo "===> Enabling rabbitmq"
 	# The management is needed for rabbitmqadmin to work
@@ -242,22 +248,17 @@ osinstall_fix_master_node_setup () {
 
 	rabbitmqctl add_vhost /mcollective
 
-	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
-	# This is already commited to git on Alioth, though a backport should be done.
-	echo "===> Downloading rabbitmqadmin to declare queues and exchanges"
-	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
-	chmod +x /usr/bin/rabbitmqadmin
-
 	rabbitmqctl add_user mcollective marionette
 	rabbitmqctl add_user naily naily
 
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_directed type=direct durable=true
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=mcollective_broadcast type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=mcollective configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=guest configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=/mcollective declare exchange name=mcollective_directed type=direct durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=/mcollective declare exchange name=mcollective_broadcast type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=naily durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/mcollective user=mcollective configure='.*' write='.*' read='.*'
 
 	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/server.cfg
 	service mcollective restart
