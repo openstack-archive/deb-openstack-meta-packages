@@ -242,9 +242,15 @@ osinstall_fix_master_node_setup () {
 	chmod +x /usr/bin/rabbitmqadmin
 
 	# Set defaults for mcollective
+	# TODO: generate the password
 	MCO_VHOST=mcollective
 	MCO_USERNAME=mcollective
 	MCO_PASSWORD=marionette
+
+	# Set defaults for astute
+	# TODO: generate the password
+	ASTUTE_RABBIT_USERNAME=naily
+	ASTUTE_RABBIT_PASS=naily
 
 	# Setup rabbitmq
 	echo "===> Enabling rabbitmq"
@@ -255,19 +261,27 @@ osinstall_fix_master_node_setup () {
 	# Enabling plugins need a restart
 	service rabbitmq-server restart
 
-	rabbitmqctl add_vhost ${MCO_VHOST}
-
+	# Add the mcollective and naily users
 	rabbitmqctl add_user ${MCO_USERNAME} ${MCO_PASSWORD}
-	rabbitmqctl add_user naily naily
+	rabbitmqctl add_user ${ASTUTE_RABBIT_USERNAME} ${ASTUTE_RABBIT_PASS}
 
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${MCO_USERNAME} configure='.*' write='.*' read='.*'
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=guest configure='.*' write='.*' read='.*'
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_directed type=direct durable=true
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_broadcast type=topic durable=true
+	# Fuel on CentOS have these users as administrators, so let's do the same
+	rabbitmqctl set_user_tags mcollective administrator
+	rabbitmqctl set_user_tags ${ASTUTE_RABBIT_USERNAME} administrator
+
+	# Fuel needs 2 queues, on the / vhost:
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=nailgun durable=true
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare queue name=naily durable=true
+	# And also 2 exchanges:
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=nailgun type=topic durable=true
-	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily type=topic durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare exchange name=naily_service type=fanout durable=true
+
+	# Declare the mcollective vhost and its exchanges
+	rabbitmqctl add_vhost ${MCO_VHOST}
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${MCO_USERNAME} configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${ASTUTE_RABBIT_USERNAME} configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_directed type=direct durable=true
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_broadcast type=topic durable=true
 
 	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/server.cfg
 	service mcollective restart
