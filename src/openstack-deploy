@@ -283,7 +283,10 @@ osinstall_fix_master_node_setup () {
 	rabbitmqadmin --username=${MCO_USERNAME} --password=${MCO_PASSWORD} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_directed type=direct durable=true
 	rabbitmqadmin --username=${MCO_USERNAME} --password=${MCO_PASSWORD} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_broadcast type=topic durable=true
 
+	sed -i s/activemq/rabbitmq/ /etc/mcollective/server.cfg
+	sed -i s/activemq/rabbitmq/ /etc/mcollective/client.cfg
 	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/server.cfg
+	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/client.cfg
 	service mcollective restart
 
 	# Fixup nailgun login and passwords for Keystone and Rabbit
