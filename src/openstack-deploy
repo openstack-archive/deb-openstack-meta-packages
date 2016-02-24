@@ -217,7 +217,8 @@ osinstall_build_fuel_bootstrap_iso () {
 }
 
 osinstall_preseed_master_node_values () {
-	osinstall_rcvalue RC_COBBLER_PASS "Cobbler admin password [generated-password]: " yes
+#	osinstall_rcvalue RC_COBBLER_PASS "Cobbler admin password [generated-password]: " yes
+	osinstall_rcvalue RC_COBBLER_PASS "Cobbler admin password [cobbler]: " no cobbler
 	echo "cobbler cobbler/password password ${RC_COBBLER_PASS}
 cobbler cobbler/password seen true
 postgresql-common postgresql-common/ssl boolean false
