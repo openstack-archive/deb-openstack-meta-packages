@@ -217,6 +217,7 @@ Architecture: all
 Pre-Depends: fuel-master-node-services
 Depends: astute,
          cobbler,
+         fuel-agent,
          fuel-web-apache,
          fuel-web-static,
          mcollective,
