@@ -380,12 +380,12 @@ case "${1}" in
 	osinstall_mysql_set_localhost
 	osinstall_install_if_not_installed ntp
 	osinstall_install_if_not_installed curl
+	osinstall_preseed_master_node_values
 	osinstall_build_fuel_bootstrap_iso
 	osinstall_install_fuel_services
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_write_openrc
-	osinstall_preseed_master_node_values
 	osinstall_install_if_not_installed fuel-master-node
 	osinstall_fix_master_node_setup
 ;;
