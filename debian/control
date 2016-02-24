@@ -179,7 +179,8 @@ Description: validate OpenStack Debian packages using tempest and openstack-depl
 
 Package: fuel-master-node-services
 Architecture: all
-Depends: cobbler,
+Depends: bind9,
+         cobbler,
          cobbler-web,
          dbconfig-common,
          dnsutils,
