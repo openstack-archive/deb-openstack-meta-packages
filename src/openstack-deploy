@@ -280,6 +280,7 @@ osinstall_fix_master_node_setup () {
 	rabbitmqctl add_vhost ${MCO_VHOST}
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${MCO_USERNAME} configure='.*' write='.*' read='.*'
 	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=${MCO_VHOST} user=${ASTUTE_RABBIT_USERNAME} configure='.*' write='.*' read='.*'
+	rabbitmqadmin --username=guest --password=${RC_RABIT_PASS} --host=localhost declare permission vhost=/ user=${ASTUTE_RABBIT_USERNAME} configure='.*' write='.*' read='.*'
 	rabbitmqadmin --username=${MCO_USERNAME} --password=${MCO_PASSWORD} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_directed type=direct durable=true
 	rabbitmqadmin --username=${MCO_USERNAME} --password=${MCO_PASSWORD} --host=localhost --vhost=${MCO_VHOST} declare exchange name=mcollective_broadcast type=topic durable=true
 
@@ -295,7 +296,15 @@ osinstall_fix_master_node_setup () {
 	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
 	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
+	# Fix the ssh pubkey in settings.yaml
+	LINE_NUM=`grep -n AUTHORIZED_KEYS: /etc/nailgun/settings.yaml  | cut -d: -f1`
+	LINE_NUM=$(($LINE_NUM +1))
+	MASTER_NODE_SSH_PUB_KEY=`cat .ssh/id_rsa.pub`
+	sed -i "$LINE_NUM s:.*:  - \"${MASTER_NODE_SSH_PUB_KEY}\":" /etc/nailgun/settings.yaml
+	# Finally restart all nailgun daemons
 	service nailgun-api restart
+	service nailgun-reciever restart
+	service nailgun-assassin restart
 
 	# Fixup astute rabbitmq login and pass
 	echo "Fixing up astute.conf and restarting"
