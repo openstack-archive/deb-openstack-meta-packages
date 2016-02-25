@@ -296,10 +296,7 @@ osinstall_fix_master_node_setup () {
 
 	# Fixup nailgun login and passwords for Keystone and Rabbit
 	echo "===> Fixing up Nailgun settings.yaml and restarting"
-	sed -i 's|AUTHENTICATION_METHOD: "fake"|AUTHENTICATION_METHOD: "keystone"|' /etc/nailgun/settings.yaml
-	sed -i 's|admin_user: "nailgun"|admin_user: "admin"|' /etc/nailgun/settings.yaml
-	sed -i 's|admin_password: "nailgun"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
-	sed -i 's|admin_tenant_name: "services"|admin_tenant_name: "admin"|' /etc/nailgun/settings.yaml
+	sed -i 's|admin_password: "XXXXXX"|admin_password: "'${RC_KEYSTONE_ADMINPASS}'"|' /etc/nailgun/settings.yaml
 	# Fix the ssh pubkey in settings.yaml
 	LINE_NUM=`grep -n AUTHORIZED_KEYS: /etc/nailgun/settings.yaml  | cut -d: -f1`
 	LINE_NUM=$(($LINE_NUM +1))
