@@ -291,6 +291,9 @@ osinstall_fix_master_node_setup () {
 	sed -i "s/^plugin.rabbitmq.pool.1.host\b.*$/plugin.rabbitmq.pool.1.host = 10.20.0.2/" /etc/mcollective/client.cfg
 	echo "plugin.rabbitmq.vhost = mcollective" >>/etc/mcollective/server.cfg
 	echo "plugin.rabbitmq.vhost = mcollective" >>/etc/mcollective/client.cfg
+	# Nailgun expects this to run the provisionning of the image (ie: fa_build_image)
+	# through nailgun sending a message using mcollective.
+	echo "identity = master" >>/etc/mcollective/server.cfg
 
 	service mcollective restart
 
