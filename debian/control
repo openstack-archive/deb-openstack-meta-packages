@@ -218,6 +218,7 @@ Pre-Depends: fuel-master-node-services
 Depends: astute,
          cobbler,
          fuel-agent,
+         fuel-misc,
          fuel-web-apache,
          fuel-web-static,
          mcollective,
