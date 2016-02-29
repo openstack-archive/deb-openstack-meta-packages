@@ -330,12 +330,12 @@ osinstall_fix_master_node_setup () {
 	service dnsmasq restart
 
 	# Normal Debian kernel
-#	cobbler distro add --name=jessie --owners=cobbler --kernel=/boot/vmlinuz-3.16.0-4-amd64 --initrd=/boot/initrd.img-3.16.0-4-amd64 --breed=debian --arch=x86_64 --os-version=jessie
-#	cobbler profile add --name=ubuntu_bootstrap  --owners=cobbler --distro=jessie --kickstart=/var/lib/cobbler/kickstarts/ubuntu-server.preseed \
-#		--kopts='console=ttyS0,9600 console=tty0 panic=60 ethdevice-timeout=120 boot=live toram components fetch=http://10.20.0.2/fuel-bootstrap-iso/filesystem.squashfs biosdevname=0 url=http://10.20.0.2 mco_user=mcollective mco_pass=marionette'
-#	cobbler profile add --name=debian_jessie_x86_64 --owners=cobbler --distro=jessie \
-#		--kopts='auto=true priority=critical locale=en_US net.ifnames=0 biosdevname=0 netcfg/choose_interface=eth0 netcfg/dhcp_timeout=120 netcfg/link_detection_timeout=20' \
-#		--kickstart=/var/lib/cobbler/kickstarts/debian-jessie.preseed
+	cobbler distro add --name=jessie --owners=cobbler --kernel=/boot/vmlinuz-3.16.0-4-amd64 --initrd=/boot/initrd.img-3.16.0-4-amd64 --breed=debian --arch=x86_64 --os-version=jessie
+	cobbler profile add --name=ubuntu_bootstrap  --owners=cobbler --distro=jessie --kickstart=/var/lib/cobbler/kickstarts/ubuntu-server.preseed \
+		--kopts='console=ttyS0,9600 console=tty0 panic=60 ethdevice-timeout=120 boot=live toram components fetch=http://10.20.0.2/fuel-bootstrap-iso/filesystem.squashfs biosdevname=0 url=http://10.20.0.2 mco_user=mcollective mco_pass=marionette'
+	cobbler profile add --name=debian_jessie_x86_64 --owners=cobbler --distro=jessie \
+		--kopts='auto=true priority=critical locale=en_US net.ifnames=0 biosdevname=0 netcfg/choose_interface=eth0 netcfg/dhcp_timeout=120 netcfg/link_detection_timeout=20' \
+		--kickstart=/var/lib/cobbler/kickstarts/debian-jessie.preseed
 	# Some convenience for the root shell
 	echo ". /root/openrc.sh" >>/root/.bashrc
 	echo 'alias fuel="fuel --user $OS_USERNAME --password $OS_PASSWORD"' >>/root/.bashrc
