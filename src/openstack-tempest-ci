@@ -141,7 +141,7 @@ otci_aptget_update () {
 	otci_scp temp_file ""
 	otci_remote "sudo cp temp_file /etc/apt/apt.conf.d/98nopdiff"
 	rm temp_file
-	otci_remote "sudo sed -i 's#http.debian.net#${OTCI_DEBIAN_REPO_URL}#' /etc/apt/sources.list"
+	otci_remote "sudo sed -i 's#http://http.debian.net/debian#${OTCI_DEBIAN_REPO_URL}#' /etc/apt/sources.list"
 	otci_remote "sudo apt-get update"
 }
 
