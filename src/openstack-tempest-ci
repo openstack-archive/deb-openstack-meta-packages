@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e
-set -x
 
 if [ -r /etc/default/openstack-tempest-ci ] ; then
 	. /etc/default/openstack-tempest-ci
