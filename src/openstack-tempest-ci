@@ -10,7 +10,9 @@ fi
 if [ -n "${1}" ] ; then
 	OTCI_DEBIAN_REPO_URL=${1}
 else
-	OTCI_DEBIAN_REPO_URL=http://http.debian.net/debian
+	if [ -z "${OTCI_DEBIAN_REPO_URL}" ] ; then
+		OTCI_DEBIAN_REPO_URL=http://http.debian.net/debian
+	fi
 fi
 
 if [ "${OTCI_VIRT_MODE}" = "xen" ] || [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
