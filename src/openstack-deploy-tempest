@@ -244,20 +244,44 @@ setup_loopback_based_lvm_vg () {
 	echo "Done!"
 }
 
+setup_real_hdd_based_lvm_vg () {
+	echo "===> Creating new volume group on device ${OTCI_LVM_DEVICE} (will destroy everything there...)"
+	parted /dev/${OTCI_LVM_DEVICE} mklabel msdos -s
+	parted /dev/${OTCI_LVM_DEVICE} mkpart primary ext4 -a optimal 2048 48G
+	parted /dev/${OTCI_LVM_DEVICE} set 1 lvm on
+	pvcreate /dev/${OTCI_LVM_DEVICE}1
+	vgcreate pkgosvg0 /dev/${OTCI_LVM_DEVICE}1
+	vgchange -a y pkgosvg0
+	echo "Done!"
+}
+
 setup_loopback_based_swift () {
 	### NOTE: this comes from http://docs.openstack.org/developer/swift/development_saio.html ###
 
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer xfsprogs
 
-	# Create the loopback device
-	mkdir -p /srv
-	qemu-img create /srv/swift-disk 20G
-	mkfs.xfs /srv/swift-disk
+	if [ "${LVMTYPE}" = "loopback" ] ; then
+		# Create the loopback device
+		mkdir -p /srv
+		qemu-img create /srv/swift-disk 20G
+		mkfs.xfs /srv/swift-disk
 
-	# Mount it
-	mkdir /mnt/sdb1
-	echo "/srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >>/etc/fstab
-	mount /mnt/sdb1
+		# Mount it
+		mkdir /mnt/sdb1
+		echo "/srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >>/etc/fstab
+		mount /mnt/sdb1
+	elif [ "${LVMTYPE}" = "resetup" ] ; then
+		mkdir -p /srv
+
+		# Create the partition and the FS
+		parted /dev/${OTCI_LVM_DEVICE} mkpart primary xfs -a optimal 48G 96G
+		mkfs.xfs /dev/${OTCI_LVM_DEVICE}2
+
+		# Mount it
+		mkdir /mnt/sdb1
+		echo "/dev/${OTCI_LVM_DEVICE}2 /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >>/etc/fstab
+		mount /mnt/sdb1
+	fi
 
 	# Setup swift disks
 	mkdir /mnt/sdb1/1 /mnt/sdb1/2 /mnt/sdb1/3 /mnt/sdb1/4
@@ -331,6 +355,8 @@ fix_tempest_config
 gen_ssh_root_key
 if [ "${LVMTYPE}" = "loopback" ] ; then
 	setup_loopback_based_lvm_vg
+elif [ "${LVMTYPE}" = "resetup" ] ; then
+	setup_real_hdd_based_lvm_vg
 fi
 setup_loopback_based_swift
 install_cinder
