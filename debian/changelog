@@ -7,6 +7,7 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Removed activation of ec2 lib in preseed, as it's gone away from upstream
     code in Nova.
   * Added 14 new python-*client in the openstack-clients metapackage.
+  * Added support for IPMI Debian Live provisionning of Tempest CI.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).

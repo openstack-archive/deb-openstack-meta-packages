@@ -13,7 +13,7 @@ else
 	OTCI_DEBIAN_REPO_URL=http://http.debian.net/debian
 fi
 
-if [ "${OTCI_VIRT_MODE}" = "xen" ] ; then
+if [ "${OTCI_VIRT_MODE}" = "xen" ] || [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
 	OTCI_SSH_USER=root
 else
 	OTCI_SSH_USER=debian
@@ -74,6 +74,26 @@ otci_provision_new_vm () {
 	if [ "${OTCI_VIRT_MODE}" = "xen" ] ; then
 		rm -f /var/lib/jenkins/.ssh/known_hosts
 		ssh -o "StrictHostKeyChecking no" root@${OTCI_XEN_DOM0_IP} /root/p
+	elif [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
+		# In the case of ipmi provisionning, we expect the machine to be setup to
+		# just run Debian live with the Jenkins /var/lib/jenkins/.ssh/id_rsa.pub key
+		# setup in /root/.ssh/authorized_keys2. So just a reboot of the machine
+		# brings it fresh and ready. Therefore, we just turn the machine off, then
+		# on again, using IPMI.
+		echo "===> Powering the tempest machine down"
+		IPMI_PASSWORD=${OTCI_IPMI_PASS} ipmitool -H ${OTCI_IPMI_IP_ADDR} -U ${OTCI_IPMI_LOGIN} -I lan -E chassis power off
+		echo "===> Waiting 10 seconds before starting it again"
+		for i in `seq 0 10` ; do
+			echo $i
+			sleep 1
+		done
+		echo "===> Powering the machine on again"
+		IPMI_PASSWORD=${OTCI_IPMI_PASS} ipmitool -H ${OTCI_IPMI_IP_ADDR} -U ${OTCI_IPMI_LOGIN} -I lan -E chassis power on
+		echo "===> Waiting 90 seconds for the machine to be up again"
+		for i in `seq 0 90` ; do
+			echo $i
+			sleep 1
+		done
 	else
 		otci_delete_if_already_running
 		otci_launch_vm
@@ -140,7 +160,7 @@ otci_add_source_list () {
 	echo "-> scp source list"
 	otci_scp /etc/openstack-tempest-ci/openstack-ci.list
 	echo "-> Install new source list"
-	otci_remote "sudo mv openstack-ci.list /etc/apt/sources.list.d/"
+	otci_remote "sudo mv openstack-ci.list /etc/apt/sources.list.d/openstack.list"
 	DEBIAN_RELEASE_NAME=`lsb_release -c | awk '{print $2}'`
 	if [ -r /etc/pkgos/pkgos.conf ] ; then
 		. /etc/pkgos/pkgos.conf
@@ -176,6 +196,9 @@ otci_run_tempest () {
 
 otci_provision_new_vm
 otci_wait_for_ssh
-otci_add_source_list
+otci_aptget_update
+if ! [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
+	otci_add_source_list
+fi
 otci_install_openstack_deploy
 otci_run_tempest

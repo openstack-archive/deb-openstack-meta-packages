@@ -1,10 +1,16 @@
-# Using Xen or OpenStack
-# Possible values: xen, openstack
-OTCI_VIRT_MODE=xen
+# Using a Xen VM, an OpenStack, or ipmi with Debian Live
+# Possible values: xen, openstack, ipmi
+OTCI_VIRT_MODE=ipmi
 
+############################
+### Xen VM provisionning ###
+############################
 # IP of the xen dom0 to provision the VM
 OTCI_XEN_DOM0_IP=185.8.56.70
 
+##################################
+### OpenStack VM provisionning ###
+##################################
 # Credential for the cloud where the CI tests are happening
 export OS_AUTH_URL=http://158.85.165.2:5000/v2.0
 export OS_TENANT_ID=73e92bdb131f4316b709c0f8613e7b59
@@ -27,24 +33,47 @@ OTCI_KEYPAIR_NAME=jenkins
 # floating IP ID
 OTCI_FLOATING_IP_ID=1dd50df2-0ddc-4605-93ca-5ea22f977003
 
-# floating IP address
-OTCI_FLOATING_IP_ADDR=185.8.56.76
-#158.85.175.83
-
 # "normal" VM network (eg: eth0)
 OTCI_ETH0_NET_ID=1f35e850-f354-414d-bc43-1b0b91e5d731
 
 # management network (ie: eth1)
 OTCI_ETH1_NET_ID=0b2f4c7c-c8d0-4740-9e52-b411c80ecdf9
 
+##########################
+### IPMI provisionning ###
+##########################
+# IP address of the IPMI of the real hardware running Debian Live
+OTCI_IPMI_IP_ADDR=
+
+# IPMI login
+OTCI_IPMI_LOGIN=
+
+# IPMI password
+OTCI_IPMI_PASS=
+
+########################################################
+### Configuration of your Tempest machine networking ###
+########################################################
+# floating IP address (or the "main" ip address of the
+# machine/vm which will run Tempest)
+OTCI_FLOATING_IP_ADDR=192.168.10.3
+#117.121.243.214
+#158.85.175.83
+
 # management network IP
 OTCI_ETH1_CIDR=192.168.0.1/24
 
 # Public IP pool start
-OTCI_PUBIP_START=117.121.243.170
+#OTCI_PUBIP_START=117.121.243.170
+OTCI_PUBIP_START=192.168.10.100
 
 # Public IP pool end
-OTCI_PUBIP_END=117.121.243.185
+#OTCI_PUBIP_END=117.121.243.185
+OTCI_PUBIP_END=192.168.10.150
 
 # OVS agent local_ip value
 OTCI_LOCAL_IP=172.16.100.1
+
+# URL to set as default Debian Jessie repo
+OTCI_DEBIAN_REPO_URL=http://185.8.56.70:9999/debian
+#http://ftp.us.debian.org/debian
