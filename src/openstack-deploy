@@ -91,6 +91,13 @@ ${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again password ${RC_MYSQL
 ${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again seen true
 " | debconf-set-selections
 		${APTGET} install ${RC_MYSQL_SERVER_PKG_NAME}
+		# The default of 100 max connections will fail when installing
+		# all of OpenStack on a single node, if that node has too many
+		# cores (as OpenStack in general, spawns more threads if more cores).
+		# So we increase max_connections from 100 to 1000, which is more
+		# than enough for big servers.
+		sed -i -e 's/^[#]*max_connections[ \t]*=.*/max_connections = 1000/' /etc/mysql/my.cnf
+		invoke-rc.d mysql restart
 	fi
 }
 
