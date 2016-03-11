@@ -374,7 +374,7 @@ case "${1}" in
 	osinstall_rabbit_host_and_pass
 	osinstall_keystone
 	osinstall_preseed_all
-	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-proxy-node nova-compute-qemu
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-proxy-node
 	osinstall_write_openrc
 ;;
 "compute")
