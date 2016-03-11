@@ -22,11 +22,31 @@ fi
 # Possible values: loopback, presetup
 LVMTYPE=loopback
 
+# Device on which we should setup LVM for Cinder use
+OTCI_LVM_DEVICE=sda
+
+# URL of the Debian repo to use to create the Debian
+# openstack VM image (only useful if the above TEST_IMAGE_TYPE
+# is set to debian).
+DEBIAN_REPO_PARAM=" -u http://http.debian.net/debian -s http://http.debian.net/debian"
+
 for i in $@ ; do
 	case "${1}" in
-	"--lvmtype")
+	"--otci-lvmtype")
 		if [ -z "${2}" ] ; then echo "Parameter for option --lvmtype is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
 		LVMTYPE="${2}"
+		shift
+		shift
+		;;
+	"--otci-lvm-device")
+		if [ -z "${2}" ] ; then echo "Parameter for option --lvmtype is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		OTCI_LVM_DEVICE="${2}"
+		shift
+		shift
+		;;
+	"--otci-openstack-debian-images-deb-repo")
+		if [ -z "${2}" ] ; then echo "Parameter for option --otci-openstack-debian-images-deb-repo is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		DEBIAN_REPO_PARAM=" -u ${2} -s ${2}"
 		shift
 		shift
 		;;
@@ -34,9 +54,9 @@ for i in $@ ; do
 		;;
 done
 
-if [ -n "${1}" ] ; then
-	DEBIAN_REPO_PARAM=" -u ${1} -s ${1}"
-	shift
+if [ ${DO_EXIT} = "yes" ] ; then
+	echo "Parameters not validated: will exit now!" > /dev/stderr
+	exit 1
 fi
 
 ####################
