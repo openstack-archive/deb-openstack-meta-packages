@@ -17,6 +17,23 @@ else
 	IMAGE_PASS="cubswin:)"
 fi
 
+# Default value for parameters:
+
+# Possible values: loopback, presetup
+LVMTYPE=loopback
+
+for i in $@ ; do
+	case "${1}" in
+	"--lvmtype")
+		if [ -z "${2}" ] ; then echo "Parameter for option --lvmtype is missing" > /dev/stderr ; DO_EXIT="yes" ; fi
+		LVMTYPE="${2}"
+		shift
+		shift
+		;;
+	*)
+		;;
+done
+
 if [ -n "${1}" ] ; then
 	DEBIAN_REPO_PARAM=" -u ${1} -s ${1}"
 	shift
@@ -292,6 +309,8 @@ create_non_admin_keystone_user
 build_and_upload_image
 fix_tempest_config
 gen_ssh_root_key
-setup_loopback_based_lvm_vg
+if [ "${LVMTYPE}" = "loopback" ] ; then
+	setup_loopback_based_lvm_vg
+fi
 setup_loopback_based_swift
 install_cinder

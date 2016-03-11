@@ -192,7 +192,16 @@ otci_install_openstack_deploy () {
 	echo "===> Running openstack-deploy-proxy-network"
 	otci_remote "sudo openstack-deploy-proxy-network --mgmt-ip-cidr ${OTCI_ETH1_CIDR} --mgmt-if eth1 --ext-host-min ${OTCI_PUBIP_START} --ext-host-max ${OTCI_PUBIP_END} --local-ip ${OTCI_LOCAL_IP}"
 	echo "===> Deploying tempest"
-	otci_remote "sudo openstack-deploy-tempest ${OTCI_DEBIAN_REPO_URL}"
+	if ! [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
+		LVMTYPE=presetup
+	else
+		LVMTYPE=loopback
+	fi
+	otci_remote "sudo openstack-deploy-tempest --lvmtype presetup ${OTCI_DEBIAN_REPO_URL}"
+}
+
+otci_add_ovs_ip () {
+	otci_remote "ifconfig eth1:0 ${OTCI_LOCAL_IP} netmask 255.255.255.0 up"
 }
 
 otci_run_tempest () {
@@ -204,6 +213,8 @@ otci_wait_for_ssh
 otci_aptget_update
 if ! [ "${OTCI_VIRT_MODE}" = "ipmi" ] ; then
 	otci_add_source_list
+else
+	otci_add_ovs_ip
 fi
 otci_install_openstack_deploy
 otci_run_tempest
