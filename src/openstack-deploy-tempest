@@ -277,7 +277,7 @@ setup_loopback_based_swift () {
 
 		# Create the partition and the FS
 		parted /dev/${OTCI_LVM_DEVICE} mkpart primary xfs -a optimal 48G 96G
-		mkfs.xfs /dev/${OTCI_LVM_DEVICE}2
+		mkfs.xfs /dev/${OTCI_LVM_DEVICE}2 -f
 
 		# Mount it
 		mkdir /mnt/sdb1
