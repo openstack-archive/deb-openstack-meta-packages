@@ -258,11 +258,11 @@ setup_real_hdd_based_lvm_vg () {
 
 setup_loopback_based_swift () {
 	### NOTE: this comes from http://docs.openstack.org/developer/swift/development_saio.html ###
-
+	echo "===> Installing Swift and xfsprogs"
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer xfsprogs
 
-	set -x
 	if [ "${LVMTYPE}" = "loopback" ] ; then
+		echo "===> Creating swift HDDs using a 20 GB loopback file at /srv/swift-disk"
 		# Create the loopback device
 		mkdir -p /srv
 		qemu-img create /srv/swift-disk 20G
@@ -273,6 +273,7 @@ setup_loopback_based_swift () {
 		echo "/srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >>/etc/fstab
 		mount /mnt/sdb1
 	elif [ "${LVMTYPE}" = "resetup" ] ; then
+		echo "===> Creating swift HDDs using a 48GB file on /dev/${OTCI_LVM_DEVICE}2"
 		mkdir -p /srv
 
 		# Create the partition and the FS
@@ -286,6 +287,7 @@ setup_loopback_based_swift () {
 		mount /mnt/sdb1
 	fi
 
+	echo "===> Configuring Swift & rsync"
 	# Setup swift disks
 	mkdir /mnt/sdb1/1 /mnt/sdb1/2 /mnt/sdb1/3 /mnt/sdb1/4
 	chown swift:swift /mnt/sdb1/*
@@ -328,6 +330,7 @@ setup_loopback_based_swift () {
 	for i in `ls /etc/init.d/swift-*` ; do $i stop ; done
 	for i in `ls /etc/init.d/swift-*` ; do $i start ; done
 
+	echo "===> Creating swift endpoints in Keystone catalog"
 	# Setup the endpoint
 	openstack --os-identity-api-version=3 service create --description "OpenStack Object Storage" --name swift object-store
 	openstack --os-identity-api-version=3 endpoint create --region regionOne swift public http://${DEFROUTE_IP}:8080/v1/AUTH_%\(tenant_id\)s
