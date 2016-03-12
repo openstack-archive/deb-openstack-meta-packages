@@ -250,7 +250,7 @@ setup_real_hdd_based_lvm_vg () {
 	parted /dev/${OTCI_LVM_DEVICE} mklabel msdos -s
 	parted /dev/${OTCI_LVM_DEVICE} mkpart primary ext4 -a optimal 2048 48G
 	parted /dev/${OTCI_LVM_DEVICE} set 1 lvm on
-	pvcreate /dev/${OTCI_LVM_DEVICE}1
+	pvcreate /dev/${OTCI_LVM_DEVICE}1 -ff -y
 	vgcreate pkgosvg0 /dev/${OTCI_LVM_DEVICE}1
 	vgchange -a y pkgosvg0
 	echo "Done!"
