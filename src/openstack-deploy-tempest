@@ -261,6 +261,7 @@ setup_loopback_based_swift () {
 
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install swift swift-proxy swift-account swift-container swift-object swift-object-expirer xfsprogs
 
+	set -x
 	if [ "${LVMTYPE}" = "loopback" ] ; then
 		# Create the loopback device
 		mkdir -p /srv
