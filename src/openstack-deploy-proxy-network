@@ -220,6 +220,16 @@ fix_spice_base_url () {
 	pkgos_inifile set /etc/nova/nova.conf spice html5proxy_base_url http://${DEFROUTE_IP}:6082/spice_auto.html
 }
 
+setup_novaapi_db () {
+	echo "===> Setting-up nova-api db"
+	GENERATED_PASSWORD=$(dd if=/dev/random bs=64 count=1 2>|/dev/null | md5sum | awk '{print $1}')
+	mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE novaapi"
+	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT ALL PRIVILEGES ON novaapi.* TO 'novaapi'@'localhost' IDENTIFIED BY '${GENERATED_PASSWORD}'"
+	mysql --defaults-file=/etc/mysql/debian.cnf -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY '${GENERATED_PASSWORD}'"
+	pkgos_inifile set /etc/nova/nova.conf api_database connection mysql+pymysql://novaapi:${GENERATED_PASSWORD}@localhost/novaapi
+	su nova -c "nova-manage api_db sync"
+}
+
 restart_all_nova_and_neutron_daemons () {
 	for i in /etc/init.d/nova* ; do $i stop ; done
 	for i in /etc/init.d/nova* ; do $i start ; done
@@ -234,6 +244,7 @@ nova_and_neutron_fixups () {
 	#fix_nova_and_neutron_admin_pass
 	misc_system_fix
 	fix_spice_base_url
+	setup_novaapi_db
 	restart_all_nova_and_neutron_daemons
 }
 
