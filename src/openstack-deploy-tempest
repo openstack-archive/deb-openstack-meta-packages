@@ -354,6 +354,15 @@ install_cinder () {
 	#pkgos_inifile set /etc/cinder/cinder.conf backup_swift_key admin
 }
 
+restart_swift_again () {
+	echo "===> Stopping swift..."
+	for i in /etc/init.d/swift* ; do $i stop ; done
+	echo "===> Waiting 5 seconds..."
+	sleep 5
+	echo "===> Starting swift..."
+	for i in /etc/init.d/swift* ; do $i stop ; done
+}
+
 deploy_tempest_install_pkgs
 create_non_admin_keystone_user
 build_and_upload_image
@@ -366,3 +375,4 @@ elif [ "${LVMTYPE}" = "resetup" ] ; then
 fi
 setup_loopback_based_swift
 install_cinder
+restart_swift_again
