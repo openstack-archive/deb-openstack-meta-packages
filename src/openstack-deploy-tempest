@@ -360,7 +360,7 @@ restart_swift_again () {
 	echo "===> Waiting 5 seconds..."
 	sleep 5
 	echo "===> Starting swift..."
-	for i in /etc/init.d/swift* ; do $i stop ; done
+	for i in /etc/init.d/swift* ; do $i start ; done
 }
 
 deploy_tempest_install_pkgs
