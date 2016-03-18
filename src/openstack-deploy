@@ -332,9 +332,6 @@ osinstall_fix_master_node_setup () {
 	sed -i 's|TFTP_ADDRESS="0.0.0.0:69"|TFTP_ADDRESS="10.20.0.2:69"|' /etc/default/tftpd-hpa
 	service tftpd-hpa restart
 	# Fixup cobbler and dnsmasq
-	echo "===> Do cobbler sync and restart dnsmasq"
-	cobbler sync
-	service dnsmasq restart
 
 	# Download the Trusty kernel and initrd
 	wget http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/linux -O /var/lib/nailgun/www/vmlinux-trusty-amd64
@@ -358,11 +355,29 @@ osinstall_fix_master_node_setup () {
 
 	# Hack to remove the udev rules installed by fuel-agent. This is to be removed and
 	# fixed properly.
-#	rm 
+	rm /lib/udev/rules.d/80-net-name-slot.rules
 
 	# Some convenience for the root shell
 	echo ". /root/openrc.sh" >>/root/.bashrc
 	echo 'alias fuel="fuel --user $OS_USERNAME --password $OS_PASSWORD"' >>/root/.bashrc
+
+	# Configure the rsync server to serve /etc/puppet
+	echo "[puppet]
+path		= /etc/puppet
+read only	= true
+uid		= 0
+gid		= 0
+use chroot	= 0
+" >/etc/rsyncd.conf
+	sed -i 's/^[ \t#]*RSYNC_ENABLE[ \t]*=.*/RSYNC_ENABLE=true/' /etc/default/rsync
+	invoke-rc.d rsync start
+
+	mkdir -p /etc/puppet/liberty-9.0
+	ln -s /etc/puppet/modules /etc/puppet/liberty-9.0/modules
+
+	echo "===> Do cobbler sync and restart dnsmasq"
+	cobbler sync
+	service dnsmasq restart
 }
 
 osinstall_write_openrc () {
