@@ -374,6 +374,7 @@ use chroot	= 0
 
 	mkdir -p /etc/puppet/liberty-9.0
 	ln -s /etc/puppet/modules /etc/puppet/liberty-9.0/modules
+	ln -s /etc/puppet/manifests /etc/puppet/liberty-9.0/manifests
 
 	echo "===> Do cobbler sync and restart dnsmasq"
 	cobbler sync
