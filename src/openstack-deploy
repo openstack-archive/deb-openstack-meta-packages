@@ -214,6 +214,36 @@ osinstall_preseed_compute () {
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}
 }
 
+osinstall_preseed_more_services () {
+	OS_OTHER_PRESEED_PARAMS="${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} ${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN}"
+	OS_RABBIT_PRESEED_PARAMS="${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS}"
+	OS_ALL_PRESEED_PARAMS="${OS_OTHER_PRESEED_PARAMS} ${OS_RABBIT_PRESEED_PARAMS}"
+
+	osinstall_rcvalue RC_DESIGNATE_SQL_PASS "Designate MySQL password [generated-password]: " yes
+	os_preseed_designate ${RC_DESIGNATE_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_BARBICAN_SQL_PASS "Barbican MySQL password [generated-password]: " yes
+	os_preseed_barbican ${RC_BARBICAN_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_MANILA_SQL_PASS "Manila MySQL password [generated-password]: " yes
+	os_preseed_manila ${RC_MANILA_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_MISTRAL_SQL_PASS "Mistral MySQL password [generated-password]: " yes
+	os_preseed_mistral ${RC_MISTRAL_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_TROVE_SQL_PASS "Trove MySQL password [generated-password]: " yes
+	os_preseed_trove ${RC_TROVE_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	# Note: Congress doesn't use Rabbit (yet?)
+	osinstall_rcvalue RC_CONGRESS_SQL_PASS "Congress MySQL password [generated-password]: " yes
+	os_preseed_congress ${RC_CONGRESS_SQL_PASS} ${OS_OTHER_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_SAHARA_SQL_PASS "Sahara MySQL password [generated-password]: " yes
+	os_preseed_sahara ${RC_SAHARA_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+
+	osinstall_rcvalue RC_MURANO_SQL_PASS "Murano MySQL password [generated-password]: " yes
+	os_preseed_murano ${RC_MURANO_SQL_PASS} ${OS_ALL_PRESEED_PARAMS}
+}
 
 osinstall_build_fuel_bootstrap_iso () {
 	osinstall_install_if_not_installed fuel-bootstrap-iso
@@ -449,6 +479,18 @@ case "${1}" in
 	osinstall_preseed_all
 	DEBIAN_FRONTEND=noninteractive ${APTGET} install openstack-toaster
 	osinstall_write_openrc
+	# Install all the rest of the services not tested by Tempest,
+	# but which we still want to test installation with.
+	osinstall_preseed_more_services
+	DEBIAN_FRONTEND=noninteractive ${APTGET} install \
+		designate \
+		barbican-api barbican-worker \
+		manila-api manila-scheduler manila-share \
+		mistral-engine mistral-executor mistral-api \
+		trove-api trove-taskmanager trove-conductor \
+		congress-server \
+		sahara-api sahara-engine \
+		murano-api murano-engine
 ;;
 *)
 	usage

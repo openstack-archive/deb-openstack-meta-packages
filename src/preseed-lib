@@ -432,7 +432,7 @@ os_preseed_aodh () {
 	RBT_HOST=${8}
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
-	os_preseed_set_dbconfig_conf aodh-common aodh ${HEAT_SQL_PASS} aodhdb aodh ${MYSQL_PASSWORD} ${MYSQL_HOST}
+	os_preseed_set_dbconfig_conf aodh-common aodh ${AODH_SQL_PASS} aodhdb aodh ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint aodh-api aodh ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken aodh-common aodh ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds aodh-common aodh ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
@@ -444,4 +444,65 @@ openstack-dashboard-apache horizon/activate_vhost seen true
 openstack-dashboard-apache horizon/use_ssl boolean true
 openstack-dashboard-apache horizon/use_ssl seen true
 " | debconf-set-selections
+}
+
+os_preseed_standard () {
+	local APP_NAME APP_NAME APP_SQL_PASS MYSQL_PASSWORD MYSQL_HOST KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
+	APP_NAME=${1}
+	APP_SQL_PASS=${2}
+	MYSQL_PASSWORD=${3}
+	MYSQL_HOST=${4}
+	KEYSTONE_ENDPOINT_IP=${5}
+	KEYSTONE_REGION=${6}
+	KEYSTONE_ADMIN_PASS=${7}
+	KEYSTONE_AUTH_TOKEN=${8}
+	RBT_HOST=${9}
+	RBT_LOGIN=${10}
+	RBT_PASS=${11}
+	os_preseed_set_dbconfig_conf ${APP_NAME}-common ${APP_NAME} ${APP_SQL_PASS} ${APP_NAME}db ${APP_NAME} ${MYSQL_PASSWORD} ${MYSQL_HOST}
+	os_preseed_endpoint ${APP_NAME}-api ${APP_NAME} ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
+	os_preseed_keystone_autotoken ${APP_NAME}-common ${APP_NAME} ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
+	os_preseed_rabbit_creds ${APP_NAME}-common ${APP_NAME} ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
+}
+
+os_preseed_designate () {
+	os_preseed_standard designate $@
+}
+
+os_preseed_barbican () {
+	os_preseed_standard barbican $@
+}
+
+os_preseed_manila () {
+	os_preseed_standard manila $@
+}
+
+os_preseed_mistral () {
+	os_preseed_standard mistral $@
+}
+
+os_preseed_trove () {
+	os_preseed_standard trove $@
+}
+
+os_preseed_sahara () {
+	os_preseed_standard sahara $@
+}
+
+os_preseed_murano () {
+	os_preseed_standard murano $@
+}
+
+os_preseed_congress () {
+	local CONGRESS_SQL_PASS MYSQL_PASSWORD MYSQL_HOST KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN
+	CONGRESS_SQL_PASS=${1}
+	MYSQL_PASSWORD=${2}
+	MYSQL_HOST=${3}
+	KEYSTONE_ENDPOINT_IP=${4}
+	KEYSTONE_REGION=${5}
+	KEYSTONE_ADMIN_PASS=${6}
+	KEYSTONE_AUTH_TOKEN=${7}
+	os_preseed_set_dbconfig_conf congress-server congress ${CONGRESS_SQL_PASS} congressdb congress ${MYSQL_PASSWORD} ${MYSQL_HOST}
+	os_preseed_endpoint congress-server congress ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
+	os_preseed_keystone_autotoken congress-common congress ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 }

@@ -8,6 +8,8 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
     code in Nova.
   * Added 14 new python-*client in the openstack-clients metapackage.
   * Added support for IPMI Debian Live provisionning of Tempest CI.
+  * Added the automatic installation of: designate, barbican, manila,
+    mistral, trove, congress, sahara, murano.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
