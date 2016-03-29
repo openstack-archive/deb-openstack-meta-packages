@@ -127,6 +127,12 @@ os_preseed_endpoint () {
 ${PKG_NAME} ${TMPL_NAME}/register-endpoint seen true
 ${PKG_NAME} ${TMPL_NAME}/keystone-ip string ${KEYSTONE_ENDPOINT_IP}
 ${PKG_NAME} ${TMPL_NAME}/keystone-ip seen true
+${PKG_NAME} ${TMPL_NAME}/keystone-admin-name string admin
+${PKG_NAME} ${TMPL_NAME}/keystone-admin-name seen true
+${PKG_NAME} ${TMPL_NAME}/keystone-project-name string admin
+${PKG_NAME} ${TMPL_NAME}/keystone-project-name seen true
+${PKG_NAME} ${TMPL_NAME}/keystone-admin-password string ${KEYSTONE_AUTH_TOKEN}
+${PKG_NAME} ${TMPL_NAME}/keystone-admin-password seen true
 ${PKG_NAME} ${TMPL_NAME}/keystone-auth-token password ${KEYSTONE_AUTH_TOKEN}
 ${PKG_NAME} ${TMPL_NAME}/keystone-auth-token seen true
 ${PKG_NAME} ${TMPL_NAME}/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
