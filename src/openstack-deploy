@@ -181,7 +181,8 @@ osinstall_preseed_all () {
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS} ${RC_METADATA_SHARED_SECRET} http://127.0.0.1:8774/v2 ${ADMIN_TENANT_ID}
 	osinstall_rcvalue RC_NOVA_SQL_PASS "Nova MySQL password [generated-password]: " yes
-	os_preseed_nova ${RC_NOVA_SQL_PASS} ${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} \
+	osinstall_rcvalue RC_NOVAAPI_SQL_PASS "Nova API MySQL password [generated-password]: " yes
+	os_preseed_nova ${RC_NOVA_SQL_PASS} ${RC_NOVAAPI_SQL_PASS} ${RC_MYSQL_PASSWORD} ${RC_MYSQL_SERVER_HOSTNAME} \
 		${RC_KEYSTONE_ENDPOINT_IP} ${RC_KEYSTONE_REGION} ${RC_KEYSTONE_ADMINPASS} ${RC_KEYSTONE_AUTHTOKEN} \
 		${RC_RABIT_HOST} ${RC_RABIT_USER} ${RC_RABIT_PASS} ${RC_METADATA_SHARED_SECRET}
 	osinstall_rcvalue RC_CINDER_SQL_PASS "Cinder MySQL password [generated-password]: " yes
@@ -481,16 +482,16 @@ case "${1}" in
 	osinstall_write_openrc
 	# Install all the rest of the services not tested by Tempest,
 	# but which we still want to test installation with.
-	osinstall_preseed_more_services
-	DEBIAN_FRONTEND=noninteractive ${APTGET} install \
-		designate \
-		barbican-api barbican-worker \
-		manila-api manila-scheduler manila-share \
-		mistral-engine mistral-executor mistral-api \
-		trove-api trove-taskmanager trove-conductor \
-		congress-server \
-		sahara-api sahara-engine \
-		murano-api murano-engine
+#	osinstall_preseed_more_services
+#	DEBIAN_FRONTEND=noninteractive ${APTGET} install \
+#		designate \
+#		barbican-api barbican-worker \
+#		manila-api manila-scheduler manila-share \
+#		mistral-engine mistral-executor mistral-api \
+#		trove-api trove-taskmanager trove-conductor \
+#		congress-server \
+#		sahara-api sahara-engine \
+#		murano-api murano-engine
 ;;
 *)
 	usage

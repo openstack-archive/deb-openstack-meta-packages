@@ -244,7 +244,7 @@ nova_and_neutron_fixups () {
 	#fix_nova_and_neutron_admin_pass
 	misc_system_fix
 	fix_spice_base_url
-	setup_novaapi_db
+#	setup_novaapi_db
 	restart_all_nova_and_neutron_daemons
 }
 

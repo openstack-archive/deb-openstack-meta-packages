@@ -286,18 +286,19 @@ glance-common glance/paste-flavor seen true
 }
 
 os_preseed_nova () {
-	local NOVA_SQL_PASS MYSQL_PASSWORD MYSQL_HOST KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
+	local NOVA_SQL_PASS NOVA_API_SQL_PASS MYSQL_PASSWORD MYSQL_HOST KEYSTONE_ENDPOINT_IP KEYSTONE_REGION KEYSTONE_ADMIN_PASS KEYSTONE_AUTH_TOKEN RBT_HOST RBT_LOGIN RBT_PASS
 	NOVA_SQL_PASS=${1}
-	MYSQL_PASSWORD=${2}
-	MYSQL_HOST=${3}
-	KEYSTONE_ENDPOINT_IP=${4}
-	KEYSTONE_REGION=${5}
-	KEYSTONE_ADMIN_PASS=${6}
-	KEYSTONE_AUTH_TOKEN=${7}
-	RBT_HOST=${8}
-	RBT_LOGIN=${9}
-	RBT_PASS=${10}
-	METADATA_SHARED_SECRET=${11}
+	NOVA_API_SQL_PASS=${2}
+	MYSQL_PASSWORD=${3}
+	MYSQL_HOST=${4}
+	KEYSTONE_ENDPOINT_IP=${5}
+	KEYSTONE_REGION=${6}
+	KEYSTONE_ADMIN_PASS=${7}
+	KEYSTONE_AUTH_TOKEN=${8}
+	RBT_HOST=${9}
+	RBT_LOGIN=${10}
+	RBT_PASS=${11}
+	METADATA_SHARED_SECRET=${12}
 	        echo "nova-common nova/active-api multiselect osapi_compute, metadata
 nova-common nova/active-api seen true
 nova-consoleproxy nova-consoleproxy/daemon_type select spicehtml5
@@ -314,6 +315,7 @@ nova-common nova/metadata_secret password ${METADATA_SHARED_SECRET}
 nova-common nova/metadata_secret seen true
 " | debconf-set-selections
 	os_preseed_set_dbconfig_conf nova-common nova ${NOVA_SQL_PASS} novadb nova ${MYSQL_PASSWORD} ${MYSQL_HOST}
+	os_preseed_set_dbconfig_conf nova-api novaapi ${NOVA_API_SQL_PASS} novaapidb novaapi ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint nova-api nova ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken nova-common nova ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds nova-common nova ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}

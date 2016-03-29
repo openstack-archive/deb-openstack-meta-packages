@@ -10,6 +10,7 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Added support for IPMI Debian Live provisionning of Tempest CI.
   * Added the automatic installation of: designate, barbican, manila,
     mistral, trove, congress, sahara, murano.
+  * Also handling novaapi db.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
