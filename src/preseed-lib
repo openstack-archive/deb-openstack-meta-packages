@@ -96,9 +96,9 @@ dbc_authmethod_user=''
 ## end postgresql specific settings
 ##
 " >/etc/dbconfig-common/${PKG_NAME}.conf
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "${PKG_NAME} ${TMPL_NAME}/configure_db boolean true
 ${PKG_NAME} ${TMPL_NAME}/configure_db seen true
-
 ${PKG_NAME} dbconfig-common/dbconfig-install boolean true
 ${PKG_NAME} dbconfig-common/dbconfig-install seen true
 ${PKG_NAME} dbconfig-common/dbconfig-reinstall boolean true
@@ -113,7 +113,9 @@ ${PKG_NAME} ${PKG_NAME}/mysql/admin-pass string ${MYSQL_PASSWORD}
 ${PKG_NAME} ${PKG_NAME}/mysql/admin-pass seen true
 ${PKG_NAME} ${TMPL_NAME}/configure_db boolean true
 ${PKG_NAME} ${TMPL_NAME}/configure_db seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
 }
 
 os_preseed_endpoint () {
@@ -123,6 +125,8 @@ os_preseed_endpoint () {
 	KEYSTONE_ENDPOINT_IP=${3}
 	KEYSTONE_REGION=${4}
 	KEYSTONE_AUTH_TOKEN=${5}
+
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "${PKG_NAME} ${TMPL_NAME}/register-endpoint boolean true
 ${PKG_NAME} ${TMPL_NAME}/register-endpoint seen true
 ${PKG_NAME} ${TMPL_NAME}/keystone-ip string ${KEYSTONE_ENDPOINT_IP}
@@ -139,7 +143,9 @@ ${PKG_NAME} ${TMPL_NAME}/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
 ${PKG_NAME} ${TMPL_NAME}/endpoint-ip seen true
 ${PKG_NAME} ${TMPL_NAME}/region-name string ${KEYSTONE_REGION}
 ${PKG_NAME} ${TMPL_NAME}/region-name seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
 }
 
 os_preseed_keystone_autotoken () {
@@ -150,6 +156,8 @@ os_preseed_keystone_autotoken () {
 	AUTH_TENANT_NAME=${4}
 	AUTH_USERNAME=${5}
 	AUTH_PASS=${6}
+	
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "${PKG_NAME} ${TMPL_NAME}/auth-host string ${AUTH_HOST}
 ${PKG_NAME} ${TMPL_NAME}/auth-host seen true
 ${PKG_NAME} ${TMPL_NAME}/admin-tenant-name string ${AUTH_TENANT_NAME}
@@ -158,7 +166,9 @@ ${PKG_NAME} ${TMPL_NAME}/admin-user string ${AUTH_USERNAME}
 ${PKG_NAME} ${TMPL_NAME}/admin-user seen true
 ${PKG_NAME} ${TMPL_NAME}/admin-password password ${AUTH_PASS}
 ${PKG_NAME} ${TMPL_NAME}/admin-password seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
 }
 
 os_preseed_rabbit_creds () {
@@ -168,13 +178,17 @@ os_preseed_rabbit_creds () {
 	RBT_HOST=${3}
 	RBT_LOGIN=${4}
 	RBT_PASS=${5}
+
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "${PKG_NAME} ${TMPL_NAME}/rabbit_host string ${RBT_HOST}
 ${PKG_NAME} ${TMPL_NAME}/rabbit_host seen true
 ${PKG_NAME} ${TMPL_NAME}/rabbit_userid string ${RBT_LOGIN}
 ${PKG_NAME} ${TMPL_NAME}/rabbit_userid seen true
 ${PKG_NAME} ${TMPL_NAME}/rabbit_password password ${RBT_PASS}
 ${PKG_NAME} ${TMPL_NAME}/rabbit_password seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
 }
 
 os_pressed_debconf_and_dbconfig_common () {
@@ -241,6 +255,8 @@ os_install_keystone () {
 	KEYSTONE_SQL_PASS=${5}
 	MYSQL_PASSWORD=${6}
 	MYSQL_HOST=${7}
+
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "keystone keystone/configure_db boolean true
 keystone keystone/configure_db seen true
 keystone keystone/auth-token password ${KEYSTONE_AUTH_TOKEN}
@@ -265,7 +281,10 @@ keystone keystone/endpoint-ip string ${KEYSTONE_ENDPOINT_IP}
 keystone keystone/endpoint-ip seen true
 keystone keystone/region-name string ${KEYSTONE_REGION}
 keystone keystone/region-name seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
+
 	os_preseed_set_dbconfig_conf keystone keystone ${KEYSTONE_SQL_PASS} keystonedb keystone ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	DEBIAN_FRONTEND=noninteractive $APTGET install -y keystone
 }
@@ -282,6 +301,7 @@ os_preseed_glance () {
 	RBT_HOST=${8}
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
+
 	echo "glance-common glance/paste-flavor select keystone
 glance-common glance/paste-flavor seen true
 " | debconf-set-selections
@@ -305,7 +325,9 @@ os_preseed_nova () {
 	RBT_LOGIN=${10}
 	RBT_PASS=${11}
 	METADATA_SHARED_SECRET=${12}
-	        echo "nova-common nova/active-api multiselect osapi_compute, metadata
+
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
+	echo "nova-common nova/active-api multiselect osapi_compute, metadata
 nova-common nova/active-api seen true
 nova-consoleproxy nova-consoleproxy/daemon_type select spicehtml5
 nova-consoleproxy nova-consoleproxy/daemon_type seen true
@@ -319,7 +341,10 @@ nova-common nova/neutron_admin_password password ${KEYSTONE_ADMIN_PASS}
 nova-common nova/neutron_admin_password seen true
 nova-common nova/metadata_secret password ${METADATA_SHARED_SECRET}
 nova-common nova/metadata_secret seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
+
 	os_preseed_set_dbconfig_conf nova-common nova ${NOVA_SQL_PASS} novadb nova ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_set_dbconfig_conf nova-api novaapi ${NOVA_API_SQL_PASS} novaapidb novaapi ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint nova-api nova ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
@@ -350,6 +375,8 @@ os_preseed_neutron () {
 		NETWORK_TYPE="gre"
 		TUNNELING="False"
 	fi
+
+	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
 	echo "neutron-common neutron/tenant_network_type select ${NETWORK_TYPE}
 neutron-common neutron/tenant_network_type seen true
 neutron-common neutron/enable_tunneling select ${TUNNELING}
@@ -370,7 +397,10 @@ neutron-common neutron/nova_admin_username string admin
 neutron-common neutron/nova_admin_username seen true
 neutron-common neutron/nova_admin_password password ${KEYSTONE_ADMIN_PASS}
 neutron-common neutron/nova_admin_password seen true
-" | debconf-set-selections
+" >${TMPFILE}
+	debconf-set-selections ${TMPFILE}
+	rm ${TMPFILE}
+
 	os_preseed_set_dbconfig_conf neutron-common neutron ${NEUTRON_SQL_PASS} neutrondb neutron ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint neutron-server neutron ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken neutron-common neutron ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
@@ -390,6 +420,7 @@ os_preseed_cinder () {
 	RBT_HOST=${8}
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
+
 	os_preseed_set_dbconfig_conf cinder-common cinder ${CINDER_SQL_PASS} cinderdb cinder ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint cinder-api cinder ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken cinder-common cinder ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
@@ -405,6 +436,7 @@ os_preseed_ceilometer () {
 	RBT_HOST=${5}
 	RBT_LOGIN=${6}
 	RBT_PASS=${7}
+
 	os_preseed_endpoint ceilometer-api ceilometer ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken ceilometer-common ceilometer ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
 	os_preseed_rabbit_creds ceilometer-common ceilometer ${RBT_HOST} ${RBT_LOGIN} ${RBT_PASS}
@@ -422,6 +454,7 @@ os_preseed_heat () {
 	RBT_HOST=${8}
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
+
 	os_preseed_set_dbconfig_conf heat-common heat ${HEAT_SQL_PASS} heatdb heat ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint heat-api heat ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken heat-common heat ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
@@ -440,6 +473,7 @@ os_preseed_aodh () {
 	RBT_HOST=${8}
 	RBT_LOGIN=${9}
 	RBT_PASS=${10}
+
 	os_preseed_set_dbconfig_conf aodh-common aodh ${AODH_SQL_PASS} aodhdb aodh ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint aodh-api aodh ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken aodh-common aodh ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
@@ -467,6 +501,7 @@ os_preseed_standard () {
 	RBT_HOST=${9}
 	RBT_LOGIN=${10}
 	RBT_PASS=${11}
+
 	os_preseed_set_dbconfig_conf ${APP_NAME}-common ${APP_NAME} ${APP_SQL_PASS} ${APP_NAME}db ${APP_NAME} ${MYSQL_PASSWORD} ${MYSQL_HOST}
 	os_preseed_endpoint ${APP_NAME}-api ${APP_NAME} ${KEYSTONE_ENDPOINT_IP} ${KEYSTONE_REGION} ${KEYSTONE_AUTH_TOKEN}
 	os_preseed_keystone_autotoken ${APP_NAME}-common ${APP_NAME} ${KEYSTONE_ENDPOINT_IP} admin admin ${KEYSTONE_ADMIN_PASS}
