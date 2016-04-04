@@ -363,6 +363,97 @@ restart_swift_again () {
 	for i in /etc/init.d/swift* ; do $i start ; done
 }
 
+prepare_node_for_trove () {
+	openstack project create trove_for_trove_usage
+	openstack user create --password trove --project trove_for_trove_usage --email root@localhost --enable regular_trove_user
+	openstack user create --password trove --project trove_for_trove_usage --email root@localhost --enable admin_trove_user
+	openstack role add --user admin_trove_user --project trove_for_trove_usage admin
+
+	# TODO: fix this by packaging rabbitmqadmin within the rabbitmq-server package.
+	# This is already commited to git on Alioth, though a backport should be done.
+	echo "===> Downloading rabbitmqadmin to declare queues and exchanges"
+	wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_0/bin/rabbitmqadmin -O /usr/bin/rabbitmqadmin
+	chmod +x /usr/bin/rabbitmqadmin
+
+	# The management is needed for rabbitmqadmin to work
+	rabbitmq-plugins enable rabbitmq_management
+	# Restarting is necessary to enable plugins
+	invoke-rc.d rabbitmq-server restart
+	# Add a new user to the rabbitmq for trove to use
+	rabbitmqctl add_user trove trove
+	# Set it as admin
+	rabbitmqctl set_user_tags trove administrator
+	# Set permissions
+	rabbitmqadmin --username=trove --password=trove --host=localhost declare permission vhost=/ user=trove configure='.*' write='.*' read='.*'
+	# Declare the exchange
+	rabbitmqadmin --username=trove --password=trove --host=localhost declare exchange name=trove type=topic durable=true
+
+	echo "#!/bin/sh
+
+set -e
+set -x
+
+. /etc/pkgos/pkgos.conf
+. /root/osinstallrc
+
+APTGET=\"apt-get -o Dpkg::Options::=--force-confnew --force-yes -y\"
+
+cp /etc/apt/sources.list.d/openstack.list \${BODI_CHROOT_PATH}/etc/apt/sources.list.d
+echo \"#!/bin/sh
+exit 101
+\" >\${BODI_CHROOT_PATH}/usr/sbin/policy-rc.d
+chmod +x \${BODI_CHROOT_PATH}/usr/sbin/policy-rc.d
+
+chroot \${BODI_CHROOT_PATH} \${APTGET} update
+chroot \${BODI_CHROOT_PATH} \${APTGET} install \${TARGET_OPENSTACK_REL}-\${TARGET_DISTRO}-archive-keyring
+chroot \${BODI_CHROOT_PATH} \${APTGET} update
+
+echo \"\${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password password \${RC_MYSQL_PASSWORD}
+\${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password seen true
+\${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again password \${RC_MYSQL_PASSWORD}
+\${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password_again seen true
+\" >\${BODI_CHROOT_PATH}/root/mysql-password-preseed
+chroot \${BODI_CHROOT_PATH} debconf-set-selections /root/mysql-password-preseed
+rm \${BODI_CHROOT_PATH}/root/mysql-password-preseed
+
+DEBIAN_FRONTEND=noninteractive chroot \${BODI_CHROOT_PATH} \${APTGET} install -y trove-guestagent heat-cfntools mysql-server-5.5 percona-xtrabackup
+rm \${BODI_CHROOT_PATH}/usr/sbin/policy-rc.d
+mkdir -p \${BODI_CHROOT_PATH}/root/.ssh
+cp /root/.ssh/id_rsa.pub \${BODI_CHROOT_PATH}/root/.ssh/authorized_keys
+cp /root/.ssh/id_rsa.pub \${BODI_CHROOT_PATH}/root/.ssh/authorized_keys2
+
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_host \${RC_KEYSTONE_ENDPOINT_IP}
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_userid trove
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_password trove
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT swift_url http://\${RC_KEYSTONE_ENDPOINT_IP}:8080/v1/AUTH_
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT os_region_name regionOne
+pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT swift_service_type object-store
+" >/root/trove-hook
+	chmod +x /root/trove-hook
+	build-openstack-debian-image -r jessie --hook-script /root/trove-hook -p trovepass -u ${DEBIAN_REPO_PARAM} -s ${DEBIAN_REPO_PARAM}
+
+#trove-manage datastore_update mysql ""
+#trove-manage datastore_version_update mysql 5.5 mysql aefce61e-af5a-4139-8f38-e7a32207a329 mysql-server-5.5 1
+#trove-manage datastore_update mysql 5.5
+
+	glance --os-username admin_trove_user --os-password trove --os-project-name trove_for_trove_usage image-create --name trove-image --visibility public --container-format ovf --disk-format qcow2 --owner admin_trove_user --file debian-jessie-8.0.0-1-amd64.qcow2
+
+	echo "#cloud-config
+packages:
+- trove-guestagent
+- mysql-server-5.5
+
+# config file for trove guestagent
+write_files:
+- path: /etc/trove/trove-guestagent.conf
+  content: |
+rabbit_host = ${RC_KEYSTONE_ENDPOINT_IP}
+rabbit_password = trove
+rabbit_userid = trove
+
+" >/etc/trove/cloudinit/mysql.cloudinit
+}
+
 deploy_tempest_install_pkgs
 create_non_admin_keystone_user
 build_and_upload_image
@@ -376,3 +467,4 @@ fi
 setup_loopback_based_swift
 install_cinder
 restart_swift_again
+#prepare_node_for_trove

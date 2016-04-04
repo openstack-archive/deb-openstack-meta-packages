@@ -3,7 +3,7 @@
 set -e
 
 if [ -z "${APTGET}" ] ; then
-	APTGET="apt-get -o Dpkg::Options::=--force-confnew --force-yes -fuy"
+	APTGET="apt-get -o Dpkg::Options::=--force-confnew --force-yes -y"
 fi
 
 # Example: os_preseed_set_dbconfig_conf glance-common glance ${KEYSTONE_SQL_PASS} keystonedb keystone ${MYSQL_PASSWORD}
