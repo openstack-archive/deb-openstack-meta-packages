@@ -206,6 +206,7 @@ otci_add_ovs_ip () {
 }
 
 otci_run_tempest () {
+	echo "===> Running tempest"
 	otci_remote tempest
 }
 
