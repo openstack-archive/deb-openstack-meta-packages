@@ -11,6 +11,8 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Added the automatic installation of: designate, barbican, manila,
     mistral, trove, congress, sahara, murano.
   * Also handling novaapi db.
+  * Correctly use KEYSTONE_ADMIN_PASS and not AUTH_TOKEN anymore when
+    preseeding endpoints.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).

@@ -421,14 +421,15 @@ rm \${BODI_CHROOT_PATH}/usr/sbin/policy-rc.d
 mkdir -p \${BODI_CHROOT_PATH}/root/.ssh
 cp /root/.ssh/id_rsa.pub \${BODI_CHROOT_PATH}/root/.ssh/authorized_keys
 cp /root/.ssh/id_rsa.pub \${BODI_CHROOT_PATH}/root/.ssh/authorized_keys2
-
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_host \${RC_KEYSTONE_ENDPOINT_IP}
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_userid trove
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_password trove
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT swift_url http://\${RC_KEYSTONE_ENDPOINT_IP}:8080/v1/AUTH_
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT os_region_name regionOne
-pkgos-fix-config-default \${BODI_CHROOT_PATH}/etc/trove/trove-guestagent.conf DEFAULT swift_service_type object-store
 " >/root/trove-hook
+
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_host ${RC_KEYSTONE_ENDPOINT_IP}
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_userid trove
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf oslo_messaging_rabbit rabbit_password trove
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf DEFAULT swift_url http://${RC_KEYSTONE_ENDPOINT_IP}:8080/v1/AUTH_
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf DEFAULT os_region_name regionOne
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf DEFAULT swift_service_type object-store
+pkgos-fix-config-default /etc/trove/trove-guestagent.conf DEFAULT trove_auth_url http://${RC_KEYSTONE_ENDPOINT_IP}:5000/v2.0
 	chmod +x /root/trove-hook
 	build-openstack-debian-image -r jessie --hook-script /root/trove-hook -p trovepass -u ${DEBIAN_REPO_PARAM} -s ${DEBIAN_REPO_PARAM}
 
