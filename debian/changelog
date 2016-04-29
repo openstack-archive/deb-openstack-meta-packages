@@ -16,6 +16,8 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
+  * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
+    .test_get_crossdomain_policy
 
  -- Thomas Goirand <zigo@debian.org>  Fri, 29 Jan 2016 11:48:15 +0800
 

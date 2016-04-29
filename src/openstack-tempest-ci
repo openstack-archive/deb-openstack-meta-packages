@@ -50,7 +50,7 @@ otci_wait_until_active () {
 	CYCLES=0
 	OTCI_STATUS=BUILD
 	echo "===> Wait until status is active"
-	echo "Wating: "
+	echo "Waiting: "
 	while [ "${OTCI_STATUS}" != "ACTIVE" ] && [ ${COUNT} != 0 ] ; do
 		echo ${CYCLES}
 		OTCI_STATUS=`nova list | grep ${OTCI_VM_HOSTNAME} | awk '{print $6}'`
@@ -115,7 +115,7 @@ otci_wait_for_ssh () {
 	CYCLES=0
 	OTCI_CAN_SSH=no
 	echo "===> Wait until we can ssh"
-	echo "Wating: "
+	echo "Waiting: "
 	while [ "${OTCI_CAN_SSH}" != "yes" ] && [ ${COUNT} != 0 ] ; do
 		echo ${CYCLES}
 		if ssh -o "StrictHostKeyChecking no" root@${OTCI_FLOATING_IP_ADDR} 'echo -n ""' ; then
@@ -206,6 +206,7 @@ otci_add_ovs_ip () {
 }
 
 otci_run_tempest () {
+	echo "===> Running tempest"
 	otci_remote tempest
 }
 
