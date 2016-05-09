@@ -127,6 +127,7 @@ os_preseed_endpoint () {
 	OSPE_KEYSTONE_ADMIN_PASS=${5}
 
 	TMPFILE=$(mktemp -t openstack-preseed-lib.XXXXXX)
+	set -x
 	echo "${OSPE_PKG_NAME} ${OSPE_TMPL_NAME}/register-endpoint boolean true
 ${OSPE_PKG_NAME} ${OSPE_TMPL_NAME}/register-endpoint seen true
 ${OSPE_PKG_NAME} ${OSPE_TMPL_NAME}/keystone-ip string ${OSPE_KEYSTONE_ENDPOINT_IP}
@@ -143,6 +144,7 @@ ${OSPE_PKG_NAME} ${OSPE_TMPL_NAME}/region-name string ${OSPE_KEYSTONE_REGION}
 ${OSPE_PKG_NAME} ${OSPE_TMPL_NAME}/region-name seen true
 " >${TMPFILE}
 	debconf-set-selections ${TMPFILE}
+	set +x
 	rm ${TMPFILE}
 }
 
