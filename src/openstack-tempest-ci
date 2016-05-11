@@ -207,7 +207,7 @@ otci_add_ovs_ip () {
 
 otci_run_tempest () {
 	echo "===> Running tempest"
-	otci_remote tempest
+	otci_remote tempest_debian_shell_wrapper
 }
 
 otci_provision_new_vm
