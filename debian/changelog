@@ -13,6 +13,7 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Also handling novaapi db.
   * Correctly use KEYSTONE_ADMIN_PASS and not AUTH_TOKEN anymore when
     preseeding endpoints.
+  * DEBIAN_FRONTEND=noninteractive in osinstall_install_if_not_installed.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
