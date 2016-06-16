@@ -165,7 +165,11 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} identity uri http://${DEFROUTE_IP}:35357/v2.0
 	pkgos_inifile set ${TEMPEST_CONF} identity uri_v3 http://${DEFROUTE_IP}:35357/v3
 
+	# [application_catalog]
+	pkgos_inifile set ${TEMPEST_CONF} application_catalog region regionOne
+
 	# [auth]
+	pkgos_inifile set ${TEMPEST_CONF} auth admin_project_name admin
 	pkgos_inifile set ${TEMPEST_CONF} auth admin_password ${RC_KEYSTONE_ADMINPASS}
 
 	# [compute]
@@ -179,10 +183,6 @@ fix_tempest_config () {
 	pkgos_inifile set ${TEMPEST_CONF} validation image_ssh_password ${IMAGE_PASS}
 	pkgos_inifile set ${TEMPEST_CONF} validation network_for_ssh ext-net
 	pkgos_inifile set ${TEMPEST_CONF} compute fixed_network_name demo-net
-	# flavor 1 is too small for the 2GB default Jessie image
-	if [ "${TEST_IMAGE_TYPE}" = debian ] ; then
-		pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref 2
-	fi
 
 	pkgos_inifile set ${TEMPEST_CONF} compute-feature-enabled spice_console true
 	pkgos_inifile set ${TEMPEST_CONF} compute-feature-enabled allow_duplicate_networks true
@@ -363,6 +363,32 @@ restart_swift_again () {
 	for i in /etc/init.d/swift* ; do $i start ; done
 }
 
+# Param: $1 = name
+#        $2 = ram
+#        $3 = disk
+#        $4 = vcpus
+create_flavor_if_not_exists () {
+	RET=$(openstack flavor list --format=csv | q -d , -H 'SELECT ID FROM - WHERE `Name`="'${1}'"' 2>/dev/null)
+	if [ -z "${RET}" ] ; then
+		openstack flavor create --ram ${2} --disk ${3} --vcpus ${4} ${1}
+	RET=$(openstack flavor list --format=csv | q -d , -H 'SELECT ID FROM - WHERE `Name`="'${1}'"')
+	fi
+}
+
+set_nova_flavors () {
+	create_flavor_if_not_exists m1.tiny    512  1 1
+	M1_TINY_FLID=$RET
+	create_flavor_if_not_exists m1.small  2048 20 1
+	M1_SMALL_FLID=$RET
+	create_flavor_if_not_exists m1.medium 4096 40 2
+	M1_MEDIUM_FLID=$RET
+	create_flavor_if_not_exists m1.large  8192 80 4
+	M1_LARGE_FLID=$RET
+
+	pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref ${M1_TINY_FLID}
+	pkgos_inifile set ${TEMPEST_CONF} compute flavor_ref_alt ${M1_SMALL_FLID}
+}
+
 prepare_node_for_trove () {
 	openstack project create trove_for_trove_usage
 	openstack user create --password trove --project trove_for_trove_usage --email root@localhost --enable regular_trove_user
@@ -468,4 +494,5 @@ fi
 setup_loopback_based_swift
 install_cinder
 restart_swift_again
+set_nova_flavors
 #prepare_node_for_trove

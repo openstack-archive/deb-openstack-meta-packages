@@ -138,11 +138,21 @@ otci_scp () {
 }
 
 otci_aptget_update () {
+	# Do not use pdiffs, they are bad...
 	echo "Acquire::PDiffs \"false\";" >temp_file
 	otci_scp temp_file ""
 	otci_remote "sudo cp temp_file /etc/apt/apt.conf.d/98nopdiff"
 	rm temp_file
+	# Use the closest mirror, as defined in pkgos.conf
 	otci_remote "sudo sed -i 's#http://http.debian.net/debian#${OTCI_DEBIAN_REPO_URL}#' /etc/apt/sources.list"
+	# Add the current repos
+	otci_scp /etc/openstack-tempest-ci/openstack-ci.list ""
+	otci_remote "cp openstack-ci.list /etc/apt/sources.list.d/openstack.list"
+	# Add the key repo
+	gpg --export -a >repo-key.gpg
+	otci_scp repo-key.gpg ""
+	otci_remote "apt-key add repo-key.gpg"
+	# Finally update
 	otci_remote "sudo apt-get update"
 }
 

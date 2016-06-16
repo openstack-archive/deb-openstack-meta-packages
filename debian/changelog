@@ -17,13 +17,13 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Adds missing mkdir -p /etc/openstack-tempest-ci in the openstack-tempest-ci
     package.
   * Adds Depends: ipmitool for openstack-tempest-ci.
+  * Added some tweaks to make it work with Newton b1 as well (compatible with
+    Mitaka though...).
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
   * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
     .test_get_crossdomain_policy
-
-  [ Thomas Goirand ]
 
  -- Thomas Goirand <zigo@debian.org>  Thu, 16 Jun 2016 17:24:18 +0200
 
