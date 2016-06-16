@@ -2,8 +2,8 @@ Source: openstack-meta-packages
 Section: net
 Priority: extra
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
-Uploaders: Thomas Goirand <zigo@debian.org>
-Build-Depends: debhelper (>= 9)
+Uploaders: Thomas Goirand <zigo@debian.org>,
+Build-Depends: debhelper (>= 9),
 Standards-Version: 3.9.6
 Homepage: http://openstack.alioth.debian.org/
 Vcs-Browser: https://anonscm.debian.org/cgit/openstack/openstack-meta-packages.git/
@@ -19,8 +19,8 @@ Depends: python-aodhclient,
          python-designateclient,
          python-glanceclient,
          python-gnocchiclient,
-         python-ironicclient,
          python-heatclient,
+         python-ironicclient,
          python-keystoneclient,
          python-magnumclient,
          python-manilaclient,
@@ -34,7 +34,7 @@ Depends: python-aodhclient,
          python-swiftclient,
          python-troveclient,
          python-zaqarclient,
-         ${misc:Depends}
+         ${misc:Depends},
 Description: Metapackage to install all Openstack clients
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -52,8 +52,8 @@ Depends: dbconfig-common,
          mysql-server,
          ntp,
          rabbitmq-server,
-         ${misc:Depends}
-Recommends: memcached
+         ${misc:Depends},
+Recommends: memcached,
 Description: Metapackage to install all Openstack service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -65,8 +65,9 @@ Description: Metapackage to install all Openstack service dependencies
 
 Package: openstack-cloud-identity
 Architecture: all
-Pre-Depends: openstack-cloud-services
-Depends: keystone, ${misc:Depends}
+Pre-Depends: openstack-cloud-services,
+Depends: keystone,
+         ${misc:Depends},
 Description: Metapackage to install an Openstack keystone
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -78,7 +79,7 @@ Description: Metapackage to install an Openstack keystone
 
 Package: openstack-proxy-node
 Architecture: all
-Pre-Depends: openstack-cloud-identity
+Pre-Depends: openstack-cloud-identity,
 Depends: aodh-api,
          aodh-evaluator,
          aodh-notifier,
@@ -103,7 +104,7 @@ Depends: aodh-api,
          nova-scheduler,
          openstack-dashboard-apache,
          openstack-pkg-tools,
-         ${misc:Depends}
+         ${misc:Depends},
 Description: Metapackage to install an Openstack proxy node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -124,8 +125,8 @@ Depends: ceilometer-agent-compute,
          novnc,
          ntp,
          openstack-pkg-tools,
-         ${misc:Depends}
-Pre-Depends: mysql-client
+         ${misc:Depends},
+Pre-Depends: mysql-client,
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -137,8 +138,9 @@ Description: Metapackage to install an Openstack compute node
 
 Package: openstack-toaster
 Architecture: all
-Pre-Depends: openstack-compute-node, openstack-proxy-node
-Depends: ${misc:Depends}
+Pre-Depends: openstack-compute-node,
+             openstack-proxy-node,
+Depends: ${misc:Depends},
 Description: Metapackage to install all of Openstack services at once
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -150,7 +152,10 @@ Description: Metapackage to install all of Openstack services at once
 
 Package: openstack-deploy
 Architecture: all
-Depends: ipcalc, openstack-pkg-tools, python-keystoneclient, ${misc:Depends}
+Depends: ipcalc,
+         openstack-pkg-tools,
+         python-keystoneclient,
+         ${misc:Depends},
 Description: Tools to deploy OpenStack
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -162,7 +167,11 @@ Description: Tools to deploy OpenStack
 
 Package: openstack-tempest-ci
 Architecture: all
-Depends: nmap, openstack-clients, lsb-release, ${misc:Depends}
+Depends: ipmitool,
+         lsb-release,
+         nmap,
+         openstack-clients,
+         ${misc:Depends},
 Description: validate OpenStack Debian packages using tempest and openstack-deploy
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -189,7 +198,7 @@ Depends: cobbler,
          python-ipaddr,
          rabbitmq-server,
          rsync,
-         ${misc:Depends}
+         ${misc:Depends},
 Description: Metapackage to install all needed Fuel master node service dependencies
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public
@@ -214,19 +223,19 @@ Description: Metapackage to install all needed Fuel master node service dependen
 
 Package: fuel-master-node
 Architecture: all
-Pre-Depends: fuel-master-node-services
+Pre-Depends: fuel-master-node-services,
 Depends: astute,
          cobbler,
          fuel-agent,
          fuel-misc,
-         fuel-web-apache,
          fuel-ui,
+         fuel-web-apache,
          mcollective,
          nailgun-api,
          nailgun-assassin,
          nailgun-reciever,
          python-fuelclient,
-         ${misc:Depends}
+         ${misc:Depends},
 Description: Metapackage to install a Fuel master node server
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public

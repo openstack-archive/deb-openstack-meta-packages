@@ -16,6 +16,7 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * DEBIAN_FRONTEND=noninteractive in osinstall_install_if_not_installed.
   * Adds missing mkdir -p /etc/openstack-tempest-ci in the openstack-tempest-ci
     package.
+  * Adds Depends: ipmitool for openstack-tempest-ci.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
