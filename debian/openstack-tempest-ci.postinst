@@ -10,6 +10,7 @@ if [ "$1" = "configure" ] || [ "$1" = "reconfigure" ] ; then
 			TARGET_DISTRO=`lsb_release -c | awk '{print $2}'`
 			TARGET_OPENSTACK_REL=mitaka
 		fi
+		mkdir -p /etc/openstack-tempest-ci
 		echo "deb http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports main
 deb-src http://${TARGET_OPENSTACK_REL}-${TARGET_DISTRO}.pkgs.mirantis.com/debian ${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports main
 

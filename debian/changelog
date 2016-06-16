@@ -14,13 +14,17 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Correctly use KEYSTONE_ADMIN_PASS and not AUTH_TOKEN anymore when
     preseeding endpoints.
   * DEBIAN_FRONTEND=noninteractive in osinstall_install_if_not_installed.
+  * Adds missing mkdir -p /etc/openstack-tempest-ci in the openstack-tempest-ci
+    package.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
   * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
     .test_get_crossdomain_policy
 
- -- Thomas Goirand <zigo@debian.org>  Fri, 29 Jan 2016 11:48:15 +0800
+  [ Thomas Goirand ]
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 16 Jun 2016 17:24:18 +0200
 
 openstack-meta-packages (0.14) experimental; urgency=medium
 
