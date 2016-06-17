@@ -19,6 +19,7 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Adds Depends: ipmitool for openstack-tempest-ci.
   * Added some tweaks to make it work with Newton b1 as well (compatible with
     Mitaka though...).
+  * Added openstack-tempest-merge-repo.
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).

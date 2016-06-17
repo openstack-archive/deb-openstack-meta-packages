@@ -1,2 +1,3 @@
 src/openstack-tempest-ci			/usr/bin
 src/openstack-tempest-ci_mgmt-lan		/usr/bin
+src/openstack-tempest-merge-repo		/usr/bin

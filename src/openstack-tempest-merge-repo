@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+set -x
+
+if ! [ -r /etc/pkgos/pkgos.conf ] ; then
+	echo "Can't find /etc/pkgos/pkgos.conf: exiting"
+	exit 1
+fi
+. /etc/pkgos/pkgos.conf
+
+REPO_NAME=${TARGET_DISTRO}-${TARGET_OPENSTACK_REL}-backports-tested
+REPO_PATH=${REPO_ROOT}/debian/pool/${REPO_NAME}/main
+REPO_1=${REPO_ROOT}/debian/pool/${REPO_DEST}/main
+REPO_2=${REPO_ROOT}/debian/pool/${REPO_NOCHANGE_BACKPORT_DEST}/main
+
+rm -rf ${REPO_PATH}
+mkdir -p ${REPO_PATH}
+cp -auxf ${REPO_1}/* ${REPO_PATH}
+cp -auxf ${REPO_2}/* ${REPO_PATH}
+pkgos-scan-repo ${REPO_NAME}
