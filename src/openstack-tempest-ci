@@ -225,7 +225,7 @@ ______  _______ ______  _____ _______ __   _       ______ _     _        _______
 |_____/ |______ |_____] __|__ |     | |  \_|      |    \_ |_____| |_____ |______ /_____ .  
 "
 	echo "===> Merging repos"
-	otci_remote openstack-tempest-merge-repo
+	openstack-tempest-merge-repo
 }
 
 otci_provision_new_vm
