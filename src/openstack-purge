@@ -88,7 +88,7 @@ libxi6 libxml2 libxml2-dev libxml2-utils libxtst6 libyajl2 lsof mongodb-clients 
 open-iscsi poppler-data qemu-keymaps reiserfsprogs scrub seabios sgml-base sharutils strace tsconf ttf-dejavu-core vgabios \
 vlan x11-common xfsprogs xml-core zerofree
 
-apt-get -y purge mysql-server mysql-server-5.5 mysql-server-core-5.5 mysql-client-5.5 mysql-common libmysqlclient18 \
+apt-get -y purge mysql-server mysql-server-5.5 mysql-server-5.6 mysql-server-core-5.5 mysql-server-core-5.6 mysql-client-5.5 mysql-client-5.6 mysql-common libmysqlclient18 \
 	libaio1 libdbd-mysql-perl libdbi-perl libnet-daemon-perl psmisc
 
 apt-get -y --purge autoremove

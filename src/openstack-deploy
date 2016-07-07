@@ -37,6 +37,10 @@ osinstall_install_if_not_installed () {
 	fi
 }
 
+mysql_version () {
+	MYSQL_VERSION=$(apt-cache policy mysql-server  |grep Candidate |awk '{print $2}' | cut -c 1-3)
+}
+
 osinstall_rcvalue () {
 	local RC_VARNAME RC_VARCONTENT RC_MESSAGE RC_ISPASS RC_DEFAULT
 	RC_VARNAME=${1}
@@ -82,7 +86,7 @@ else
 fi
 
 osinstall_mysql_server () {
-	osinstall_rcvalue RC_MYSQL_SERVER_PKG_NAME "MySQL package name [mysql-server-5.5]: " no mysql-server-5.5
+	osinstall_rcvalue RC_MYSQL_SERVER_PKG_NAME "MySQL package name [mysql-server-${MYSQL_VERSION}]: " no mysql-server-${MYSQL_VERSION}
 	osinstall_rcvalue RC_MYSQL_PASSWORD "MySQL server password [generated-password]: " yes
 	if ! osinstall_check_installed ${RC_MYSQL_SERVER_PKG_NAME} ; then
 echo "${RC_MYSQL_SERVER_PKG_NAME} mysql-server/root_password password ${RC_MYSQL_PASSWORD}
@@ -122,6 +126,7 @@ osinstall_pgsql_server () {
 
 osinstall_install_services () {
 	os_pressed_misc
+	mysql_version
 	osinstall_mysql_server
 	osinstall_install_if_not_installed mongodb
 	osinstall_install_if_not_installed rabbitmq-server
