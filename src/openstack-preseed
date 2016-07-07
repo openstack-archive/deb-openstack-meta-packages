@@ -28,7 +28,7 @@ dbconfig-common dbconfig-common/remember-admin-pass boolean true
 fix_man_db () {
 	echo "man-db man-db/install-setuid seen true
 man-db man-db/install-setuid boolean false
-" | debconf-set-selections
+" | debconf-set-selections || true
 }
 
 fix_ca_certs () {
