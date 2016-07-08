@@ -26,6 +26,11 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
     .test_get_crossdomain_policy
 
+  [ gustavo panizzo ]
+  * openstack-deploy: Ignore errors preseeding man-db
+  * openstack-deply: Determine the MySQL server version automatically
+  * openstack-deploy: now it can be used in sid
+
  -- Thomas Goirand <zigo@debian.org>  Thu, 16 Jun 2016 17:24:18 +0200
 
 openstack-meta-packages (0.14) experimental; urgency=medium
