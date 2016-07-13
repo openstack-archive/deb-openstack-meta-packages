@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
 Uploaders: Thomas Goirand <zigo@debian.org>,
 Build-Depends: debhelper (>= 9),
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Homepage: http://openstack.alioth.debian.org/
 Vcs-Browser: https://anonscm.debian.org/cgit/openstack/openstack-meta-packages.git/
 Vcs-Git: https://anonscm.debian.org/git/openstack/openstack-meta-packages.git

@@ -31,6 +31,7 @@ openstack-meta-packages (0.14) unstable; urgency=medium
   * Fixed compute image_ssh_user.
   * Do not set public_router_id at all (this adds failures).
   * Added the setup of swift.
+  * Standards-Version is now 3.9.8 (no change).
 
   [ Ondřej Nový ]
   * Fixed VCS URLs (https).
