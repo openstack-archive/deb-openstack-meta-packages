@@ -1,4 +1,4 @@
-openstack-meta-packages (0.15) UNRELEASED; urgency=medium
+openstack-meta-packages (0.14) unstable; urgency=medium
 
   [ Thomas Goirand ]
   * Update to mitaka instead of liberty.
@@ -20,21 +20,6 @@ openstack-meta-packages (0.15) UNRELEASED; urgency=medium
   * Added some tweaks to make it work with Newton b1 as well (compatible with
     Mitaka though...).
   * Added openstack-tempest-merge-repo.
-
-  [ Ondřej Nový ]
-  * Fixed VCS URLs (https).
-  * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
-    .test_get_crossdomain_policy
-
-  [ gustavo panizzo ]
-  * openstack-deploy: Ignore errors preseeding man-db
-  * openstack-deply: Determine the MySQL server version automatically
-  * openstack-deploy: now it can be used in sid
-
- -- Thomas Goirand <zigo@debian.org>  Thu, 16 Jun 2016 17:24:18 +0200
-
-openstack-meta-packages (0.14) experimental; urgency=medium
-
   * Fixed --shared option when deploying proxy network.
   * Fixed ssh user for cirros in openstack-deploy-tempest.
   * Switched to using liberty instead of Kilo.
@@ -47,7 +32,17 @@ openstack-meta-packages (0.14) experimental; urgency=medium
   * Do not set public_router_id at all (this adds failures).
   * Added the setup of swift.
 
- -- Thomas Goirand <zigo@debian.org>  Sat, 16 May 2015 07:26:45 +0200
+  [ Ondřej Nový ]
+  * Fixed VCS URLs (https).
+  * Fixed tempest.api.object_storage.test_crossdomain.CrossdomainTest
+    .test_get_crossdomain_policy
+
+  [ gustavo panizzo ]
+  * openstack-deploy: Ignore errors preseeding man-db
+  * openstack-deply: Determine the MySQL server version automatically
+  * openstack-deploy: now it can be used in sid
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 13 Jul 2016 10:48:29 +0000
 
 openstack-meta-packages (0.13) unstable; urgency=medium
 
