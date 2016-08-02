@@ -28,7 +28,7 @@ dbconfig-common dbconfig-common/remember-admin-pass boolean true
 fix_man_db () {
 	echo "man-db man-db/install-setuid seen true
 man-db man-db/install-setuid boolean false
-" | debconf-set-selections
+" | debconf-set-selections || true
 }
 
 fix_ca_certs () {
@@ -37,11 +37,15 @@ ca-certificates ca-certificates/trust_new_crts select yes
 " | debconf-set-selections
 }
 
+mysql_version () {
+	MYSQL_VERSION=$(apt-cache policy mysql-server  |grep Candidate |awk '{print $2}' | cut -c 1-3)
+}
+
 install_mysql_server () {
-	echo "mysql-server-5.5 mysql-server/root_password password ${MYSQL_PASSWORD}
-mysql-server-5.5 mysql-server/root_password seen true
-mysql-server-5.5 mysql-server/root_password_again password ${MYSQL_PASSWORD}
-mysql-server-5.5 mysql-server/root_password_again seen true
+	echo "mysql-server-${MYSQL_VERSION} mysql-server/root_password password ${MYSQL_PASSWORD}
+mysql-server-${MYSQL_VERSION} mysql-server/root_password seen true
+mysql-server-${MYSQL_VERSION} mysql-server/root_password_again password ${MYSQL_PASSWORD}
+mysql-server-${MYSQL_VERSION} mysql-server/root_password_again seen true
 " | debconf-set-selections
 	$APTGET install -y mysql-server
 }
@@ -192,6 +196,7 @@ if [ "${INSTALL_TYPE}" = "compute-node" ] ; then
 	preseed_quantum ${INSTALL_TYPE}
 	preseed_nova
 else
+	mysql_version
 	install_mysql_server
 	$APTGET install -y openstack-cloud-services
 	install_keystone
