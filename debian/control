@@ -6,8 +6,8 @@ Uploaders: Thomas Goirand <zigo@debian.org>,
 Build-Depends: debhelper (>= 9),
 Standards-Version: 3.9.8
 Homepage: http://openstack.alioth.debian.org/
-Vcs-Browser: https://anonscm.debian.org/cgit/openstack/openstack-meta-packages.git/
-Vcs-Git: https://anonscm.debian.org/git/openstack/openstack-meta-packages.git
+Vcs-Browser: https://git.openstack.org/cgit/openstack/deb-openstack-meta-packages?h=debian%2Fnewton
+Vcs-Git: https://git.openstack.org/openstack/deb-openstack-meta-packages -b debian/newton
 
 Package: openstack-clients
 Architecture: all

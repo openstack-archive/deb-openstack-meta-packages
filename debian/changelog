@@ -1,3 +1,10 @@
+openstack-meta-packages (0.15) UNRELEASED; urgency=medium
+
+  * d/s/options: extend-diff-ignore of .gitreview
+  * d/control: Using OpenStack's Gerrit as VCS URLs.
+
+ -- Ondřej Nový <onovy@debian.org>  Mon, 26 Sep 2016 19:05:08 +0200
+
 openstack-meta-packages (0.14) unstable; urgency=medium
 
   [ Thomas Goirand ]
