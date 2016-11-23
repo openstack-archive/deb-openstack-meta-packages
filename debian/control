@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
 Uploaders: Thomas Goirand <zigo@debian.org>,
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 10),
 Standards-Version: 3.9.8
 Homepage: http://openstack.alioth.debian.org/
 Vcs-Browser: https://git.openstack.org/cgit/openstack/deb-openstack-meta-packages?h=debian%2Fnewton
