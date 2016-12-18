@@ -49,7 +49,7 @@ Package: openstack-cloud-services
 Architecture: all
 Depends: dbconfig-common,
          mongodb | mongodb-10gen-unstable | mongodb-nightly | mongodb-stable | mongodb-unstable | mongodb-10gen,
-         mysql-server,
+         default-mysql-server | mysql-server,
          ntp,
          rabbitmq-server,
          ${misc:Depends},
@@ -126,7 +126,7 @@ Depends: ceilometer-agent-compute,
          ntp,
          openstack-pkg-tools,
          ${misc:Depends},
-Pre-Depends: mysql-client,
+Pre-Depends: default-mysql-client | mysql-client,
 Description: Metapackage to install an Openstack compute node
  OpenStack is a reliable cloud infrastructure. Its mission is to produce
  the ubiquitous cloud computing platform that will meet the needs of public

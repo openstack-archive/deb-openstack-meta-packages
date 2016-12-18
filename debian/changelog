@@ -1,9 +1,13 @@
-openstack-meta-packages (0.15) UNRELEASED; urgency=medium
+openstack-meta-packages (0.15) unstable; urgency=medium
 
+  [ Ondřej Nový ]
   * d/s/options: extend-diff-ignore of .gitreview
   * d/control: Using OpenStack's Gerrit as VCS URLs.
 
- -- Ondřej Nový <onovy@debian.org>  Mon, 26 Sep 2016 19:05:08 +0200
+  [ Thomas Goirand ]
+  * Runtime depends on default-mysql-* (Closes: #848445, #848446).
+
+ -- Thomas Goirand <zigo@debian.org>  Sun, 18 Dec 2016 11:56:07 +0100
 
 openstack-meta-packages (0.14) unstable; urgency=medium
 
